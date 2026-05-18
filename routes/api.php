@@ -49,4 +49,18 @@ Route::prefix('v1')->group(function () {
     Route::get('/invoices/{id}', [App\Http\Controllers\Api\v1\InvoiceController::class, 'show']);
     Route::post('/invoices/{id}/pay', [App\Http\Controllers\Api\v1\InvoiceController::class, 'pay']);
     Route::get('/customers/{id}/due-invoices', [App\Http\Controllers\Api\v1\InvoiceController::class, 'customerDueInvoices']);
+
+    // Supplier routes
+    Route::get('/suppliers', [App\Http\Controllers\Api\v1\SupplierController::class, 'index']);
+    Route::post('/suppliers', [App\Http\Controllers\Api\v1\SupplierController::class, 'store']);
+    Route::get('/suppliers/{id}', [App\Http\Controllers\Api\v1\SupplierController::class, 'show']);
+    Route::put('/suppliers/{id}', [App\Http\Controllers\Api\v1\SupplierController::class, 'update']);
+    Route::delete('/suppliers/{id}', [App\Http\Controllers\Api\v1\SupplierController::class, 'destroy']);
+
+    // Purchase routes
+    Route::get('/purchases', [App\Http\Controllers\Api\v1\PurchaseController::class, 'index']);
+    Route::post('/purchases', [App\Http\Controllers\Api\v1\PurchaseController::class, 'store']);
+    Route::get('/purchases/{id}', [App\Http\Controllers\Api\v1\PurchaseController::class, 'show']);
+    Route::put('/purchases/{id}/status', [App\Http\Controllers\Api\v1\PurchaseController::class, 'updateStatus']);
+    Route::get('/purchases/low-stock-parts', [App\Http\Controllers\Api\v1\PurchaseController::class, 'lowStockParts']);
 });
