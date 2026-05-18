@@ -1,0 +1,8 @@
+{
+    "files.exclude": {
+        "composer.phar": true
+    },
+    "intelephense.files.exclude": [
+        "**/composer.phar"
+    ]
+}
