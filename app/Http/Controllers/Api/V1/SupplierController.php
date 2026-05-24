@@ -15,7 +15,7 @@ class SupplierController extends Controller
 {
     use ApiResponseTrait;
 
-    protected $supplierService;
+    protected SupplierService $supplierService;
 
     public function __construct(SupplierService $supplierService)
     {
@@ -24,12 +24,24 @@ class SupplierController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', \App\Models\Supplier::class);
+
         $suppliers = $this->supplierService->listSuppliers($request->all());
-        return $this->successResponse(SupplierResource::collection($suppliers), 'Suppliers retrieved successfully');
+        
+        $meta = [
+            'current_page' => $suppliers->currentPage(),
+            'per_page' => $suppliers->perPage(),
+            'total' => $suppliers->total(),
+            'last_page' => $suppliers->lastPage(),
+        ];
+        
+        return $this->successResponse(SupplierResource::collection($suppliers->items()), 'Suppliers retrieved successfully', 200, $meta);
     }
 
     public function store(CreateSupplierRequest $request): JsonResponse
     {
+        $this->authorize('create', \App\Models\Supplier::class);
+
         $supplier = $this->supplierService->createSupplier($request->validated());
         return $this->successResponse(new SupplierResource($supplier), 'Supplier created successfully', 201);
     }
@@ -42,15 +54,25 @@ class SupplierController extends Controller
             return $this->errorResponse('Supplier not found', 404);
         }
         
+        $this->authorize('view', $supplier);
+        
         return $this->successResponse(new SupplierResource($supplier), 'Supplier details retrieved successfully');
     }
 
     public function update(UpdateSupplierRequest $request, int $id): JsonResponse
     {
+        $supplier = $this->supplierService->getSupplier($id);
+        
+        if (!$supplier) {
+            return $this->errorResponse('Supplier not found', 404);
+        }
+
+        $this->authorize('update', $supplier);
+
         $updated = $this->supplierService->updateSupplier($id, $request->validated());
         
         if (!$updated) {
-            return $this->errorResponse('Supplier not found or update failed', 404);
+            return $this->errorResponse('Update failed', 400);
         }
         
         $supplier = $this->supplierService->getSupplier($id);
@@ -59,10 +81,18 @@ class SupplierController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
+        $supplier = $this->supplierService->getSupplier($id);
+        
+        if (!$supplier) {
+            return $this->errorResponse('Supplier not found', 404);
+        }
+
+        $this->authorize('delete', $supplier);
+
         $deleted = $this->supplierService->deleteSupplier($id);
         
         if (!$deleted) {
-            return $this->errorResponse('Supplier not found or delete failed', 404);
+            return $this->errorResponse('Delete failed', 400);
         }
         
         return $this->successResponse(null, 'Supplier deleted successfully');

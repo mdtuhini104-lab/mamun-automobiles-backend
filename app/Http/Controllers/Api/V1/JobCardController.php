@@ -26,6 +26,8 @@ class JobCardController extends Controller
      */
     public function store(CreateJobCardRequest $request): JsonResponse
     {
+        $this->authorize('create', \App\Models\JobCard::class);
+
         $jobCard = $this->jobCardService->createJobCard($request->validated());
         return $this->successResponse(new JobCardResource($jobCard), 'Job Card created successfully', 201);
     }
@@ -35,9 +37,19 @@ class JobCardController extends Controller
      */
     public function index(\Illuminate\Http\Request $request): JsonResponse
     {
-        $filters = $request->only(['status']);
+        $this->authorize('viewAny', \App\Models\JobCard::class);
+
+        $filters = $request->only(['status', 'customer_id', 'vehicle_id', 'search', 'page', 'per_page', 'sort_by', 'sort_order']);
         $jobCards = $this->jobCardService->listJobCards($filters);
-        return $this->successResponse(JobCardResource::collection($jobCards), 'Job Cards retrieved successfully');
+        
+        $meta = [
+            'current_page' => $jobCards->currentPage(),
+            'per_page' => $jobCards->perPage(),
+            'total' => $jobCards->total(),
+            'last_page' => $jobCards->lastPage(),
+        ];
+        
+        return $this->successResponse(JobCardResource::collection($jobCards->items()), 'Job Cards retrieved successfully', 200, $meta);
     }
 
     /**
@@ -51,6 +63,8 @@ class JobCardController extends Controller
             return $this->errorResponse('Job Card not found', 404);
         }
         
+        $this->authorize('view', $jobCard);
+        
         return $this->successResponse(new JobCardResource($jobCard), 'Job Card details retrieved successfully');
     }
 
@@ -59,6 +73,8 @@ class JobCardController extends Controller
      */
     public function vehicleHistory(int $vehicleId): JsonResponse
     {
+        $this->authorize('viewAny', \App\Models\JobCard::class);
+
         $history = $this->jobCardService->getVehicleServiceHistory($vehicleId);
         return $this->successResponse(JobCardResource::collection($history), 'Vehicle service history retrieved successfully');
     }
@@ -68,6 +84,8 @@ class JobCardController extends Controller
      */
     public function customerHistory(int $customerId): JsonResponse
     {
+        $this->authorize('viewAny', \App\Models\JobCard::class);
+
         $history = $this->jobCardService->getCustomerServiceHistory($customerId);
         return $this->successResponse(JobCardResource::collection($history), 'Customer service history retrieved successfully');
     }
@@ -77,10 +95,18 @@ class JobCardController extends Controller
      */
     public function update(UpdateJobCardRequest $request, int $id): JsonResponse
     {
+        $jobCard = $this->jobCardService->getJobCard($id);
+        
+        if (!$jobCard) {
+            return $this->errorResponse('Job Card not found', 404);
+        }
+
+        $this->authorize('update', $jobCard);
+
         $updated = $this->jobCardService->updateJobCard($id, $request->validated());
         
         if (!$updated) {
-            return $this->errorResponse('Job Card not found or update failed', 404);
+            return $this->errorResponse('Update failed', 400);
         }
         
         return $this->successResponse(null, 'Job Card updated successfully');
@@ -91,10 +117,18 @@ class JobCardController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
+        $jobCard = $this->jobCardService->getJobCard($id);
+        
+        if (!$jobCard) {
+            return $this->errorResponse('Job Card not found', 404);
+        }
+
+        $this->authorize('delete', $jobCard);
+
         $deleted = $this->jobCardService->deleteJobCard($id);
         
         if (!$deleted) {
-            return $this->errorResponse('Job Card not found or delete failed', 404);
+            return $this->errorResponse('Delete failed', 400);
         }
         
         return $this->successResponse(null, 'Job Card deleted successfully');

@@ -24,12 +24,24 @@ class PurchaseController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', \App\Models\Purchase::class);
+
         $purchases = $this->purchaseService->listPurchases($request->all());
-        return $this->successResponse(PurchaseResource::collection($purchases), 'Purchases retrieved successfully');
+        
+        $meta = [
+            'current_page' => $purchases->currentPage(),
+            'per_page' => $purchases->perPage(),
+            'total' => $purchases->total(),
+            'last_page' => $purchases->lastPage(),
+        ];
+        
+        return $this->successResponse(PurchaseResource::collection($purchases->items()), 'Purchases retrieved successfully', 200, $meta);
     }
 
     public function store(CreatePurchaseRequest $request): JsonResponse
     {
+        $this->authorize('create', \App\Models\Purchase::class);
+
         try {
             $purchase = $this->purchaseService->createPurchase($request->validated());
             return $this->successResponse(new PurchaseResource($purchase), 'Purchase created successfully', 201);
@@ -46,20 +58,30 @@ class PurchaseController extends Controller
             return $this->errorResponse('Purchase not found', 404);
         }
         
+        $this->authorize('view', $purchase);
+        
         return $this->successResponse(new PurchaseResource($purchase), 'Purchase details retrieved successfully');
     }
 
     public function updateStatus(Request $request, int $id): JsonResponse
     {
+        $purchase = $this->purchaseService->getPurchase($id);
+        
+        if (!$purchase) {
+            return $this->errorResponse('Purchase not found', 404);
+        }
+
+        $this->authorize('update', $purchase);
+
         $request->validate([
-            'status' => 'required|in:pending,received,cancelled',
+            'status' => 'required|in:pending,approved,rejected,received,cancelled',
         ]);
 
         try {
             $updated = $this->purchaseService->updatePurchaseStatus($id, $request->status);
             
             if (!$updated) {
-                return $this->errorResponse('Purchase not found or update failed', 404);
+                return $this->errorResponse('Update failed', 400);
             }
             
             $purchase = $this->purchaseService->getPurchase($id);
@@ -71,7 +93,28 @@ class PurchaseController extends Controller
 
     public function lowStockParts(): JsonResponse
     {
+        $this->authorize('viewAny', \App\Models\Purchase::class);
+
         $parts = $this->purchaseService->getLowStockParts();
         return $this->successResponse(PartResource::collection($parts), 'Low stock parts retrieved successfully');
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        $purchase = $this->purchaseService->getPurchase($id);
+        
+        if (!$purchase) {
+            return $this->errorResponse('Purchase not found', 404);
+        }
+
+        $this->authorize('delete', $purchase);
+
+        $deleted = $this->purchaseService->deletePurchase($id);
+        
+        if (!$deleted) {
+            return $this->errorResponse('Delete failed', 400);
+        }
+        
+        return $this->successResponse(null, 'Purchase deleted successfully');
     }
 }
