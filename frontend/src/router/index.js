@@ -22,6 +22,12 @@ const router = createRouter({
       meta: { guest: true }
     },
     {
+      path: '/verify/invoice/:invoice_no',
+      name: 'verify.invoice',
+      component: () => import('../views/verification/InvoiceVerificationView.vue'),
+      meta: { public: true }
+    },
+    {
       path: '/',
       name: 'dashboard',
       component: () => import('../views/dashboard/DashboardLayout.vue'),
@@ -58,6 +64,18 @@ const router = createRouter({
           meta: { permission: 'customers.edit' }
         },
         {
+          path: 'crm/customer-ledger',
+          name: 'crm.customer-ledger',
+          component: () => import('../views/crm/CustomerLedgerView.vue'),
+          meta: { permission: 'customers.view' }
+        },
+        {
+          path: 'crm/customer-statement/:id',
+          name: 'crm.customer-statement',
+          component: () => import('../views/crm/CustomerStatementView.vue'),
+          meta: { permission: 'customers.view' }
+        },
+        {
           path: 'vehicles',
           name: 'vehicles.index',
           component: () => import('../views/vehicles/VehicleList.vue'),
@@ -80,6 +98,18 @@ const router = createRouter({
           name: 'vehicles.edit',
           component: () => import('../views/vehicles/VehicleForm.vue'),
           meta: { permission: 'vehicles.edit' }
+        },
+        {
+          path: 'vehicles/history',
+          name: 'vehicles.history.index',
+          component: () => import('../views/vehicles/VehicleHistoryView.vue'),
+          meta: { permission: 'vehicles.view' }
+        },
+        {
+          path: 'vehicles/history/:id',
+          name: 'vehicles.history.timeline',
+          component: () => import('../views/vehicles/VehicleTimelineView.vue'),
+          meta: { permission: 'vehicles.view' }
         },
         {
           path: 'inventory',
@@ -163,6 +193,54 @@ const router = createRouter({
           path: 'payrolls',
           name: 'payrolls.index',
           component: () => import('../views/hr/PayrollList.vue'),
+          meta: { permission: 'payrolls.view' }
+        },
+        {
+          path: 'attendance-dashboard',
+          name: 'attendance.dashboard',
+          component: () => import('../views/hr/AttendanceDashboard.vue'),
+          meta: { permission: 'attendances.view' }
+        },
+        {
+          path: 'daily-attendance',
+          name: 'attendance.daily',
+          component: () => import('../views/hr/DailyAttendance.vue'),
+          meta: { permission: 'attendances.view' }
+        },
+        {
+          path: 'monthly-attendance',
+          name: 'attendance.monthly',
+          component: () => import('../views/hr/MonthlyAttendance.vue'),
+          meta: { permission: 'attendances.view' }
+        },
+        {
+          path: 'leave-management',
+          name: 'attendance.leave',
+          component: () => import('../views/hr/LeaveManagement.vue'),
+          meta: { permission: 'attendances.view' }
+        },
+        {
+          path: 'payroll-dashboard',
+          name: 'payroll.dashboard',
+          component: () => import('../views/hr/PayrollDashboard.vue'),
+          meta: { permission: 'payrolls.view' }
+        },
+        {
+          path: 'generate-payroll',
+          name: 'payroll.generate',
+          component: () => import('../views/hr/GeneratePayroll.vue'),
+          meta: { permission: 'payrolls.create' }
+        },
+        {
+          path: 'payslip-preview',
+          name: 'payroll.payslip',
+          component: () => import('../views/hr/PayslipPreview.vue'),
+          meta: { permission: 'payrolls.view' }
+        },
+        {
+          path: 'salary-structure',
+          name: 'payroll.salary',
+          component: () => import('../views/hr/SalaryStructure.vue'),
           meta: { permission: 'payrolls.view' }
         },
         {

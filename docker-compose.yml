@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./mamun-automobiles-backend
+      dockerfile: Dockerfile
+    image: mamun-erp-backend
+    container_name: erp_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./mamun-automobiles-backend:/var/www
+    networks:
+      - erp_network
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: mamun-erp-frontend
+    container_name: erp_web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - erp_network
+
+  db:
+    image: mysql:8.0
+    container_name: erp_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - erp_network
+
+  redis:
+    image: redis:alpine
+    container_name: erp_redis
+    restart: unless-stopped
+    networks:
+      - erp_network
+
+networks:
+  erp_network:
+    driver: bridge
+
+volumes:
+  dbdata:
