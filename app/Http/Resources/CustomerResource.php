@@ -23,7 +23,10 @@ class CustomerResource extends JsonResource
             'balance' => $this->balance,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'vehicles_count' => $this->vehicles_count ?? 0,
+            'invoices_count' => $this->invoices_count ?? 0,
             'vehicles' => VehicleResource::collection($this->whenLoaded('vehicles')),
+            'invoices' => InvoiceResource::collection($this->whenLoaded('invoices')),
         ];
     }
 }

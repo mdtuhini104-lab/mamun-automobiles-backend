@@ -4,5 +4,10 @@ namespace App\Repositories;
 
 abstract class BaseRepository
 {
-    // Common repository logic can go here
+    protected $model;
+
+    public function __construct($model = null)
+    {
+        $this->model = $model;
+    }
 }

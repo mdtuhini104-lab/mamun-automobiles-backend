@@ -9,23 +9,33 @@ use App\Models\Purchase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
 
+use App\Services\AuditLogService;
+
+use App\Services\NotificationService;
+
 class PurchaseService extends BaseService
 {
     protected $purchaseRepository;
     protected $purchaseItemRepository;
     protected $partRepository;
+    protected $auditLogService;
+    protected $notificationService;
 
     public function __construct(
         PurchaseRepository $purchaseRepository,
         PurchaseItemRepository $purchaseItemRepository,
-        PartRepository $partRepository
+        PartRepository $partRepository,
+        AuditLogService $auditLogService,
+        NotificationService $notificationService
     ) {
         $this->purchaseRepository = $purchaseRepository;
         $this->purchaseItemRepository = $purchaseItemRepository;
         $this->partRepository = $partRepository;
+        $this->auditLogService = $auditLogService;
+        $this->notificationService = $notificationService;
     }
 
-    public function listPurchases(array $filters = []): Collection
+    public function listPurchases(array $filters = [])
     {
         return $this->purchaseRepository->getAll($filters);
     }
@@ -80,9 +90,11 @@ class PurchaseService extends BaseService
 
                 // If received immediately, update stock
                 if ($purchaseData['status'] === 'received') {
-                    $this->increaseStock($item['part_id'], $item['quantity']);
+                    $this->increaseStock($item['part_id'], $item['quantity'], $purchase->id);
                 }
             }
+
+            $this->auditLogService->log('create', 'Purchase', $purchase->id, $data);
 
             return $purchase;
         });
@@ -96,18 +108,26 @@ class PurchaseService extends BaseService
                 throw new \Exception('Purchase not found');
             }
 
-            // If it's already received, we don't allow changing status back or to cancelled easily
-            // unless we handle stock reduction, which can be complex. Let's prevent it for now.
-            if ($purchase->status->value === 'received') {
-                throw new \Exception('Cannot change status of a received purchase');
+            // If it's already approved or received, we don't allow changing status
+            if ($purchase->status->value === 'approved' || $purchase->status->value === 'received') {
+                throw new \Exception('Cannot change status of an approved or received purchase');
             }
 
             $updated = $this->purchaseRepository->update($id, ['status' => $status]);
 
-            if ($updated && $status === 'received') {
-                $items = $this->purchaseItemRepository->getByPurchaseId($id);
-                foreach ($items as $item) {
-                    $this->increaseStock($item->part_id, $item->quantity);
+            if ($updated) {
+                $this->auditLogService->log('update_status', 'Purchase', $id, ['status' => $status]);
+
+                if ($status === 'approved' || $status === 'received') {
+                    $items = $this->purchaseItemRepository->getByPurchaseId($id);
+                    foreach ($items as $item) {
+                        $this->increaseStock($item->part_id, $item->quantity, $purchase->id);
+                    }
+                }
+
+                // Send notification
+                if ($status === 'approved' || $status === 'rejected') {
+                    $this->notificationService->sendToAllAdmins(new \App\Notifications\PurchaseApprovalNotification($purchase, $status));
                 }
             }
 
@@ -115,17 +135,30 @@ class PurchaseService extends BaseService
         });
     }
 
+    public function deletePurchase(int $id): bool
+    {
+        $deleted = $this->purchaseRepository->delete($id);
+        if ($deleted) {
+            $this->auditLogService->log('delete', 'Purchase', $id);
+        }
+        return $deleted;
+    }
+
     public function getLowStockParts(): Collection
     {
         return $this->partRepository->getLowStock();
     }
 
-    protected function increaseStock(int $partId, float $quantity): void
+    protected function increaseStock(int $partId, float $quantity, ?int $purchaseId = null): void
     {
-        $part = $this->partRepository->findById($partId);
-        if ($part) {
-            $part->stock_quantity += $quantity;
-            $part->save();
-        }
+        $partService = app(\App\Services\PartService::class);
+        $partService->adjustStock(
+            $partId,
+            $quantity,
+            'in',
+            'Purchase stock received',
+            'purchase',
+            $purchaseId
+        );
     }
 }

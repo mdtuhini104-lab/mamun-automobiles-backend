@@ -6,23 +6,29 @@ use App\Repositories\SupplierRepository;
 use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Collection;
 
+use App\Services\AuditLogService;
+
 class SupplierService extends BaseService
 {
-    protected $supplierRepository;
+    protected SupplierRepository $supplierRepository;
+    protected AuditLogService $auditLogService;
 
-    public function __construct(SupplierRepository $supplierRepository)
+    public function __construct(SupplierRepository $supplierRepository, AuditLogService $auditLogService)
     {
         $this->supplierRepository = $supplierRepository;
+        $this->auditLogService = $auditLogService;
     }
 
-    public function listSuppliers(array $filters = []): Collection
+    public function listSuppliers(array $filters = [])
     {
         return $this->supplierRepository->getAll($filters);
     }
 
     public function createSupplier(array $data): Supplier
     {
-        return $this->supplierRepository->create($data);
+        $supplier = $this->supplierRepository->create($data);
+        $this->auditLogService->log('create', 'Supplier', $supplier->id, $data);
+        return $supplier;
     }
 
     public function getSupplier(int $id): ?Supplier
@@ -32,11 +38,19 @@ class SupplierService extends BaseService
 
     public function updateSupplier(int $id, array $data): bool
     {
-        return $this->supplierRepository->update($id, $data);
+        $updated = $this->supplierRepository->update($id, $data);
+        if ($updated) {
+            $this->auditLogService->log('update', 'Supplier', $id, $data);
+        }
+        return $updated;
     }
 
     public function deleteSupplier(int $id): bool
     {
-        return $this->supplierRepository->delete($id);
+        $deleted = $this->supplierRepository->delete($id);
+        if ($deleted) {
+            $this->auditLogService->log('delete', 'Supplier', $id);
+        }
+        return $deleted;
     }
 }

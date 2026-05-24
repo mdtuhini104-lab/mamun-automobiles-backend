@@ -18,7 +18,7 @@ class InvoiceRepository extends BaseRepository
     /**
      * Get all invoices with optional filters.
      */
-    public function getAll(array $filters = []): Collection
+    public function getAll(array $filters = [])
     {
         $query = Invoice::with(['customer', 'jobCard']);
         
@@ -30,7 +30,32 @@ class InvoiceRepository extends BaseRepository
             $query->where('customer_id', $filters['customer_id']);
         }
         
-        return $query->get();
+        // Search
+        if (isset($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_number', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function ($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Sorting
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $sortOrder = $filters['sort_order'] ?? 'desc';
+        
+        $allowedSorts = ['invoice_number', 'grand_total', 'created_at'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        // Pagination
+        $perPage = $filters['per_page'] ?? 15;
+
+        return $query->paginate($perPage);
     }
 
     /**
@@ -73,5 +98,20 @@ class InvoiceRepository extends BaseRepository
             return false;
         }
         return $invoice->delete();
+    }
+
+    public function getTotals(array $filters = []): array
+    {
+        $query = \App\Models\Invoice::query();
+
+        if (isset($filters['start_date']) && isset($filters['end_date'])) {
+            $query->whereBetween('created_at', [$filters['start_date'], $filters['end_date']]);
+        }
+
+        return [
+            'grand_total' => (float) $query->sum('grand_total'),
+            'paid_amount' => (float) $query->sum('paid_amount'),
+            'due_amount' => (float) $query->sum('due_amount'),
+        ];
     }
 }

@@ -9,31 +9,38 @@ use App\Models\JobCard;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
+use App\Services\AuditLogService;
+
 class JobCardService extends BaseService
 {
     protected $jobCardRepository;
     protected $partRepository;
     protected $jobCardItemRepository;
     protected $invoiceService;
+    protected $auditLogService;
 
     public function __construct(
         JobCardRepository $jobCardRepository,
         PartRepository $partRepository,
         JobCardItemRepository $jobCardItemRepository,
-        InvoiceService $invoiceService
+        InvoiceService $invoiceService,
+        AuditLogService $auditLogService
     ) {
         $this->jobCardRepository = $jobCardRepository;
         $this->partRepository = $partRepository;
         $this->jobCardItemRepository = $jobCardItemRepository;
         $this->invoiceService = $invoiceService;
+        $this->auditLogService = $auditLogService;
     }
 
     public function createJobCard(array $data): JobCard
     {
-        return $this->jobCardRepository->create($data);
+        $jobCard = $this->jobCardRepository->create($data);
+        $this->auditLogService->log('create', 'JobCard', $jobCard->id, $data);
+        return $jobCard;
     }
 
-    public function listJobCards(array $filters = []): Collection
+    public function listJobCards(array $filters = [])
     {
         return $this->jobCardRepository->getAll($filters);
     }
@@ -57,8 +64,12 @@ class JobCardService extends BaseService
     {
         $updated = $this->jobCardRepository->update($id, $data);
         
-        if ($updated && isset($data['service_status']) && $data['service_status'] === 'completed') {
-            $this->invoiceService->generateInvoiceFromJobCard($id);
+        if ($updated) {
+            $this->auditLogService->log('update', 'JobCard', $id, $data);
+
+            if (isset($data['service_status']) && $data['service_status'] === 'completed') {
+                $this->invoiceService->generateInvoiceFromJobCard($id);
+            }
         }
         
         return $updated;
@@ -66,7 +77,11 @@ class JobCardService extends BaseService
 
     public function deleteJobCard(int $id): bool
     {
-        return $this->jobCardRepository->delete($id);
+        $deleted = $this->jobCardRepository->delete($id);
+        if ($deleted) {
+            $this->auditLogService->log('delete', 'JobCard', $id);
+        }
+        return $deleted;
     }
 
     /**
@@ -96,6 +111,8 @@ class JobCardService extends BaseService
                 'quantity' => $data['quantity'],
                 'unit_price' => $data['unit_price'] ?? $part->sale_price,
             ]);
+            
+            $this->auditLogService->log('add_item', 'JobCard', $jobCardId, $data);
             
             return true;
         });

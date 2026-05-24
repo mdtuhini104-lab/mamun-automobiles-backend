@@ -28,6 +28,9 @@ class CreateVehicleRequest extends FormRequest
             'model' => 'required|string|max:255',
             'year' => 'nullable|integer',
             'vin' => 'nullable|string|max:255',
+            'engine_number' => 'nullable|string|max:255',
+            'color' => 'nullable|string|max:50',
+            'fuel_type' => 'nullable|string|max:50',
         ];
     }
 }

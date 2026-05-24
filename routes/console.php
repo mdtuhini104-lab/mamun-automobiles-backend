@@ -2,25 +2,17 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Artisan::command('git:push', function () {
-    $this->info('Running git add .');
-    $output = shell_exec('git add . 2>&1');
+Artisan::command('run:migrate', function () {
+    $this->info('Running migrate');
+    $output = shell_exec('php artisan migrate --force 2>&1');
     $this->info($output);
+})->purpose('Run migrations');
 
-    $this->info('Running git commit');
-    $output = shell_exec('git commit -m "Complete Mamun Automobiles ERP Backend Phase 1" 2>&1');
-    $this->info($output);
-
-    $this->info('Renaming branch to main');
-    $output = shell_exec('git branch -M main 2>&1');
-    $this->info($output);
-
-    $this->info('Running git push');
-    $output = shell_exec('git push -u origin main 2>&1');
-    $this->info($output);
-})->purpose('Run git commands');
+// Daily automatic database backup at 12:00 AM (midnight)
+Schedule::command('backup:run')->dailyAt('00:00');

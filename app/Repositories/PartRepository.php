@@ -18,14 +18,26 @@ class PartRepository extends BaseRepository
     /**
      * Get all parts with optional filters.
      */
-    public function getAll(array $filters = []): Collection
+    public function getAll(array $filters = [])
     {
         $query = Part::query();
         
+        // Search
+        if (isset($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%")
+                  ->orWhere('brand', 'like', "%{$search}%");
+            });
+        }
+        
+        // Brand filter
         if (isset($filters['brand'])) {
             $query->where('brand', $filters['brand']);
         }
         
+        // Stock availability filter
         if (isset($filters['stock_availability'])) {
             if ($filters['stock_availability'] === 'available') {
                 $query->where('stock_quantity', '>', 0);
@@ -34,7 +46,22 @@ class PartRepository extends BaseRepository
             }
         }
         
-        return $query->get();
+        // Sorting
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $sortOrder = $filters['sort_order'] ?? 'desc';
+        
+        // Validate sort_by to prevent SQL injection
+        $allowedSorts = ['name', 'sku', 'brand', 'cost_price', 'sale_price', 'stock_quantity', 'created_at'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+        
+        // Pagination
+        $perPage = $filters['per_page'] ?? 15;
+        
+        return $query->paginate($perPage);
     }
 
     /**

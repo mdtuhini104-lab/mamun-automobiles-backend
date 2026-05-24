@@ -18,7 +18,7 @@ class JobCardRepository extends BaseRepository
     /**
      * Get all job cards with optional filters.
      */
-    public function getAll(array $filters = []): Collection
+    public function getAll(array $filters = [])
     {
         $query = JobCard::with(['customer', 'vehicle', 'mechanic']);
         
@@ -26,7 +26,44 @@ class JobCardRepository extends BaseRepository
             $query->where('service_status', $filters['status']);
         }
         
-        return $query->get();
+        if (isset($filters['customer_id'])) {
+            $query->where('customer_id', $filters['customer_id']);
+        }
+        
+        if (isset($filters['vehicle_id'])) {
+            $query->where('vehicle_id', $filters['vehicle_id']);
+        }
+        
+        // Search
+        if (isset($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('complaint', 'like', "%{$search}%")
+                  ->orWhere('diagnosis', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function ($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('vehicle', function ($vq) use ($search) {
+                      $vq->where('license_plate', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Sorting
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $sortOrder = $filters['sort_order'] ?? 'desc';
+        
+        $allowedSorts = ['service_date', 'estimated_cost', 'created_at'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        // Pagination
+        $perPage = $filters['per_page'] ?? 15;
+
+        return $query->paginate($perPage);
     }
 
     /**

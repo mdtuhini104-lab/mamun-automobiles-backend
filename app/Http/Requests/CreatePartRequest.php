@@ -24,11 +24,15 @@ class CreatePartRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'sku' => 'required|string|unique:parts,sku|max:50',
+            'barcode' => 'nullable|string|max:100|unique:parts,barcode',
             'brand' => 'nullable|string|max:100',
             'cost_price' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'nullable|integer|min:0',
             'low_stock_threshold' => 'nullable|integer|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'rack_location' => 'nullable|string|max:100',
+            'unit_type' => 'nullable|string|max:50',
         ];
     }
 }

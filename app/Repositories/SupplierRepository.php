@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class SupplierRepository extends BaseRepository
 {
-    public function getAll(array $filters = []): Collection
+    public function getAll(array $filters = [])
     {
         $query = Supplier::query();
 
@@ -25,7 +25,21 @@ class SupplierRepository extends BaseRepository
             });
         }
 
-        return $query->get();
+        // Sorting
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $sortOrder = $filters['sort_order'] ?? 'desc';
+        
+        $allowedSorts = ['name', 'email', 'phone', 'company_name', 'status', 'created_at'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        // Pagination
+        $perPage = $filters['per_page'] ?? 15;
+
+        return $query->paginate($perPage);
     }
 
     public function create(array $data): Supplier
