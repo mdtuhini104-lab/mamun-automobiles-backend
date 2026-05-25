@@ -7,7 +7,7 @@
 
     <!-- AI Insights Section -->
     <div v-if="analyticsStore.dashboard?.insights?.length" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div v-for="(insight, index) in analyticsStore.dashboard.insights" :key="index"
+      <div v-for="(insight, index) in (analyticsStore.dashboard?.insights || [])" :key="index"
            :class="{
              'bg-emerald-50 border-emerald-200 text-emerald-800': insight.type === 'success',
              'bg-rose-50 border-rose-200 text-rose-800': insight.type === 'danger',
@@ -58,7 +58,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
-              <tr v-for="item in analyticsStore.dashboard.low_stock" :key="item.name">
+              <tr v-for="item in (analyticsStore.dashboard?.low_stock || [])" :key="item.name">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{{ item.name }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-rose-600 font-bold text-right">{{ item.current_stock }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 text-right">{{ item.min_stock_level }}</td>
@@ -66,7 +66,7 @@
                   <span class="inline-flex items-center rounded-md bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 ring-1 ring-inset ring-rose-600/20">Critical</span>
                 </td>
               </tr>
-              <tr v-if="!analyticsStore.dashboard.low_stock.length">
+              <tr v-if="!(analyticsStore.dashboard?.low_stock?.length)">
                 <td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">Inventory levels are healthy.</td>
               </tr>
             </tbody>
@@ -91,8 +91,8 @@ onMounted(() => {
 const trendSeries = computed(() => {
   if (!analyticsStore.dashboard) return [];
   return [
-    { name: 'Revenue', data: analyticsStore.dashboard.trends.revenue },
-    { name: 'Expense', data: analyticsStore.dashboard.trends.expense }
+    { name: 'Revenue', data: analyticsStore.dashboard.trends?.revenue || [] },
+    { name: 'Expense', data: analyticsStore.dashboard.trends?.expense || [] }
   ];
 });
 
@@ -103,7 +103,7 @@ const trendOptions = computed(() => {
     colors: ['#4f46e5', '#f43f5e'],
     dataLabels: { enabled: false },
     stroke: { curve: 'smooth', width: 2 },
-    xaxis: { categories: analyticsStore.dashboard.trends.categories },
+    xaxis: { categories: analyticsStore.dashboard.trends?.categories || [] },
     yaxis: { labels: { formatter: (value) => '$' + value } },
     fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 100] } }
   };
@@ -111,14 +111,14 @@ const trendOptions = computed(() => {
 
 const mechanicSeries = computed(() => {
   if (!analyticsStore.dashboard) return [];
-  return analyticsStore.dashboard.mechanics.series;
+  return analyticsStore.dashboard.mechanics?.series || [];
 });
 
 const mechanicOptions = computed(() => {
   if (!analyticsStore.dashboard) return {};
   return {
     chart: { type: 'donut', fontFamily: 'inherit' },
-    labels: analyticsStore.dashboard.mechanics.labels,
+    labels: analyticsStore.dashboard.mechanics?.labels || [],
     colors: ['#3b82f6', '#10b981', '#f59e0b', '#6366f1', '#ec4899'],
     legend: { position: 'bottom' }
   };
