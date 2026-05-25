@@ -23,6 +23,13 @@ class AnalyticsController extends Controller
         return response()->json($this->dashboardService->getKpiSummary());
     }
 
+    public function dashboard()
+    {
+        return response()->json([
+            'data' => $this->dashboardService->getKpiSummary()
+        ]);
+    }
+
     public function sales(Request $request)
     {
         $startDate = $request->input('start_date', now()->subDays(30)->toDateString());
