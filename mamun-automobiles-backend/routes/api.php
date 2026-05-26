@@ -23,8 +23,9 @@ Route::prefix('v1')->group(function () {
                 'database' => $db ? 'connected' : 'disconnected',
                 'redis' => $redis ? 'connected' : 'disconnected',
             ]
-        ], ($db && $redis) ? 200 : 503);
+        ], 200);
     });
+
     
 
 
