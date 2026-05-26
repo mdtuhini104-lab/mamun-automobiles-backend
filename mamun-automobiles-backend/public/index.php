@@ -5,36 +5,26 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Force Debug mode on Vercel for error reporting
-putenv('APP_DEBUG=true');
-$_ENV['APP_DEBUG'] = 'true';
-$_SERVER['APP_DEBUG'] = 'true';
-
-
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
-try {
-    // Register the Composer autoloader...
-    if (file_exists(__DIR__.'/../vendor/autoload.php')) {
-        require __DIR__.'/../vendor/autoload.php';
-    } else {
-        require __DIR__.'/../../vendor/autoload.php';
-    }
+// Force script name to root to enable clean routing in subdirectory structure
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['PHP_SELF'] = '/index.php';
 
-    // Bootstrap Laravel and handle the request...
-    /** @var Application $app */
-    $app = require_once __DIR__.'/../bootstrap/app.php';
-
-    $app->handleRequest(Request::capture());
-} catch (\Throwable $e) {
-    header('HTTP/1.1 200 OK');
-    header('Content-Type: text/plain');
-    echo "DIAGNOSTIC ERROR CAUGHT:\n";
-    echo $e->getMessage() . "\n";
-    echo "File: " . $e->getFile() . " on line " . $e->getLine() . "\n\n";
-    echo "Trace:\n" . $e->getTraceAsString() . "\n";
+// Register the Composer autoloader...
+if (file_exists(__DIR__.'/../vendor/autoload.php')) {
+    require __DIR__.'/../vendor/autoload.php';
+} else {
+    require __DIR__.'/../../vendor/autoload.php';
 }
+
+// Bootstrap Laravel and handle the request...
+/** @var Application $app */
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+$app->handleRequest(Request::capture());
+
 
