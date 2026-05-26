@@ -1,0 +1,1 @@
+<?php require 'vendor/autoload.php'; require 'bootstrap/app.php'; app()->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap(); $user = App\Models\User::where('email', 'admin@mamunerp.com')->first(); echo $user->hasPermissionTo('manage_invoices', 'web') ? 'yes' : 'no';

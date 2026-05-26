@@ -1,0 +1,101 @@
+version: '3.8'
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mamun-erp-backend
+    container_name: mamun-erp-app
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    volumes:
+      - ./:/var/www
+    networks:
+      - app-network
+
+  horizon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mamun-erp-backend
+    container_name: mamun-erp-horizon
+    restart: unless-stopped
+    command: php artisan horizon
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - redis
+      - db
+    networks:
+      - app-network
+
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mamun-erp-backend
+    container_name: mamun-erp-reverb
+    restart: unless-stopped
+    command: php artisan reverb:start --host="0.0.0.0" --port=8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - redis
+    networks:
+      - app-network
+
+
+  webserver:
+    image: nginx:alpine
+    container_name: mamun-erp-webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      - app-network
+
+  db:
+    image: mysql:8.0
+    container_name: mamun-erp-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: mamun_erp
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      MYSQL_USER: root
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    container_name: mamun-erp-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+  redisdata:
+    driver: local
