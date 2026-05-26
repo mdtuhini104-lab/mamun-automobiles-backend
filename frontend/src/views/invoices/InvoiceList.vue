@@ -321,7 +321,8 @@ import axios from 'axios';
 
 const printInvoice = async (id, type = 'pdf') => {
   const token = localStorage.getItem('token');
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const isProd = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+  const baseUrl = isProd ? 'https://mamunerp.com' : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
   
   try {
     if (type === 'thermal') {

@@ -4,15 +4,20 @@ import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
 export const initEcho = () => {
+  const isProd = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+  const wsHost = isProd ? 'mamunerp.com' : (import.meta.env.VITE_REVERB_HOST || 'localhost');
+  const forceTLS = isProd ? true : ((import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https');
+  const apiURL = isProd ? 'https://mamunerp.com/api' : (import.meta.env.VITE_API_URL || 'http://localhost:8000/api');
+
   return new Echo({
     broadcaster: 'reverb',
-    key: import.meta.env.VITE_REVERB_APP_KEY || process.env.VITE_REVERB_APP_KEY || 'app-key',
-    wsHost: import.meta.env.VITE_REVERB_HOST || 'localhost',
-    wsPort: import.meta.env.VITE_REVERB_PORT ? Number(import.meta.env.VITE_REVERB_PORT) : 8080,
-    wssPort: import.meta.env.VITE_REVERB_PORT ? Number(import.meta.env.VITE_REVERB_PORT) : 8080,
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https',
+    key: import.meta.env.VITE_REVERB_APP_KEY || 'mamun_erp_key',
+    wsHost: wsHost,
+    wsPort: isProd ? 443 : (import.meta.env.VITE_REVERB_PORT ? Number(import.meta.env.VITE_REVERB_PORT) : 8080),
+    wssPort: isProd ? 443 : (import.meta.env.VITE_REVERB_PORT ? Number(import.meta.env.VITE_REVERB_PORT) : 8080),
+    forceTLS: forceTLS,
     enabledTransports: ['ws', 'wss'],
-    authEndpoint: (import.meta.env.VITE_API_URL || 'http://localhost:8000/api') + '/broadcasting/auth',
+    authEndpoint: apiURL + '/broadcasting/auth',
     auth: {
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token'),
