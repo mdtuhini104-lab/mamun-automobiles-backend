@@ -8,7 +8,7 @@ cd mamun-automobiles-backend
 php artisan down || true
 
 # Update codebase
-git pull origin main
+git pull origin backend
 
 # Install dependencies
 composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
