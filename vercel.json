@@ -1,38 +1,17 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "mamun-automobiles-backend/public/index.php",
-      "use": "vercel-php@0.7.2"
+      "source": "/api/v1/health",
+      "destination": "/api/index.php"
     },
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/v1/health",
-      "dest": "/mamun-automobiles-backend/public/index.php"
+      "source": "/api/v1/:path*",
+      "destination": "/api/index.php"
     },
     {
-      "src": "/api/v1/(.*)",
-      "dest": "/mamun-automobiles-backend/public/index.php"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/mamun-automobiles-backend/public/index.php"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/frontend/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "source": "/api/:path*",
+      "destination": "/api/index.php"
     }
   ]
 }
