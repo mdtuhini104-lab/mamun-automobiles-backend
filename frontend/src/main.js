@@ -17,3 +17,5 @@ const initApp = () => {
 };
 
 initApp();
+// Trigger Vercel build
+
