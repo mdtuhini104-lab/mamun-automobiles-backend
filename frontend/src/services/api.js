@@ -5,7 +5,7 @@ import router from '../router';
 const getBaseURL = () => {
   if (typeof window !== 'undefined') {
     if (window.location.hostname.includes('vercel.app')) {
-      return 'https://mamunerp.com/api/v1';
+      return 'https://mamun-automobiles-backend.vercel.app/api/v1';
     }
   }
   return import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';

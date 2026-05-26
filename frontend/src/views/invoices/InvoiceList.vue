@@ -322,7 +322,7 @@ import axios from 'axios';
 const printInvoice = async (id, type = 'pdf') => {
   const token = localStorage.getItem('token');
   const isProd = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
-  const baseUrl = isProd ? 'https://mamunerp.com' : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
+  const baseUrl = isProd ? 'https://mamun-automobiles-backend.vercel.app' : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
   
   try {
     if (type === 'thermal') {

@@ -5,9 +5,9 @@ window.Pusher = Pusher;
 
 export const initEcho = () => {
   const isProd = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
-  const wsHost = isProd ? 'mamunerp.com' : (import.meta.env.VITE_REVERB_HOST || 'localhost');
+  const wsHost = isProd ? 'mamun-automobiles-backend.vercel.app' : (import.meta.env.VITE_REVERB_HOST || 'localhost');
   const forceTLS = isProd ? true : ((import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https');
-  const apiURL = isProd ? 'https://mamunerp.com/api' : (import.meta.env.VITE_API_URL || 'http://localhost:8000/api');
+  const apiURL = isProd ? 'https://mamun-automobiles-backend.vercel.app/api' : (import.meta.env.VITE_API_URL || 'http://localhost:8000/api');
 
   return new Echo({
     broadcaster: 'reverb',
