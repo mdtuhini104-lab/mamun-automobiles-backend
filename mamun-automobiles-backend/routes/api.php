@@ -26,26 +26,6 @@ Route::prefix('v1')->group(function () {
         ], 200);
     });
 
-    Route::get('/system/migrate/production', function () {
-        try {
-            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-            return response()->json(['success' => true, 'output' => \Illuminate\Support\Facades\Artisan::output()]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()]);
-        }
-    });
-
-    Route::get('/system/test/vehicle/create', function () {
-        try {
-            $vehicle = \App\Models\Vehicle::create([
-                'license_plate' => 'TEST-' . rand(1000, 9999)
-            ]);
-            return response()->json(['success' => true, 'vehicle' => $vehicle]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()]);
-        }
-    });
-
     Route::get('/login', function () {
         return response()->json([
             'success' => false,
