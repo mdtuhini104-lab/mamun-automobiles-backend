@@ -61,12 +61,11 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (\Throwable $e) {
+            $isLocal = config('app.env') === 'local' || config('app.debug');
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => explode("\n", $e->getTraceAsString()),
+                'message' => $isLocal ? $e->getMessage() : 'An unexpected error occurred.',
+                'trace' => $isLocal ? $e->getTrace() : null,
             ], 500);
         });
     })->create();
