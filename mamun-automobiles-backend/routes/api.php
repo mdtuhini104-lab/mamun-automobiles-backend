@@ -5,14 +5,11 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::get('/health', function () {
         $db = false;
-        $dbError = null;
         $redis = false;
         try {
             \Illuminate\Support\Facades\DB::connection()->getPdo();
             $db = true;
-        } catch (\Exception $e) {
-            $dbError = $e->getMessage();
-        }
+        } catch (\Exception $e) {}
         
         try {
             \Illuminate\Support\Facades\Redis::connection()->ping();
@@ -24,7 +21,6 @@ Route::prefix('v1')->group(function () {
             'message' => 'API v1 is running',
             'services' => [
                 'database' => $db ? 'connected' : 'disconnected',
-                'database_error' => $dbError,
                 'redis' => $redis ? 'connected' : 'disconnected',
             ]
         ], 200);
