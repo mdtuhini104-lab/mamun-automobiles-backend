@@ -32,6 +32,13 @@ Route::prefix('v1')->group(function () {
     
 
     
+    Route::get('/login', function () {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthenticated.',
+        ], 401);
+    })->name('login');
+
     // Public Verification Route
     Route::get('/verify/invoice/{invoice_no}', [App\Http\Controllers\Api\VerificationController::class, 'verifyInvoice']);
 
