@@ -24,10 +24,10 @@ class UpdateVehicleRequest extends FormRequest
         $vehicleId = $this->route('id');
 
         return [
-            'customer_id' => 'sometimes|required|exists:customers,id',
+            'customer_id' => 'sometimes|nullable|exists:customers,id',
             'license_plate' => 'sometimes|required|string|max:20|unique:vehicles,license_plate,' . $vehicleId,
-            'make' => 'sometimes|required|string|max:255',
-            'model' => 'sometimes|required|string|max:255',
+            'make' => 'sometimes|nullable|string|max:255',
+            'model' => 'sometimes|nullable|string|max:255',
             'year' => 'nullable|integer',
             'vin' => 'nullable|string|max:255',
             'engine_number' => 'nullable|string|max:255',

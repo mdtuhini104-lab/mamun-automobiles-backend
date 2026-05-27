@@ -22,10 +22,10 @@ class CreateVehicleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => 'required|exists:customers,id',
+            'customer_id' => 'nullable|exists:customers,id',
             'license_plate' => 'required|string|unique:vehicles,license_plate|max:20',
-            'make' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
+            'make' => 'nullable|string|max:255',
+            'model' => 'nullable|string|max:255',
             'year' => 'nullable|integer',
             'vin' => 'nullable|string|max:255',
             'engine_number' => 'nullable|string|max:255',

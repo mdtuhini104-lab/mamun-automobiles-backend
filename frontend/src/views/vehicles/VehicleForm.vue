@@ -17,9 +17,9 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="col-span-1 md:col-span-2">
-            <label class="block text-sm font-medium text-slate-700 mb-1">Customer / Owner <span class="text-red-500">*</span></label>
-            <select v-model="form.customer_id" required class="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" :disabled="loadingCustomers">
-              <option value="" disabled>Select a customer</option>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Customer / Owner</label>
+            <select v-model="form.customer_id" class="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" :disabled="loadingCustomers">
+              <option value="">Select a customer (Optional)</option>
               <option v-for="customer in customers" :key="customer.id" :value="customer.id">
                 {{ customer.name }} ({{ customer.phone || customer.email }})
               </option>
@@ -32,13 +32,13 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Make / Brand <span class="text-red-500">*</span></label>
-            <input type="text" v-model="form.make" required class="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="e.g. Toyota" />
+            <label class="block text-sm font-medium text-slate-700 mb-1">Make / Brand</label>
+            <input type="text" v-model="form.make" class="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="e.g. Toyota" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Model <span class="text-red-500">*</span></label>
-            <input type="text" v-model="form.model" required class="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="e.g. Corolla" />
+            <label class="block text-sm font-medium text-slate-700 mb-1">Model</label>
+            <input type="text" v-model="form.model" class="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="e.g. Corolla" />
           </div>
 
           <div>
