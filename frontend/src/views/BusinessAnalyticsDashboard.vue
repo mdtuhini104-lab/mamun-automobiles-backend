@@ -63,13 +63,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import api from '../services/api';
 
 const kpi = ref({});
 
 const fetchKpi = async () => {
   try {
-    const response = await axios.get('/api/v1/analytics/summary');
+    const response = await api.get('/analytics/summary');
     kpi.value = response.data;
   } catch (error) {
     console.error("Failed to fetch KPI", error);

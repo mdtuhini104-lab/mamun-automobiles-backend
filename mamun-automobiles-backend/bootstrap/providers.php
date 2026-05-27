@@ -6,4 +6,5 @@ return [
     AppServiceProvider::class,
     Laravel\Sanctum\SanctumServiceProvider::class,
     Spatie\Permission\PermissionServiceProvider::class,
+    Milon\Barcode\BarcodeServiceProvider::class,
 ];

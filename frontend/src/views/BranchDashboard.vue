@@ -43,7 +43,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import api from '../services/api';
 
 const branches = ref([
     { id: 1, name: 'Dhaka HQ', location: 'Mirpur, Dhaka', revenue: 150000, pending_jobs: 12 },
@@ -52,7 +52,7 @@ const branches = ref([
 
 const fetchBranches = async () => {
     // In a real scenario, uncomment below
-    // const res = await axios.get('/api/v1/branches');
+    // const res = await api.get('/branches');
     // branches.value = res.data;
 };
 

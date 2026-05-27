@@ -125,13 +125,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import api from '../services/api';
 
 const health = ref({});
 
 const fetchHealth = async () => {
     try {
-        const res = await axios.get('/api/v1/system/health');
+        const res = await api.get('/system/health');
         health.value = res.data;
     } catch (error) {
         console.error('Error fetching system health', error);

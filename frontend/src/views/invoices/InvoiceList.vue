@@ -317,26 +317,19 @@ const handlePaymentSubmit = async () => {
   }
 };
 
-import axios from 'axios';
+import api from '../../services/api';
 
 const printInvoice = async (id, type = 'pdf') => {
-  const token = localStorage.getItem('token');
-  const isProd = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
-  const baseUrl = isProd ? 'https://mamun-automobiles-backend.vercel.app' : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
-  
   try {
     if (type === 'thermal') {
-      const response = await axios.get(`${baseUrl}/api/v1/print/invoice/${id}/thermal`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get(`/print/invoice/${id}/thermal`);
       const printWindow = window.open('', '_blank', 'width=400,height=600');
       printWindow.document.write(response.data);
       printWindow.document.close();
       printWindow.focus();
       setTimeout(() => printWindow.print(), 500);
     } else {
-      const response = await axios.get(`${baseUrl}/api/v1/print/invoice/${id}${type==='download'?'?action=download':''}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await api.get(`/print/invoice/${id}${type==='download'?'?action=download':''}`, {
         responseType: 'blob'
       });
       const blob = new Blob([response.data], { type: 'application/pdf' });
@@ -355,7 +348,6 @@ const printInvoice = async (id, type = 'pdf') => {
     }
   } catch (e) {
     console.error('Print failed', e);
-    // Optionally show a toast error
   }
 };
 

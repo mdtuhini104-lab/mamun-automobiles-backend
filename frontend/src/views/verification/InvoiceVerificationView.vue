@@ -81,7 +81,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import axios from 'axios';
+import api from '../../services/api';
 
 const route = useRoute();
 const loading = ref(true);
@@ -98,7 +98,7 @@ onMounted(async () => {
   }
 
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/verify/invoice/${invoiceNo}`, {
+    const response = await api.get(`/verify/invoice/${invoiceNo}`, {
       params: { token }
     });
     verificationResult.value = response.data;

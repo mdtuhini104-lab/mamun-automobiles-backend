@@ -84,7 +84,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import api from '../services/api';
 
 const predictions = ref({});
 const anomalies = ref(0);
@@ -92,7 +92,7 @@ const recommendations = ref(0);
 
 const fetchDashboard = async () => {
   try {
-    const res = await axios.get('/api/v1/ai/dashboard');
+    const res = await api.get('/ai/dashboard');
     predictions.value = res.data.predictions;
     anomalies.value = res.data.anomalies;
     recommendations.value = res.data.recommendations;
@@ -103,7 +103,7 @@ const fetchDashboard = async () => {
 
 const runAutomations = async () => {
   try {
-    await axios.post('/api/v1/ai/run-automation');
+    await api.post('/ai/run-automation');
     alert('AI Automations executed successfully!');
   } catch (error) {
     alert('Failed to run AI automations.');
