@@ -19,6 +19,10 @@ Route::prefix('v1')->group(function () {
         return response()->json([
             'success' => true,
             'message' => 'API v1 is running',
+            'config_cached' => app()->configurationIsCached(),
+            'config_cache_path' => app()->getCachedConfigPath(),
+            'config_cache_exists' => file_exists(app()->getCachedConfigPath()),
+            'permission_config' => config('permission'),
             'services' => [
                 'database' => $db ? 'connected' : 'disconnected',
                 'redis' => $redis ? 'connected' : 'disconnected',
