@@ -3,6 +3,15 @@
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 
+$dbConnection = env('DB_CONNECTION', 'mysql');
+$dbHost = env('DB_HOST', '127.0.0.1');
+
+// Auto-detect and fix if the user mistakenly put the database host into DB_CONNECTION variable
+if (str_contains($dbConnection, '.') || str_contains($dbConnection, '-')) {
+    $dbHost = $dbConnection;
+    $dbConnection = 'mysql';
+}
+
 return [
 
     /*
@@ -17,7 +26,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => $dbConnection,
 
     /*
     |--------------------------------------------------------------------------
@@ -47,7 +56,8 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => $dbHost,
+
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
