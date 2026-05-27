@@ -6,16 +6,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/health', function () {
         $db = false;
         $redis = false;
-        $tables = [];
         try {
             \Illuminate\Support\Facades\DB::connection()->getPdo();
             $db = true;
-            $tables = collect(\Illuminate\Support\Facades\DB::select('SHOW TABLES'))->map(function ($table) {
-                return array_values((array) $table)[0];
-            })->all();
-        } catch (\Exception $e) {
-            $tables = ['error' => $e->getMessage()];
-        }
+        } catch (\Exception $e) {}
         
         try {
             \Illuminate\Support\Facades\Redis::connection()->ping();
@@ -25,7 +19,6 @@ Route::prefix('v1')->group(function () {
         return response()->json([
             'success' => true,
             'message' => 'API v1 is running',
-            'tables' => $tables,
             'services' => [
                 'database' => $db ? 'connected' : 'disconnected',
                 'redis' => $redis ? 'connected' : 'disconnected',
