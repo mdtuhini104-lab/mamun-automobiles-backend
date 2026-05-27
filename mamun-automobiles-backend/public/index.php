@@ -10,21 +10,31 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
     require $maintenance;
 }
 
-// Force script name to root to enable clean routing in subdirectory structure
-$_SERVER['SCRIPT_NAME'] = '/index.php';
-$_SERVER['PHP_SELF'] = '/index.php';
+try {
+    // Force script name to root to enable clean routing in subdirectory structure
+    $_SERVER['SCRIPT_NAME'] = '/index.php';
+    $_SERVER['PHP_SELF'] = '/index.php';
 
-// Register the Composer autoloader...
-if (file_exists(__DIR__.'/../vendor/autoload.php')) {
-    require __DIR__.'/../vendor/autoload.php';
-} else {
-    require __DIR__.'/../../vendor/autoload.php';
+    // Register the Composer autoloader...
+    if (file_exists(__DIR__.'/../vendor/autoload.php')) {
+        require __DIR__.'/../vendor/autoload.php';
+    } else {
+        require __DIR__.'/../../vendor/autoload.php';
+    }
+
+    // Bootstrap Laravel and handle the request...
+    /** @var Application $app */
+    $app = require_once __DIR__.'/../bootstrap/app.php';
+
+    $app->handleRequest(Request::capture());
+} catch (\Throwable $e) {
+    header('HTTP/1.1 200 OK');
+    header('Content-Type: text/plain');
+    echo "DIAGNOSTIC ERROR CAUGHT:\n";
+    echo $e->getMessage() . "\n";
+    echo "File: " . $e->getFile() . " on line " . $e->getLine() . "\n\n";
+    echo "Trace:\n" . $e->getTraceAsString() . "\n";
 }
 
-// Bootstrap Laravel and handle the request...
-/** @var Application $app */
-$app = require_once __DIR__.'/../bootstrap/app.php';
-
-$app->handleRequest(Request::capture());
 
 
