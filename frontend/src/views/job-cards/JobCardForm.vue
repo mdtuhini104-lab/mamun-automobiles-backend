@@ -133,6 +133,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
+import { ROLES } from '../../constants/roles';
 
 const router = useRouter();
 const route = useRoute();
@@ -175,13 +176,23 @@ const loadCustomers = async () => {
 
 const loadMechanics = async () => {
   try {
-    // Ideally an endpoint to fetch users with role 'Mechanic'
-    const response = await api.get('/users', { params: { role: 'Mechanic' } }).catch(() => null);
-    if (response) {
+    console.log(`JobCardForm: Fetching users with role "${ROLES.TECHNICIAN}"...`);
+    const response = await api.get('/users', { params: { role: ROLES.TECHNICIAN } });
+    if (response && response.data && Array.isArray(response.data.data)) {
       mechanics.value = response.data.data;
+      console.log(`JobCardForm: Successfully loaded ${mechanics.value.length} technicians/mechanics:`, JSON.parse(JSON.stringify(mechanics.value)));
+      if (mechanics.value.length === 0) {
+        toast.warning('No technicians are currently registered in the system.');
+      }
+    } else {
+      console.error('JobCardForm: Unexpected users API response shape:', response);
+      toast.error('Failed to load mechanics dropdown data due to malformed server response.');
+      mechanics.value = [];
     }
   } catch (error) {
-    // Ignore, fallback to unassigned
+    console.error('JobCardForm: Failed to load mechanics list from server', error);
+    toast.error(error.response?.data?.message || 'Failed to connect to the server to load mechanics.');
+    mechanics.value = [];
   }
 };
 

@@ -55,8 +55,8 @@ $roleCashier->syncPermissions([
     'dashboard.view', 'invoice.view', 'invoice.create', 'transaction.view', 'transaction.create', 'pos.access'
 ]);
 
-$roleMechanic = Role::firstOrCreate(['name' => 'Mechanic']);
-$roleMechanic->syncPermissions([
+$roleTechnician = Role::firstOrCreate(['name' => 'Technician']);
+$roleTechnician->syncPermissions([
     'dashboard.view', 'job_card.view', 'vehicle.view'
 ]);
 
@@ -91,7 +91,7 @@ function createStaff($name, $email, $roleName, $phone, $salary) {
 createStaff('System Admin', 'admin@mamunerp.com', 'Super Admin', '01711000000', 100000);
 createStaff('Manager Hasan', 'manager@mamunerp.com', 'Manager', '01711000001', 50000);
 createStaff('Cashier Rahim', 'cashier@mamunerp.com', 'Cashier', '01711000002', 25000);
-createStaff('Mechanic John', 'mechanic@mamunerp.com', 'Mechanic', '01711000003', 30000);
+createStaff('Mechanic John', 'mechanic@mamunerp.com', 'Technician', '01711000003', 30000);
 createStaff('Accountant Ali', 'accountant@mamunerp.com', 'Accountant', '01711000004', 40000);
 createStaff('Inventory Kabir', 'inventory@mamunerp.com', 'Inventory Manager', '01711000005', 35000);
 

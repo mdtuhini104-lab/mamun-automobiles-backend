@@ -19,6 +19,12 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+    public const ROLE_SUPER_ADMIN = 'Super Admin';
+    public const ROLE_MANAGER = 'Manager';
+    public const ROLE_TECHNICIAN = 'Technician';
+    public const ROLE_CASHIER = 'Cashier';
+    public const ROLE_STORE_MANAGER = 'Store Manager';
+
     protected string $guard_name = 'web';
 
     /**

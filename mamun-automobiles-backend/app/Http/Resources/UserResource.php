@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             'is_active' => (bool) $this->is_active,
             'roles' => $this->roles->pluck('name'),
             'permissions' => $this->getAllPermissions()->pluck('name'),
-            'stats' => $this->when($this->hasRole('Mechanic'), function () {
+            'stats' => $this->when($this->hasRole(\App\Models\User::ROLE_TECHNICIAN), function () {
                 return [
                     'active_jobs' => $this->assignedJobs()->where('service_status', '!=', 'completed')->count(),
                     'completed_jobs' => $this->assignedJobs()->where('service_status', 'completed')->count(),
