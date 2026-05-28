@@ -30,8 +30,18 @@ class UserController extends Controller
 
     public function store(CreateUserRequest $request): JsonResponse
     {
-        $user = $this->userService->createUser($request->validated());
-        return $this->successResponse(new UserResource($user), 'User created successfully', 201);
+        try {
+            $user = $this->userService->createUser($request->validated());
+            return $this->successResponse(new UserResource($user), 'User created successfully', 201);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('User creation failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'input' => $request->safe()->except(['password'])
+            ]);
+            throw $e;
+        }
     }
 
     public function show(int $id): JsonResponse
@@ -47,14 +57,29 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
-        $updated = $this->userService->updateUser($id, $request->validated());
-        
-        if (!$updated) {
-            return $this->errorResponse('User not found or update failed', 404);
+        try {
+            $updated = $this->userService->updateUser($id, $request->validated());
+            
+            if (!$updated) {
+                \Illuminate\Support\Facades\Log::warning('User update failed: user not found or no changes made', [
+                    'user_id' => $id,
+                    'input' => $request->safe()->except(['password'])
+                ]);
+                return $this->errorResponse('User not found or update failed', 404);
+            }
+            
+            $user = $this->userService->getUser($id);
+            return $this->successResponse(new UserResource($user), 'User updated successfully');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('User update failed with exception', [
+                'user_id' => $id,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'input' => $request->safe()->except(['password'])
+            ]);
+            throw $e;
         }
-        
-        $user = $this->userService->getUser($id);
-        return $this->successResponse(new UserResource($user), 'User updated successfully');
     }
 
     public function destroy(int $id): JsonResponse

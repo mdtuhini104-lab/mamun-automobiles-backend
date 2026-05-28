@@ -21,14 +21,16 @@ class UserService extends BaseService
 
     public function createUser(array $data)
     {
-        $data['password'] = Hash::make($data['password']);
-        $user = $this->repository->create($data);
-        
-        if (isset($data['role'])) {
-            $user->assignRole($data['role']);
-        }
-        
-        return $user;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+            $data['password'] = Hash::make($data['password']);
+            $user = $this->repository->create($data);
+            
+            if (isset($data['role'])) {
+                $user->assignRole($data['role']);
+            }
+            
+            return $user;
+        });
     }
 
     public function getUser(int $id)
@@ -38,18 +40,26 @@ class UserService extends BaseService
 
     public function updateUser(int $id, array $data)
     {
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
+        if (array_key_exists('password', $data)) {
+            if ($data['password'] === null || $data['password'] === '') {
+                unset($data['password']);
+            } else {
+                $data['password'] = Hash::make($data['password']);
+            }
         }
         
-        $updated = $this->repository->update($id, $data);
-        
-        if ($updated && isset($data['role'])) {
-            $user = $this->repository->findById($id);
-            $user->syncRoles([$data['role']]);
-        }
-        
-        return $updated;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id, $data) {
+            $updated = $this->repository->update($id, $data);
+            
+            if ($updated && isset($data['role'])) {
+                $user = $this->repository->findById($id);
+                if ($user) {
+                    $user->syncRoles([$data['role']]);
+                }
+            }
+            
+            return $updated;
+        });
     }
 
     public function deleteUser(int $id)
