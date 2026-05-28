@@ -151,6 +151,32 @@ Route::prefix('v1')->group(function () {
         Route::put('/job-cards/{id}', [App\Http\Controllers\Api\V1\JobCardController::class, 'update']);
         Route::delete('/job-cards/{id}', [App\Http\Controllers\Api\V1\JobCardController::class, 'destroy']);
         
+        // Workshop Bay routes
+        Route::get('/workshop-bays', [App\Http\Controllers\Api\V1\WorkshopBayController::class, 'index']);
+        Route::post('/workshop-bays', [App\Http\Controllers\Api\V1\WorkshopBayController::class, 'store']);
+        Route::get('/workshop-bays/{id}/utilization', [App\Http\Controllers\Api\V1\WorkshopBayController::class, 'getUtilization']);
+
+        // Workforce Assignment routes
+        Route::get('/workforce/employees', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'listEmployees']);
+        Route::get('/workforce/skills', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'listSkills']);
+        Route::get('/workforce/departments', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'listDepartments']);
+        Route::get('/workforce/designations', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'listDesignations']);
+
+        Route::post('/job-cards/{id}/assign', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'assignWorkforce']);
+        Route::post('/job-cards/{id}/tasks', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'createTask']);
+        Route::post('/job-cards/{id}/tasks/{taskId}/assign', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'assignTask']);
+        Route::post('/job-cards/assignments/{assignmentId}/complete', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'completeAssignment']);
+        Route::post('/job-cards/task-assignments/{assignmentId}/complete', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'completeTaskAssignment']);
+        Route::get('/workforce/employees/{id}/workload', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'getEmployeeWorkload']);
+
+        // Employee Availability logs
+        Route::get('/workforce/employees/{id}/availability', [App\Http\Controllers\Api\V1\EmployeeAvailabilityController::class, 'getHistory']);
+        Route::post('/workforce/employees/{id}/availability', [App\Http\Controllers\Api\V1\EmployeeAvailabilityController::class, 'updateAvailability']);
+
+        // Employee Shift Assignments
+        Route::get('/workforce/employees/{id}/shifts', [App\Http\Controllers\Api\V1\EmployeeShiftAssignmentController::class, 'getAssignments']);
+        Route::post('/workforce/employees/{id}/shifts', [App\Http\Controllers\Api\V1\EmployeeShiftAssignmentController::class, 'assignShift']);
+        
         // Settings Routes
         Route::get('/settings', [App\Http\Controllers\Api\V1\SettingsController::class, 'index'])->middleware('permission:settings.view');
         Route::post('/settings', [App\Http\Controllers\Api\V1\SettingsController::class, 'update'])->middleware('permission:settings.edit');

@@ -61,4 +61,24 @@ class JobCard extends Model
     {
         return $this->hasMany(JobCardItem::class);
     }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function workshopBay(): BelongsTo
+    {
+        return $this->belongsTo(WorkshopBay::class);
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(JobCardAssignment::class);
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(JobCardTask::class);
+    }
 }

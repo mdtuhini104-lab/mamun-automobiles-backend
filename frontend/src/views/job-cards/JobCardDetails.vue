@@ -145,6 +145,9 @@
               </div>
             </div>
           </div>
+
+          <!-- Decomposed Tasks and Labor Hour Progress -->
+          <TaskBoard :job-card="jobCard" @updated="fetchJobCard" />
         </div>
 
         <!-- Sidebar Info -->
@@ -197,6 +200,12 @@
               </dl>
             </div>
           </div>
+
+          <!-- Workshop Bay Allocation Panel -->
+          <BayAllocationPanel :job-card="jobCard" @updated="fetchJobCard" />
+
+          <!-- Workforce Delegation Panel -->
+          <WorkforcePanel :job-card="jobCard" @updated="fetchJobCard" />
         </div>
       </div>
     </div>
@@ -208,6 +217,9 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
+import WorkforcePanel from './components/WorkforcePanel.vue';
+import BayAllocationPanel from './components/BayAllocationPanel.vue';
+import TaskBoard from './components/TaskBoard.vue';
 
 const route = useRoute();
 const router = useRouter();

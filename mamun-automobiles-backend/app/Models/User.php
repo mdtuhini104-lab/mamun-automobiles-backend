@@ -47,4 +47,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\JobCard::class, 'assigned_mechanic_id');
     }
+
+    public function employee()
+    {
+        return $this->hasOne(\App\Models\Employee::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(\App\Models\Department::class);
+    }
+
+    public function designation()
+    {
+        return $this->belongsTo(\App\Models\Designation::class);
+    }
 }

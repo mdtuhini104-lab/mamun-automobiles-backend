@@ -33,6 +33,18 @@ class JobCardResource extends JsonResource
             'start_date' => $this->start_date,
             'delivery_date' => $this->delivery_date,
             'notes' => $this->notes,
+            'department_id' => $this->department_id,
+            'department' => $this->whenLoaded('department', function () {
+                return $this->department ? [
+                    'id' => $this->department->id,
+                    'name' => $this->department->name,
+                    'code' => $this->department->code,
+                ] : null;
+            }),
+            'workshop_bay_id' => $this->workshop_bay_id,
+            'workshop_bay' => new WorkshopBayResource($this->whenLoaded('workshopBay')),
+            'assignments' => JobCardAssignmentResource::collection($this->whenLoaded('assignments')),
+            'tasks' => JobCardTaskResource::collection($this->whenLoaded('tasks')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

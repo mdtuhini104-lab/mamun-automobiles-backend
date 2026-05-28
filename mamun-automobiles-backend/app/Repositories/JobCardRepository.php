@@ -71,7 +71,16 @@ class JobCardRepository extends BaseRepository
      */
     public function findById(int $id): ?JobCard
     {
-        return JobCard::with(['customer', 'vehicle', 'mechanic', 'items.part'])->find($id);
+        return JobCard::with([
+            'customer',
+            'vehicle',
+            'mechanic',
+            'items.part',
+            'department',
+            'workshopBay',
+            'assignments.employee.user',
+            'tasks.assignments.employee.user'
+        ])->find($id);
     }
 
     /**

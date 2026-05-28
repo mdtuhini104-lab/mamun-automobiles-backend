@@ -8,21 +8,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\LogsActivity;
 
-class Department extends Model
+class WorkshopBay extends Model
 {
     use HasFactory, LogsActivity;
 
     protected $fillable = [
         'name',
         'code',
-        'description',
-        'head_user_id',
         'branch_id',
-        'is_active',
+        'max_vehicle_capacity',
+        'current_load',
+        'status',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'max_vehicle_capacity' => 'integer',
+        'current_load' => 'integer',
     ];
 
     public function branch(): BelongsTo
@@ -30,18 +31,8 @@ class Department extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function headUser(): BelongsTo
+    public function jobCards(): HasMany
     {
-        return $this->belongsTo(User::class, 'head_user_id');
-    }
-
-    public function employees(): HasMany
-    {
-        return $this->hasMany(Employee::class);
-    }
-
-    public function designations(): HasMany
-    {
-        return $this->hasMany(Designation::class);
+        return $this->hasMany(JobCard::class);
     }
 }
