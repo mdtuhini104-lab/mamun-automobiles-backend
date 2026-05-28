@@ -308,5 +308,3 @@ Route::prefix('v1')->group(function () {
         Route::get('/print/payroll/{id}', [App\Http\Controllers\Api\V1\PrintController::class, 'payroll']);
     });
 });
-/ /   T r i g g e r   d e p l o y m e n t  
- 
