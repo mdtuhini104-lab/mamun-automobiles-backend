@@ -19,10 +19,10 @@ class JobCardResource extends JsonResource
             'customer' => new CustomerResource($this->whenLoaded('customer')),
             'vehicle' => new VehicleResource($this->whenLoaded('vehicle')),
             'mechanic' => $this->whenLoaded('mechanic', function () {
-                return [
+                return $this->mechanic ? [
                     'id' => $this->mechanic->id,
                     'name' => $this->mechanic->name,
-                ];
+                ] : null;
             }),
             'complaint' => $this->complaint,
             'diagnosis' => $this->diagnosis,

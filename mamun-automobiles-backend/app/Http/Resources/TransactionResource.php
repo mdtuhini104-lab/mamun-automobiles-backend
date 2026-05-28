@@ -14,7 +14,7 @@ class TransactionResource extends JsonResource
             'account' => new AccountResource($this->whenLoaded('account')),
             'type' => $this->type,
             'category' => $this->whenLoaded('category', function () {
-                return ['id' => $this->category->id, 'name' => $this->category->name];
+                return $this->category ? ['id' => $this->category->id, 'name' => $this->category->name] : null;
             }),
             'amount' => $this->amount,
             'payment_method' => $this->payment_method,

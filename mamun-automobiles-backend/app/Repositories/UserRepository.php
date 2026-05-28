@@ -25,7 +25,9 @@ class UserRepository extends BaseRepository
         }
         
         if (isset($filters['role'])) {
-            $query->role($filters['role']);
+            $query->whereHas('roles', function ($q) use ($filters) {
+                $q->where('name', $filters['role']);
+            });
         }
 
         return $query->get();
