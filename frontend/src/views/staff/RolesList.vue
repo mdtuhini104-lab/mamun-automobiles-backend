@@ -51,71 +51,87 @@
     </div>
 
     <!-- Role Matrix Modal -->
-    <div v-if="isModalOpen" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-slate-900 bg-opacity-50 transition-opacity" @click="closeModal"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
-          <form @submit.prevent="saveRole">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-              <div class="sm:flex sm:items-start">
-                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                  <h3 class="text-lg leading-6 font-semibold text-slate-900" id="modal-title">
-                    {{ editingRole ? 'Edit Role & Permissions' : 'Create New Role' }}
-                  </h3>
-                  
-                  <div class="mt-4">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Role Name</label>
-                    <input type="text" v-model="form.name" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="e.g. Senior Technician">
-                  </div>
+    <Teleport to="body">
+      <div v-if="isModalOpen" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div class="fixed inset-0 bg-slate-900 bg-opacity-50 transition-opacity" @click="closeModal"></div>
+          <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+          <div class="relative inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full z-10">
+            <form @submit.prevent="saveRole">
+              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                  <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                    <h3 class="text-lg leading-6 font-semibold text-slate-900" id="modal-title">
+                      {{ editingRole ? 'Edit Role & Permissions' : 'Create New Role' }}
+                    </h3>
+                    
+                    <!-- Fallback UI if role data is missing while editing -->
+                    <div v-if="editingRole && !form.name" class="mt-4 p-4 bg-yellow-50 text-yellow-800 text-sm rounded-lg border border-yellow-200">
+                      <strong>Warning:</strong> Selected role details are not fully loaded or are invalid. Please close the modal and try again.
+                    </div>
 
-                  <div class="mt-6">
-                    <h4 class="text-md font-semibold text-slate-800 mb-3">Permission Matrix</h4>
-                    <div class="border border-slate-200 rounded-lg overflow-hidden">
-                      <table class="min-w-full divide-y divide-slate-200 table-fixed">
-                        <thead class="bg-slate-50">
-                          <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-1/4">Module</th>
-                            <th scope="col" class="px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider w-12" v-for="action in availableActions" :key="action">
-                              {{ action }}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-slate-200">
-                          <tr v-for="(modulePerms, moduleName) in groupedPermissions" :key="moduleName" class="hover:bg-slate-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 capitalize">
-                              {{ moduleName.replace('_', ' ') }}
-                            </td>
-                            <td class="px-2 py-4 whitespace-nowrap text-center" v-for="action in availableActions" :key="action">
-                              <input 
-                                v-if="hasActionForModule(moduleName, action)"
-                                type="checkbox" 
-                                :value="getPermissionName(moduleName, action)"
-                                v-model="form.permissions"
-                                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded cursor-pointer"
-                              >
-                              <span v-else class="text-slate-300">-</span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    <div class="mt-4">
+                      <label class="block text-sm font-medium text-slate-700 mb-1">Role Name</label>
+                      <input type="text" v-model="form.name" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="e.g. Senior Technician">
+                    </div>
+
+                    <!-- Loader if permissions list is empty -->
+                    <div v-if="!groupedPermissions || Object.keys(groupedPermissions).length === 0" class="mt-6 p-8 text-center text-slate-500 border border-dashed border-slate-200 rounded-lg">
+                      <svg class="animate-spin h-6 w-6 text-slate-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Loading permissions matrix...
+                    </div>
+
+                    <div v-else class="mt-6">
+                      <h4 class="text-md font-semibold text-slate-800 mb-3">Permission Matrix</h4>
+                      <div class="border border-slate-200 rounded-lg overflow-hidden overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200 table-fixed">
+                          <thead class="bg-slate-50">
+                            <tr>
+                              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-1/4">Module</th>
+                              <th scope="col" class="px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider w-12" v-for="action in availableActions" :key="action">
+                                {{ action }}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody class="bg-white divide-y divide-slate-200">
+                            <tr v-for="(modulePerms, moduleName) in (groupedPermissions || {})" :key="moduleName" class="hover:bg-slate-50">
+                              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 capitalize">
+                                {{ typeof moduleName === 'string' ? moduleName.replace('_', ' ') : moduleName }}
+                              </td>
+                              <td class="px-2 py-4 whitespace-nowrap text-center" v-for="action in availableActions" :key="action">
+                                <input 
+                                  v-if="hasActionForModule(moduleName, action)"
+                                  type="checkbox" 
+                                  :value="getPermissionName(moduleName, action)"
+                                  v-model="form.permissions"
+                                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded cursor-pointer"
+                                >
+                                <span v-else class="text-slate-300">-</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-200">
-              <button type="submit" :disabled="isSaving" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
-                {{ isSaving ? 'Saving...' : 'Save Role Matrix' }}
-              </button>
-              <button type="button" @click="closeModal" class="mt-3 w-full inline-flex justify-center rounded-lg border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                Cancel
-              </button>
-            </div>
-          </form>
+              <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-200">
+                <button type="submit" :disabled="isSaving" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+                  {{ isSaving ? 'Saving...' : 'Save Role Matrix' }}
+                </button>
+                <button type="button" @click="closeModal" class="mt-3 w-full inline-flex justify-center rounded-lg border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
@@ -152,8 +168,9 @@ const loadData = async () => {
 };
 
 const hasActionForModule = (module, action) => {
+  if (!groupedPermissions.value || !module) return false;
   const perms = groupedPermissions.value[module] || [];
-  return perms.some(p => p.name.endsWith(`.${action}`));
+  return Array.isArray(perms) && perms.some(p => p && p.name && p.name.endsWith(`.${action}`));
 };
 
 const getPermissionName = (module, action) => {
@@ -163,8 +180,10 @@ const getPermissionName = (module, action) => {
 const openModal = (role = null) => {
   editingRole.value = role;
   if (role) {
-    form.value.name = role.name;
-    form.value.permissions = role.permissions ? role.permissions.map(p => p.name) : [];
+    form.value.name = role.name || '';
+    form.value.permissions = Array.isArray(role.permissions)
+      ? role.permissions.filter(p => p && p.name).map(p => p.name)
+      : [];
   } else {
     form.value.name = '';
     form.value.permissions = [];
@@ -178,14 +197,18 @@ const closeModal = () => {
 };
 
 const saveRole = async () => {
+  if (!form.value.name) {
+    toastStore.warning('Role name is required.');
+    return;
+  }
   isSaving.value = true;
   try {
     const payload = {
       name: form.value.name,
-      permissions: form.value.permissions
+      permissions: form.value.permissions || []
     };
 
-    if (editingRole.value) {
+    if (editingRole.value && editingRole.value.id) {
       await api.put(`/roles/${editingRole.value.id}`, payload);
     } else {
       await api.post('/roles', payload);
@@ -196,12 +219,14 @@ const saveRole = async () => {
     toastStore.success('Role saved successfully.');
   } catch (error) {
     console.error('Failed to save role', error);
+    toastStore.error(error.response?.data?.message || 'Failed to save role matrix.');
   } finally {
     isSaving.value = false;
   }
 };
 
 const deleteRole = async (id) => {
+  if (!id) return;
   if (confirm('Are you sure you want to delete this role?')) {
     try {
       await api.delete(`/roles/${id}`);
@@ -209,6 +234,7 @@ const deleteRole = async (id) => {
       toastStore.success('Role deleted successfully.');
     } catch (error) {
       console.error('Failed to delete role', error);
+      toastStore.error(error.response?.data?.message || 'Failed to delete role.');
     }
   }
 };
