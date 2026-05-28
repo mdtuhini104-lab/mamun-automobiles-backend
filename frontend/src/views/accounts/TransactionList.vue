@@ -96,7 +96,9 @@
               </div>
             </div>
             <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-              <button @click="handleSave" type="button" class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto">Save</button>
+              <button @click="handleSave" :disabled="txStore.saving" type="button" class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto disabled:opacity-50">
+                {{ txStore.saving ? 'Saving...' : 'Save' }}
+              </button>
               <button @click="txStore.closeModal()" type="button" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto">Cancel</button>
             </div>
           </div>
@@ -109,8 +111,10 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useTransactionStore } from '../../stores/transaction';
+import { useToastStore } from '../../stores/toast';
 
 const txStore = useTransactionStore();
+const toastStore = useToastStore();
 const typeInput = ref('');
 
 onMounted(() => {
@@ -124,8 +128,9 @@ const applyType = () => {
 const handleSave = async () => {
   try {
     await txStore.saveTransaction();
+    toastStore.success('Transaction saved successfully.');
   } catch (e) {
-    alert('Failed to save transaction');
+    // Handled by global Axios interceptor toast
   }
 };
 </script>

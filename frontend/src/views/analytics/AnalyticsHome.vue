@@ -80,9 +80,11 @@
 <script setup>
 import { onMounted, computed } from 'vue';
 import { useAnalyticsStore } from '../../stores/analytics';
+import { useToastStore } from '../../stores/toast';
 import VueApexCharts from 'vue3-apexcharts';
 
 const analyticsStore = useAnalyticsStore();
+const toast = useToastStore();
 
 onMounted(() => {
   analyticsStore.fetchDashboard();
@@ -125,7 +127,7 @@ const mechanicOptions = computed(() => {
 });
 
 const exportPDF = () => {
-  alert('Report PDF Generation triggered! In a real app this downloads the analytical PDF.');
+  toast.info('Report PDF Generation triggered! In a real app this downloads the analytical PDF.');
 };
 </script>
 

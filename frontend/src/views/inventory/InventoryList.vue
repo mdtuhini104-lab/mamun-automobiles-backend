@@ -254,11 +254,11 @@
 import { onMounted, ref } from 'vue';
 import { useInventoryStore } from '../../stores/inventory';
 import { useAuthStore } from '../../stores/auth';
-
+import { useToastStore } from '../../stores/toast';
 
 const inventoryStore = useInventoryStore();
 const authStore = useAuthStore();
-
+const toastStore = useToastStore();
 
 const searchInput = ref('');
 const categoryInput = ref('');
@@ -283,20 +283,20 @@ const changePage = (page) => {
 const handleSave = async () => {
   try {
     await inventoryStore.savePart();
-    alert('Part saved successfully');
+    toastStore.success('Part saved successfully.');
   } catch (e) {
-    alert('Failed to save part');
+    // Handled by global Axios interceptor
   }
 };
 
 const handleDelete = async (id) => {
-  if(confirm('Are you sure you want to delete this part?')) {
+  if (confirm('Are you sure you want to delete this part?')) {
     try {
       await inventoryStore.deletePart(id);
       inventoryStore.closeModal();
-      alert('Part deleted successfully');
+      toastStore.success('Part deleted successfully.');
     } catch (e) {
-      alert('Failed to delete part');
+      // Handled by global Axios interceptor
     }
   }
 };

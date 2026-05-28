@@ -85,10 +85,12 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import api from '../services/api';
+import { useToastStore } from '../stores/toast';
 
 const predictions = ref({});
 const anomalies = ref(0);
 const recommendations = ref(0);
+const toast = useToastStore();
 
 const fetchDashboard = async () => {
   try {
@@ -104,9 +106,10 @@ const fetchDashboard = async () => {
 const runAutomations = async () => {
   try {
     await api.post('/ai/run-automation');
-    alert('AI Automations executed successfully!');
+    toast.success('AI Automations executed successfully!');
   } catch (error) {
-    alert('Failed to run AI automations.');
+    // Error is also handled by global Axios interceptor, but we fallback gracefully
+    toast.error('Failed to run AI automations.');
   }
 };
 

@@ -67,7 +67,9 @@
               </div>
             </div>
             <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-              <button @click="handleSave" type="button" class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto">Save</button>
+              <button @click="handleSave" :disabled="accountStore.saving" type="button" class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto disabled:opacity-50">
+                {{ accountStore.saving ? 'Saving...' : 'Save' }}
+              </button>
               <button @click="accountStore.closeModal()" type="button" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto">Cancel</button>
             </div>
           </div>
@@ -81,9 +83,11 @@
 import { onMounted } from 'vue';
 import { useAccountStore } from '../../stores/account';
 import { useAuthStore } from '../../stores/auth';
+import { useToastStore } from '../../stores/toast';
 
 const accountStore = useAccountStore();
 const authStore = useAuthStore();
+const toastStore = useToastStore();
 
 onMounted(() => {
   accountStore.fetchAccounts();
@@ -92,8 +96,9 @@ onMounted(() => {
 const handleSave = async () => {
   try {
     await accountStore.saveAccount();
+    toastStore.success('Account saved successfully.');
   } catch (e) {
-    alert('Failed to save account');
+    // Handled by global Axios interceptor toast
   }
 };
 </script>

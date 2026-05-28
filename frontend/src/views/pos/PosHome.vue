@@ -257,9 +257,11 @@ import { usePosStore } from '../../stores/pos';
 import { useStockSocket } from '../../composables/useStockSocket';
 import { usePosSocket } from '../../composables/usePosSocket';
 import { useAuthStore } from '../../stores/auth';
+import { useToastStore } from '../../stores/toast';
 
 const posStore = usePosStore();
 const authStore = useAuthStore();
+const toast = useToastStore();
 const searchInputRef = ref(null);
 const isFullscreen = ref(false);
 let searchTimeout = null;
@@ -324,7 +326,7 @@ const handleAddToCart = (product) => {
 };
 
 const closeRegister = () => {
-  alert('Daily Closing Report:\nTotal Sales: $1,250.00\nCash: $800.00\nCard: $350.00\nDue: $100.00');
+  toast.info('Daily Closing Report:\nTotal Sales: $1,250.00\nCash: $800.00\nCard: $350.00\nDue: $100.00');
 };
 
 const processPaymentAndPrint = async () => {
@@ -335,7 +337,7 @@ const processPaymentAndPrint = async () => {
       posStore.clearCart();
     }, 300);
   } else {
-    alert('Failed to process payment. Please try again.');
+    toast.error('Failed to process payment. Please try again.');
   }
 };
 

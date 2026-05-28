@@ -122,12 +122,14 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import api from '../../services/api';
+import { useToastStore } from '../../stores/toast';
 
 const roles = ref([]);
 const groupedPermissions = ref({});
 const isModalOpen = ref(false);
 const editingRole = ref(null);
 const isSaving = ref(false);
+const toastStore = useToastStore();
 
 const availableActions = ['view', 'create', 'edit', 'delete', 'approve', 'print', 'export', 'execute'];
 
@@ -191,9 +193,9 @@ const saveRole = async () => {
     
     await loadData();
     closeModal();
+    toastStore.success('Role saved successfully.');
   } catch (error) {
     console.error('Failed to save role', error);
-    alert(error.response?.data?.message || 'Failed to save role');
   } finally {
     isSaving.value = false;
   }
@@ -204,9 +206,9 @@ const deleteRole = async (id) => {
     try {
       await api.delete(`/roles/${id}`);
       await loadData();
+      toastStore.success('Role deleted successfully.');
     } catch (error) {
       console.error('Failed to delete role', error);
-      alert(error.response?.data?.message || 'Failed to delete role');
     }
   }
 };

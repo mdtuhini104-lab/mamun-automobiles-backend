@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import api from '../services/api';
+import { useToastStore } from './toast';
 
 export const usePurchaseStore = defineStore('purchases', {
   state: () => ({
@@ -133,7 +134,8 @@ export const usePurchaseStore = defineStore('purchases', {
       
       const purchase = this.purchases.find(p => p.id === id);
       if (purchase && purchase.status === 'approved') {
-        alert('This purchase was already approved externally.');
+        const toast = useToastStore();
+        toast.warning('This purchase was already approved externally.');
         return false;
       }
 

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import api from '../services/api';
+import { useToastStore } from './toast';
 
 export const useInvoiceStore = defineStore('invoices', {
   state: () => ({
@@ -88,7 +89,8 @@ export const useInvoiceStore = defineStore('invoices', {
       // Prevent stale modal submission if externally paid
       const currentInvoice = this.invoices.find(i => i.id === invoiceId);
       if (currentInvoice && currentInvoice.payment_status === 'paid') {
-        alert('This invoice was already fully paid.');
+        const toast = useToastStore();
+        toast.warning('This invoice was already fully paid.');
         this.closePaymentModal();
         return false;
       }
