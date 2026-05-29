@@ -116,6 +116,22 @@ Route::prefix('v1')->group(function () {
         }
     });
 
+    Route::get('/debug-token', function () {
+        try {
+            $user = \App\Models\User::where('email', 'admin@mamunerp.com')->firstOrFail();
+            $token = $user->createToken('debug-token')->plainTextToken;
+            return response()->json([
+                'success' => true,
+                'token' => $token
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    });
+
     Route::get('/debug-dashboard-auth/{userId}', function ($userId) {
         try {
             $user = \App\Models\User::findOrFail($userId);
