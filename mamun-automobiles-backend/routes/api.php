@@ -89,6 +89,51 @@ Route::prefix('v1')->group(function () {
         }
     });
 
+    Route::get('/debug-users', function () {
+        try {
+            $users = \App\Models\User::all()->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'roles' => $user->roles->pluck('name'),
+                    'tenant_id' => $user->tenant_id,
+                    'branch_id' => $user->branch_id,
+                ];
+            });
+            return response()->json([
+                'success' => true,
+                'users' => $users
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'trace' => explode("\n", $e->getTraceAsString())
+            ], 500);
+        }
+    });
+
+    Route::get('/debug-dashboard-auth/{userId}', function ($userId) {
+        try {
+            $user = \App\Models\User::findOrFail($userId);
+            auth()->login($user);
+            
+            $data = app(App\Services\DashboardService::class)->getDashboardData();
+            return response()->json([
+                'success' => true,
+                'message' => 'Dashboard loaded successfully for user ' . $user->email,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'trace' => explode("\n", $e->getTraceAsString())
+            ], 500);
+        }
+    });
+
     // Public Verification Route
     Route::get('/verify/invoice/{invoice_no}', [App\Http\Controllers\Api\VerificationController::class, 'verifyInvoice']);
     Route::get('/portal/access/{uuid}', [App\Http\Controllers\Api\V1\CustomerPortalController::class, 'accessViaUuid']);
