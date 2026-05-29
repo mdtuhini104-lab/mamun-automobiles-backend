@@ -28,6 +28,12 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/deploy-migrate', function () {
         try {
+            // Clean up any remnants of failed runs directly on the database level
+            \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+            \Illuminate\Support\Facades\Schema::dropIfExists('job_task_assignments');
+            \Illuminate\Support\Facades\Schema::dropIfExists('job_card_assignments');
+            \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
             \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
             $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
             
