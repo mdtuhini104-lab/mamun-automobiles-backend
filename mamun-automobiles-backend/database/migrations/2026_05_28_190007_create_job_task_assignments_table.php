@@ -27,7 +27,9 @@ return new class extends Migration
         });
 
         // Add partial unique index to prevent duplicate ACTIVE task assignments for the same employee
-        DB::statement("CREATE UNIQUE INDEX job_task_assignments_active_unique ON job_task_assignments (job_card_task_id, employee_id) WHERE status = 'active' AND deleted_at IS NULL;");
+        if (DB::getDriverName() === 'sqlite' || DB::getDriverName() === 'pgsql') {
+            DB::statement("CREATE UNIQUE INDEX job_task_assignments_active_unique ON job_task_assignments (job_card_task_id, employee_id) WHERE status = 'active' AND deleted_at IS NULL;");
+        }
     }
 
     public function down(): void

@@ -32,7 +32,9 @@ return new class extends Migration
         });
 
         // Add a partial unique index to prevent duplicate ACTIVE assignments for the same employee on the same job card
-        DB::statement("CREATE UNIQUE INDEX job_card_assignments_active_unique ON job_card_assignments (job_card_id, employee_id) WHERE status = 'active' AND deleted_at IS NULL;");
+        if (DB::getDriverName() === 'sqlite' || DB::getDriverName() === 'pgsql') {
+            DB::statement("CREATE UNIQUE INDEX job_card_assignments_active_unique ON job_card_assignments (job_card_id, employee_id) WHERE status = 'active' AND deleted_at IS NULL;");
+        }
     }
 
     public function down(): void
