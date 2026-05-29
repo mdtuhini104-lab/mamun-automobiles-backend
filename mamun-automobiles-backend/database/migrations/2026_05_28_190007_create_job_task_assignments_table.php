@@ -9,6 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::dropIfExists('job_task_assignments');
         Schema::create('job_task_assignments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('job_card_task_id')->constrained('job_card_tasks')->cascadeOnDelete();
