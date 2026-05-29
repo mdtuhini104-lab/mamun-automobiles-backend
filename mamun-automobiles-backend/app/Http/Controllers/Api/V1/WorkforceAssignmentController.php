@@ -262,5 +262,14 @@ class WorkforceAssignmentController extends Controller
         $designations = \App\Models\Designation::where('is_active', true)->orderBy('name')->get();
         return $this->successResponse($designations, 'Designations retrieved successfully');
     }
+
+    /**
+     * List all shifts.
+     */
+    public function listShifts(): JsonResponse
+    {
+        $shifts = \App\Models\Shift::orderBy('name')->get();
+        return $this->successResponse($shifts, 'Shifts retrieved successfully');
+    }
 }
 

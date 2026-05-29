@@ -24,6 +24,14 @@ class CreateUserRequest extends FormRequest
             'salary' => 'nullable|numeric|min:0',
             'joining_date' => 'nullable|date',
             'is_active' => 'nullable|boolean',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'designation_id' => 'nullable|integer|exists:designations,id',
+            'shift_id' => 'nullable|integer|exists:shifts,id',
+            'employee_code' => 'nullable|string|max:50',
+            'status' => 'nullable|string',
+            'availability_status' => 'nullable|string',
+            'skills' => 'nullable|array',
+            'skills.*' => 'integer|exists:skills,id',
         ];
     }
 }

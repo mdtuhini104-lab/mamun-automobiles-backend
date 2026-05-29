@@ -161,6 +161,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/workforce/skills', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'listSkills']);
         Route::get('/workforce/departments', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'listDepartments']);
         Route::get('/workforce/designations', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'listDesignations']);
+        Route::get('/workforce/shifts', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'listShifts']);
 
         Route::post('/job-cards/{id}/assign', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'assignWorkforce']);
         Route::post('/job-cards/{id}/tasks', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'createTask']);

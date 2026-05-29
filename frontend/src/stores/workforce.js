@@ -8,6 +8,7 @@ export const useWorkforceStore = defineStore('workforce', {
     skills: [],
     departments: [],
     designations: [],
+    shifts: [],
     loading: false,
     saving: false
   }),
@@ -25,14 +26,16 @@ export const useWorkforceStore = defineStore('workforce', {
     },
     async fetchLookups() {
       try {
-        const [skillsRes, deptsRes, desgsRes] = await Promise.all([
+        const [skillsRes, deptsRes, desgsRes, shiftsRes] = await Promise.all([
           api.get('/workforce/skills'),
           api.get('/workforce/departments'),
-          api.get('/workforce/designations')
+          api.get('/workforce/designations'),
+          api.get('/workforce/shifts')
         ]);
         this.skills = skillsRes.data.data;
         this.departments = deptsRes.data.data;
         this.designations = desgsRes.data.data;
+        this.shifts = shiftsRes.data.data;
       } catch (error) {
         console.error('Failed to load workforce lookups', error);
       }

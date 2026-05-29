@@ -14,7 +14,7 @@ class UserRepository extends BaseRepository
 
     public function getAll(array $filters = []): Collection
     {
-        $query = User::query();
+        $query = User::with(['roles', 'permissions', 'employee.department', 'employee.designation', 'employee.skills', 'department', 'designation']);
 
         if (isset($filters['search'])) {
             $search = $filters['search'];
@@ -40,7 +40,7 @@ class UserRepository extends BaseRepository
 
     public function findById(int $id): ?User
     {
-        return User::find($id);
+        return User::with(['roles', 'permissions', 'employee.department', 'employee.designation', 'employee.skills', 'department', 'designation'])->find($id);
     }
 
     public function findByEmail(string $email): ?User
