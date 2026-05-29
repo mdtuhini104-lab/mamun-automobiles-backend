@@ -33,6 +33,27 @@ Route::prefix('v1')->group(function () {
         ], 401);
     })->name('login');
 
+    // TEMPORARY: Deploy migrate and debug routes
+    Route::get('/deploy-migrate', function () {
+        try {
+            $output = '';
+            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Migrations run successfully',
+                'output' => \Illuminate\Support\Facades\Artisan::output()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'trace' => explode("\n", $e->getTraceAsString())
+            ], 500);
+        }
+    });
+
+    Route::get('/debug-dash', [App\Http\Controllers\Api\V1\DashboardController::class, 'index']);
+
     // Public Verification Route
     Route::get('/verify/invoice/{invoice_no}', [App\Http\Controllers\Api\VerificationController::class, 'verifyInvoice']);
     Route::get('/portal/access/{uuid}', [App\Http\Controllers\Api\V1\CustomerPortalController::class, 'accessViaUuid']);
