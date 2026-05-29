@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\MultitenantSafe;
+use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +12,7 @@ use App\Enums\ServiceStatus;
 
 class JobCard extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, MultitenantSafe, BranchScoped;
     protected $fillable = [
         'customer_id',
         'vehicle_id',
@@ -24,10 +26,27 @@ class JobCard extends Model
         'start_date',
         'delivery_date',
         'notes',
+        'fuel_level',
+        'odometer_reading',
+        'emergency_level',
+        'expected_delivery_date',
+        'inspection_notes',
+        'priority_level',
+        'safety_warnings',
+        'voice_notes_path',
+        'images_paths',
+        'documents_paths',
+        'ai_priority_score',
+        'ai_failure_probability',
     ];
 
     protected $casts = [
         'service_status' => ServiceStatus::class,
+        'expected_delivery_date' => 'datetime',
+        'images_paths' => 'array',
+        'documents_paths' => 'array',
+        'ai_priority_score' => 'float',
+        'ai_failure_probability' => 'float',
     ];
 
     /**
@@ -81,4 +100,29 @@ class JobCard extends Model
     {
         return $this->hasMany(JobCardTask::class);
     }
+
+    /**
+     * Get all quotations associated with this job card.
+     */
+    public function quotations(): HasMany
+    {
+        return $this->hasMany(Quotation::class);
+    }
+
+    /**
+     * Get the work order generated from this job card.
+     */
+    public function workOrder(): HasOne
+    {
+        return $this->hasOne(WorkOrder::class);
+    }
+
+    /**
+     * Get the workflow state history logs.
+     */
+    public function workflowHistories(): HasMany
+    {
+        return $this->hasMany(WorkflowHistory::class);
+    }
 }
+

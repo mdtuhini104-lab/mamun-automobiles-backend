@@ -45,6 +45,7 @@ class JobCardResource extends JsonResource
             'workshop_bay' => new WorkshopBayResource($this->whenLoaded('workshopBay')),
             'assignments' => JobCardAssignmentResource::collection($this->whenLoaded('assignments')),
             'tasks' => JobCardTaskResource::collection($this->whenLoaded('tasks')),
+            'workflow_history' => WorkflowHistoryResource::collection($this->whenLoaded('workflowHistory')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

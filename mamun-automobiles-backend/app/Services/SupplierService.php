@@ -53,4 +53,40 @@ class SupplierService extends BaseService
         }
         return $deleted;
     }
+
+    /**
+     * Record a payment made to a supplier.
+     */
+    public function recordPayment(int $supplierId, float $amount, ?string $notes = null): \App\Models\SupplierLedger
+    {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($supplierId, $amount, $notes) {
+            $supplier = $this->getSupplier($supplierId);
+            if (!$supplier) {
+                throw new \Exception('Supplier not found');
+            }
+
+            $ledger = \App\Models\SupplierLedger::logTransaction($supplierId, $amount, 'payment', $notes);
+            
+            $this->auditLogService->log('record_payment', 'Supplier', $supplierId, [
+                'amount' => $amount,
+                'notes' => $notes,
+                'ledger_id' => $ledger->id
+            ]);
+
+            return $ledger;
+        });
+    }
+
+    /**
+     * Get the ledger history for a supplier.
+     */
+    public function getLedgerHistory(int $supplierId)
+    {
+        $supplier = $this->getSupplier($supplierId);
+        if (!$supplier) {
+            throw new \Exception('Supplier not found');
+        }
+
+        return $supplier->ledgers()->latest()->get();
+    }
 }

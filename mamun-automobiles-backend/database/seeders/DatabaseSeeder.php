@@ -20,6 +20,10 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             WorkforceSeeder::class,
             RealDataSeeder::class,
+            WorkflowStateMachineSeeder::class,
+            CustomerPricingSeeder::class,
+            KnowledgeBaseSeeder::class,
         ]);
     }
 }
+

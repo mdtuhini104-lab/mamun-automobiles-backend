@@ -15,6 +15,7 @@ class JobCardTaskResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'estimated_minutes' => $this->estimated_minutes,
+            'actual_minutes' => $this->actual_minutes,
             'status' => $this->status,
             'assignments' => JobTaskAssignmentResource::collection($this->whenLoaded('taskAssignments')),
         ];

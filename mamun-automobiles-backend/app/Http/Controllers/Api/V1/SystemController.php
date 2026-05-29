@@ -26,13 +26,53 @@ class SystemController extends Controller
         return response()->json($this->monitoringService->getSystemHealth());
     }
 
-    public function createBackup()
+    public function createBackup(\App\Services\BackupRecoveryEngine $engine)
     {
-        return response()->json($this->backupService->generateFullBackup());
+        try {
+            $archivePath = $engine->createArchive();
+            $encryptedPath = $engine->gpgEncrypt($archivePath);
+            $isViable = $engine->verifyRestore($encryptedPath);
+
+            if ($isViable) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Encrypted system database backup completed and restore integrity verified successfully.',
+                    'file' => basename($encryptedPath)
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Integrity verification failed on backup archive.'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    public function restoreBackup(Request $request)
+    public function restoreBackup(Request $request, \App\Services\BackupRecoveryEngine $engine)
     {
-        return response()->json($this->recoveryService->restoreFromBackup($request->input('file_id')));
+        $filePath = storage_path('app/backups/' . $request->input('file_id'));
+        try {
+            $isValid = $engine->verifyRestore($filePath);
+            if ($isValid) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Backup archive restore capability successfully verified.'
+                ]);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid backup encryption signature or corrupted file payload.'
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

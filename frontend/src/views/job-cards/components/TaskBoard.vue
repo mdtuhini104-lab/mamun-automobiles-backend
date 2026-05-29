@@ -114,6 +114,12 @@
       </div>
     </div>
 
+    <!-- Interactive Workshop Kanban Flow -->
+    <TaskKanbanBoard
+      :tasks="jobCard.tasks"
+      @updated="$emit('updated')"
+    />
+
     <!-- Labor tracking & Completing assignment board -->
     <div class="bg-white shadow-sm rounded-xl border border-slate-200 overflow-hidden">
       <div class="px-6 py-5 border-b border-slate-200 bg-slate-50">
@@ -179,14 +185,11 @@
       </div>
     </div>
 
-    <!-- Modals -->
-    <TaskAssignmentModal
-      :is-open="isAssignModalOpen"
-      :task-id="selectedTaskForAssign?.id || 0"
-      :task-name="selectedTaskForAssign?.name || ''"
-      :job-card-id="jobCard.id"
-      @close="isAssignModalOpen = false"
-      @assigned="$emit('updated')"
+    <!-- Technician Assignment Drawer -->
+    <TechnicianAssignmentDrawer
+      :is-open="isDrawerOpen"
+      @close="isDrawerOpen = false"
+      @selected="handleDrawerAssign"
     />
 
     <!-- Labor hours log inline overlay -->
@@ -225,7 +228,8 @@
 <script setup>
 import { ref, reactive, computed } from 'vue';
 import { useJobCardTasksStore } from '../../../stores/jobCardTasks';
-import TaskAssignmentModal from './TaskAssignmentModal.vue';
+import TaskKanbanBoard from './TaskKanbanBoard.vue';
+import TechnicianAssignmentDrawer from './TechnicianAssignmentDrawer.vue';
 
 const props = defineProps({
   jobCard: {
@@ -242,7 +246,7 @@ const emit = defineEmits(['updated']);
 const tasksStore = useJobCardTasksStore();
 
 const showAddTaskForm = ref(false);
-const isAssignModalOpen = ref(false);
+const isDrawerOpen = ref(false);
 const selectedTaskForAssign = ref(null);
 
 const showLaborModal = ref(false);
@@ -292,7 +296,18 @@ const submitAddTask = async () => {
 
 const assignTaskTech = (task) => {
   selectedTaskForAssign.value = task;
-  isAssignModalOpen.value = true;
+  isDrawerOpen.value = true;
+};
+
+const handleDrawerAssign = async (tech) => {
+  if (!selectedTaskForAssign.value) return;
+  try {
+    await tasksStore.assignTask(props.jobCard.id, selectedTaskForAssign.value.id, tech.id);
+    isDrawerOpen.value = false;
+    emit('updated');
+  } catch (error) {
+    // Handled by global interceptor toast
+  }
 };
 
 const completeTask = async (task) => {

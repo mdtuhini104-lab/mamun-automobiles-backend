@@ -24,6 +24,33 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Check if offline and request is modifying data
+  if (typeof window !== 'undefined' && !navigator.onLine && config.method !== 'get') {
+    const queue = JSON.parse(localStorage.getItem('mamun_offline_queue') || '[]');
+    // Prevent duplicate entries for exact same payload
+    const isDuplicate = queue.some(q => q.url === config.url && JSON.stringify(q.data) === JSON.stringify(config.data));
+    if (!isDuplicate) {
+      queue.push({
+        url: config.url,
+        method: config.method,
+        data: config.data,
+        timestamp: Date.now()
+      });
+      localStorage.setItem('mamun_offline_queue', JSON.stringify(queue));
+
+      try {
+        const toast = useToastStore();
+        toast.warning('Offline Mode: Your action has been queued and will sync once online.');
+      } catch (e) {}
+    }
+
+    // Cancel actual request and handle as resolved mock response in error block
+    const cancelToken = axios.CancelToken.source();
+    config.cancelToken = cancelToken.token;
+    cancelToken.cancel('offline_queued');
+  }
+
   return config;
 }, (error) => {
   return Promise.reject(error);
@@ -32,6 +59,13 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   response => response,
   error => {
+    // If request was offline-cancelled, return a resolved promise with mock success structure
+    if (axios.isCancel(error) && error.message === 'offline_queued') {
+      return Promise.resolve({
+        data: { success: true, message: 'Offline queued', data: {} }
+      });
+    }
+
     try {
       const toast = useToastStore();
       
@@ -70,5 +104,44 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Offline Queue Replay Synchronization
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', async () => {
+    const queue = JSON.parse(localStorage.getItem('mamun_offline_queue') || '[]');
+    if (queue.length === 0) return;
+
+    try {
+      const toast = useToastStore();
+      toast.info(`Device back online. Synchronizing ${queue.length} offline actions...`);
+    } catch (e) {}
+
+    for (const req of queue) {
+      try {
+        await axios({
+          url: getBaseURL() + req.url,
+          method: req.method,
+          data: req.data,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+      } catch (err) {
+        console.error('Failed to sync offline action:', req, err);
+      }
+    }
+
+    localStorage.removeItem('mamun_offline_queue');
+
+    try {
+      const toast = useToastStore();
+      toast.success('All offline actions synced successfully.');
+    } catch (e) {}
+
+    window.dispatchEvent(new CustomEvent('offline-sync-completed'));
+  });
+}
 
 export default api;

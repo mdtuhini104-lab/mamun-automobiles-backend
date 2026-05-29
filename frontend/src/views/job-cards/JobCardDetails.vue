@@ -31,7 +31,7 @@
             v-if="jobCard.service_status === 'completed' || jobCard.service_status === 'delivered'"
             @click="generateInvoice"
             :disabled="generatingInvoice"
-            class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
+            class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 transition-all"
           >
             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -47,107 +47,149 @@
         </div>
       </div>
 
+      <!-- Tab Selectors -->
+      <div class="border-b border-slate-200">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            @click="activeTab = tab.id"
+            :class="[
+              activeTab === tab.id
+                ? 'border-indigo-500 text-indigo-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300',
+              'whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition-all'
+            ]"
+          >
+            {{ tab.name }}
+          </button>
+        </nav>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Main Job Info -->
+        <!-- Main Job Info (Col span 2) -->
         <div class="lg:col-span-2 space-y-6">
-          <div class="bg-white shadow-sm rounded-xl border border-slate-200 overflow-hidden">
-            <div class="px-6 py-5 border-b border-slate-200 bg-slate-50">
-              <h3 class="text-lg leading-6 font-medium text-slate-900">Service Details</h3>
-            </div>
-            <div class="px-6 py-5 space-y-6">
-              <!-- Complaint -->
-              <div>
-                <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Customer Complaint / Issue</h4>
-                <div class="bg-red-50 text-red-800 p-4 rounded-lg text-sm">
-                  {{ jobCard.complaint }}
-                </div>
+          
+          <!-- TAB 1: Service Details -->
+          <div v-if="activeTab === 'details'" class="space-y-6">
+            <div class="bg-white shadow-sm rounded-xl border border-slate-200 overflow-hidden">
+              <div class="px-6 py-5 border-b border-slate-200 bg-slate-50">
+                <h3 class="text-lg leading-6 font-medium text-slate-900">Service Details</h3>
               </div>
-              
-              <!-- Diagnosis -->
-              <div v-if="jobCard.diagnosis">
-                <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Diagnosis / Findings</h4>
-                <div class="bg-blue-50 text-blue-800 p-4 rounded-lg text-sm whitespace-pre-line">
-                  {{ jobCard.diagnosis }}
+              <div class="px-6 py-5 space-y-6">
+                <!-- Complaint -->
+                <div>
+                  <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Customer Complaint / Issue</h4>
+                  <div class="bg-red-50 text-red-800 p-4 rounded-lg text-sm">
+                    {{ jobCard.complaint }}
+                  </div>
                 </div>
-              </div>
+                
+                <!-- Diagnosis -->
+                <div v-if="jobCard.diagnosis">
+                  <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Diagnosis / Findings</h4>
+                  <div class="bg-blue-50 text-blue-800 p-4 rounded-lg text-sm whitespace-pre-line">
+                    {{ jobCard.diagnosis }}
+                  </div>
+                </div>
 
-              <!-- General Info Grid -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
-                <div>
-                  <dt class="text-sm font-medium text-slate-500">Service Date</dt>
-                  <dd class="mt-1 text-sm text-slate-900">{{ formatDate(jobCard.service_date) || 'Not set' }}</dd>
+                <!-- General Info Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+                  <div>
+                    <dt class="text-sm font-medium text-slate-500">Service Date</dt>
+                    <dd class="mt-1 text-sm text-slate-900">{{ formatDate(jobCard.service_date) || 'Not set' }}</dd>
+                  </div>
+                  <div>
+                    <dt class="text-sm font-medium text-slate-500">Expected Delivery</dt>
+                    <dd class="mt-1 text-sm text-slate-900">{{ formatDate(jobCard.expected_delivery_date) || 'Not set' }}</dd>
+                  </div>
+                  <div>
+                    <dt class="text-sm font-medium text-slate-500">Mechanic Assigned</dt>
+                    <dd class="mt-1 text-sm text-slate-900 font-medium">{{ jobCard.mechanic?.name || 'Unassigned' }}</dd>
+                  </div>
+                  <div>
+                    <dt class="text-sm font-medium text-slate-500">Estimated Cost</dt>
+                    <dd class="mt-1 text-sm text-slate-900">{{ formatCurrency(jobCard.estimated_cost) }}</dd>
+                  </div>
                 </div>
-                <div>
-                  <dt class="text-sm font-medium text-slate-500">Expected Delivery</dt>
-                  <dd class="mt-1 text-sm text-slate-900">{{ formatDate(jobCard.delivery_date) || 'Not set' }}</dd>
-                </div>
-                <div>
-                  <dt class="text-sm font-medium text-slate-500">Mechanic Assigned</dt>
-                  <dd class="mt-1 text-sm text-slate-900 font-medium">{{ jobCard.mechanic?.name || 'Unassigned' }}</dd>
-                </div>
-                <div>
-                  <dt class="text-sm font-medium text-slate-500">Estimated Cost</dt>
-                  <dd class="mt-1 text-sm text-slate-900">{{ formatCurrency(jobCard.estimated_cost) }}</dd>
-                </div>
-              </div>
 
-              <!-- Notes -->
-              <div v-if="jobCard.notes" class="pt-4 border-t border-slate-100">
-                <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Internal Notes</h4>
-                <p class="text-sm text-slate-700 italic">{{ jobCard.notes }}</p>
+                <!-- Notes -->
+                <div v-if="jobCard.notes" class="pt-4 border-t border-slate-100">
+                  <h4 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Internal Notes</h4>
+                  <p class="text-sm text-slate-700 italic">{{ jobCard.notes }}</p>
+                </div>
               </div>
             </div>
+
+            <!-- Required Parts / Items -->
+            <div class="bg-white shadow-sm rounded-xl border border-slate-200 overflow-hidden">
+              <div class="px-6 py-5 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <h3 class="text-lg leading-6 font-medium text-slate-900">Required Parts & Services</h3>
+              </div>
+              <div class="px-6 py-5">
+                <div v-if="!jobCard.items || jobCard.items.length === 0" class="text-center py-6">
+                  <p class="text-sm text-slate-500">No parts or service items added yet.</p>
+                </div>
+                <div v-else class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                      <tr>
+                        <th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-slate-500">Item</th>
+                        <th scope="col" class="px-4 py-2 text-right text-xs font-semibold text-slate-500">Qty</th>
+                        <th scope="col" class="px-4 py-2 text-right text-xs font-semibold text-slate-500">Price</th>
+                        <th scope="col" class="px-4 py-2 text-right text-xs font-semibold text-slate-500">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                      <tr v-for="item in jobCard.items" :key="item.id">
+                        <td class="px-4 py-3 text-sm text-slate-900">{{ item.part?.name || 'Service Task' }}</td>
+                        <td class="px-4 py-3 text-sm text-slate-900 text-right">{{ item.quantity }}</td>
+                        <td class="px-4 py-3 text-sm text-slate-900 text-right">{{ formatCurrency(item.unit_price) }}</td>
+                        <td class="px-4 py-3 text-sm font-medium text-slate-900 text-right">{{ formatCurrency(item.quantity * item.unit_price) }}</td>
+                      </tr>
+                    </tbody>
+                    <tfoot class="bg-slate-50">
+                      <tr>
+                        <td colspan="3" class="px-4 py-3 text-sm font-semibold text-slate-700 text-right">Parts Total:</td>
+                        <td class="px-4 py-3 text-sm font-bold text-slate-900 text-right">{{ formatCurrency(calculatePartsTotal()) }}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="3" class="px-4 py-3 text-sm font-semibold text-slate-700 text-right">Service Cost:</td>
+                        <td class="px-4 py-3 text-sm font-bold text-slate-900 text-right">{{ formatCurrency(jobCard.final_cost || 0) }}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="3" class="px-4 py-3 text-base font-bold text-slate-900 text-right">Grand Total:</td>
+                        <td class="px-4 py-3 text-base font-bold text-indigo-600 text-right">{{ formatCurrency(calculatePartsTotal() + Number(jobCard.final_cost || 0)) }}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Decomposed Tasks Board -->
+            <TaskBoard :job-card="jobCard" @updated="fetchJobCard" />
           </div>
 
-          <!-- Required Parts / Items -->
-          <div class="bg-white shadow-sm rounded-xl border border-slate-200 overflow-hidden">
-            <div class="px-6 py-5 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-              <h3 class="text-lg leading-6 font-medium text-slate-900">Required Parts & Services</h3>
-              <!-- In a full implementation, you'd have an Add Item button here -->
-            </div>
-            <div class="px-6 py-5">
-              <div v-if="!jobCard.items || jobCard.items.length === 0" class="text-center py-6">
-                <p class="text-sm text-slate-500">No parts or service items added yet.</p>
-              </div>
-              <div v-else class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                  <thead class="bg-slate-50">
-                    <tr>
-                      <th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-slate-500">Item</th>
-                      <th scope="col" class="px-4 py-2 text-right text-xs font-semibold text-slate-500">Qty</th>
-                      <th scope="col" class="px-4 py-2 text-right text-xs font-semibold text-slate-500">Price</th>
-                      <th scope="col" class="px-4 py-2 text-right text-xs font-semibold text-slate-500">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-200">
-                    <tr v-for="item in jobCard.items" :key="item.id">
-                      <td class="px-4 py-3 text-sm text-slate-900">{{ item.part?.name || 'Service Task' }}</td>
-                      <td class="px-4 py-3 text-sm text-slate-900 text-right">{{ item.quantity }}</td>
-                      <td class="px-4 py-3 text-sm text-slate-900 text-right">{{ formatCurrency(item.unit_price) }}</td>
-                      <td class="px-4 py-3 text-sm font-medium text-slate-900 text-right">{{ formatCurrency(item.quantity * item.unit_price) }}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot class="bg-slate-50">
-                    <tr>
-                      <td colspan="3" class="px-4 py-3 text-sm font-semibold text-slate-700 text-right">Parts Total:</td>
-                      <td class="px-4 py-3 text-sm font-bold text-slate-900 text-right">{{ formatCurrency(calculatePartsTotal()) }}</td>
-                    </tr>
-                    <tr>
-                      <td colspan="3" class="px-4 py-3 text-sm font-semibold text-slate-700 text-right">Service Cost:</td>
-                      <td class="px-4 py-3 text-sm font-bold text-slate-900 text-right">{{ formatCurrency(jobCard.final_cost || 0) }}</td>
-                    </tr>
-                    <tr>
-                      <td colspan="3" class="px-4 py-3 text-base font-bold text-slate-900 text-right">Grand Total:</td>
-                      <td class="px-4 py-3 text-base font-bold text-indigo-600 text-right">{{ formatCurrency(calculatePartsTotal() + Number(jobCard.final_cost || 0)) }}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
+          <!-- TAB 2: Inspection Tab -->
+          <div v-if="activeTab === 'inspection'">
+            <InspectionTab :job-card="jobCard" @updated="fetchJobCard" />
           </div>
 
-          <!-- Decomposed Tasks and Labor Hour Progress -->
-          <TaskBoard :job-card="jobCard" @updated="fetchJobCard" />
+          <!-- TAB 3: Quotation Engine Tab -->
+          <div v-if="activeTab === 'quotation'">
+            <QuotationTab :job-card="jobCard" @updated="fetchJobCard" />
+          </div>
+
+          <!-- TAB 4: Workshop Execution Tab -->
+          <div v-if="activeTab === 'execution'">
+            <ExecutionTab :job-card="jobCard" @updated="fetchJobCard" />
+          </div>
+
+          <!-- TAB 5: Lifecycle Timeline Tab -->
+          <div v-if="activeTab === 'timeline'">
+            <JobCardTimeline :history="jobCard.workflow_history || []" />
+          </div>
         </div>
 
         <!-- Sidebar Info -->
@@ -170,8 +212,12 @@
                   <dd class="text-sm text-slate-900">{{ jobCard.vehicle.vin || 'N/A' }}</dd>
                 </div>
                 <div class="flex justify-between">
-                  <dt class="text-sm font-medium text-slate-500">Mileage</dt>
-                  <dd class="text-sm text-slate-900">12,500 km (Demo)</dd>
+                  <dt class="text-sm font-medium text-slate-500">Odometer Reading</dt>
+                  <dd class="text-sm text-slate-900">{{ jobCard.odometer_reading ? jobCard.odometer_reading + ' KM' : 'Not recorded' }}</dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="text-sm font-medium text-slate-500">Fuel Level</dt>
+                  <dd class="text-sm text-slate-900 font-semibold">{{ jobCard.fuel_level || 'Not recorded' }}</dd>
                 </div>
               </dl>
               <div class="mt-4 pt-4 border-t border-slate-100">
@@ -220,6 +266,12 @@ import { useToastStore } from '../../stores/toast';
 import WorkforcePanel from './components/WorkforcePanel.vue';
 import BayAllocationPanel from './components/BayAllocationPanel.vue';
 import TaskBoard from './components/TaskBoard.vue';
+import JobCardTimeline from '../../components/timeline/JobCardTimeline.vue';
+
+// Custom Tab Components
+import InspectionTab from './components/InspectionTab.vue';
+import QuotationTab from './components/QuotationTab.vue';
+import ExecutionTab from './components/ExecutionTab.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -228,6 +280,15 @@ const toast = useToastStore();
 const jobCard = ref(null);
 const loading = ref(true);
 const generatingInvoice = ref(false);
+
+const activeTab = ref('details');
+const tabs = [
+  { id: 'details', name: 'Service Details' },
+  { id: 'inspection', name: 'Intake Inspection' },
+  { id: 'quotation', name: 'Quotation Engine' },
+  { id: 'execution', name: 'Workshop Execution' },
+  { id: 'timeline', name: 'Lifecycle Timeline' },
+];
 
 const fetchJobCard = async () => {
   try {
@@ -242,13 +303,11 @@ const fetchJobCard = async () => {
 };
 
 const generateInvoice = async () => {
-  if (!confirm('Are you sure you want to finalize this job card and generate an invoice? This will reduce parts stock.')) return;
+  if (!confirm('Are you sure you want to finalize this job card and generate an invoice? This will adjust parts stock.')) return;
   generatingInvoice.value = true;
   try {
-    // We assume there's an endpoint to generate invoice. If not, we will need to add it in api.php
     const response = await api.post(`/invoices/generate/${jobCard.value.id}`);
     toast.success('Invoice generated successfully!');
-    // Redirect to invoice details
     router.push({ name: 'invoices.show', params: { id: response.data.data.id } });
   } catch (error) {
     toast.error(error.response?.data?.message || 'Failed to generate invoice');

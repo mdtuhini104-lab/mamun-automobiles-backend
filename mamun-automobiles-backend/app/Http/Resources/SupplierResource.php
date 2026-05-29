@@ -18,6 +18,7 @@ class SupplierResource extends JsonResource
             'company_name' => $this->company_name,
             'status' => $this->status,
             'tax_number' => $this->tax_number,
+            'balance' => $this->balance,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'purchases' => PurchaseResource::collection($this->whenLoaded('purchases')),

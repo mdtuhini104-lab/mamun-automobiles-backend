@@ -7,15 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\LogsActivity;
+use App\Traits\MultitenantSafe;
+use App\Traits\BranchScoped;
 
 class WorkshopBay extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, LogsActivity, MultitenantSafe, BranchScoped;
 
     protected $fillable = [
+        'tenant_id',
+        'branch_id',
         'name',
         'code',
-        'branch_id',
         'max_vehicle_capacity',
         'current_load',
         'status',

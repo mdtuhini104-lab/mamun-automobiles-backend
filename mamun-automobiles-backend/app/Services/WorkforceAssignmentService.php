@@ -218,6 +218,8 @@ class WorkforceAssignmentService
             // Update task status to in_progress
             if ($task->status === 'pending') {
                 $task->update(['status' => 'in_progress']);
+                // Dispatch event
+                event(new \App\Events\TaskStarted($task));
             }
 
             // Employeeavailability becomes busy if they take on tasks
@@ -268,6 +270,8 @@ class WorkforceAssignmentService
 
             if (!$hasActive) {
                 $task->update(['status' => 'completed']);
+                // Dispatch event
+                event(new \App\Events\TaskCompleted($task));
             }
 
             // Update employee availability back to available if no other busy assignments

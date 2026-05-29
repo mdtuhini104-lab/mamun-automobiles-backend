@@ -33,6 +33,9 @@ class WorkflowBoardService
                 'notes' => $notes,
             ]);
 
+            // Dispatch real-time websocket broadcast
+            event(new \App\Events\JobMoved($jobCardId, $oldStage, $newStage->slug, $changedBy, $notes));
+
             // If new stage is 'completed_stage', we would trigger verification
             // and activity logging
             

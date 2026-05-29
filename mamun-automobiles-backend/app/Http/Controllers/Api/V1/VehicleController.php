@@ -134,4 +134,19 @@ class VehicleController extends Controller
         
         return $this->successResponse(VehicleResource::collection($vehicles->items()), 'Vehicles retrieved successfully', 200, $meta);
     }
+
+    /**
+     * Get AI vehicle health and predictive maintenance recommendations.
+     */
+    public function getHealthPrediction(int $id, \App\Services\PredictiveMaintenanceService $service): JsonResponse
+    {
+        $vehicle = $this->vehicleService->getVehicle($id);
+        if (!$vehicle) {
+            return $this->errorResponse('Vehicle not found', 404);
+        }
+        $this->authorize('view', $vehicle);
+
+        $healthData = $service->generateHealthScore($id);
+        return $this->successResponse($healthData, 'AI vehicle health predictions generated successfully');
+    }
 }

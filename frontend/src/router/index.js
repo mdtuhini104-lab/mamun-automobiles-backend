@@ -28,6 +28,12 @@ const router = createRouter({
       meta: { public: true }
     },
     {
+      path: '/portal/:uuid',
+      name: 'customer-portal',
+      component: () => import('../views/customers/CustomerPortalDashboard.vue'),
+      meta: { public: true }
+    },
+    {
       path: '/',
       name: 'dashboard',
       component: () => import('../views/dashboard/DashboardLayout.vue'),
@@ -38,6 +44,30 @@ const router = createRouter({
           name: 'dashboard-home',
           component: () => import('../views/dashboard/DashboardHome.vue'),
           meta: { permission: 'dashboard.view' }
+        },
+        {
+          path: 'live-board',
+          name: 'workshop.live-board',
+          component: () => import('../views/dashboard/WorkshopLiveBoard.vue'),
+          meta: { permission: 'work_orders.view' }
+        },
+        {
+          path: 'qc-delivery',
+          name: 'workshop.qc-delivery',
+          component: () => import('../views/dashboard/QcDeliveryDashboard.vue'),
+          meta: { permission: 'quality_controls.manage' }
+        },
+        {
+          path: 'executive',
+          name: 'dashboard.executive',
+          component: () => import('../views/dashboard/ExecutiveCommandCenter.vue'),
+          meta: { permission: 'analytics.view' }
+        },
+        {
+          path: 'ai-inbox',
+          name: 'dashboard.ai-inbox',
+          component: () => import('../views/dashboard/AiRecommendationInbox.vue'),
+          meta: { permission: 'ai_operations.view' }
         },
         {
           path: 'customers',
@@ -67,6 +97,12 @@ const router = createRouter({
           path: 'crm/customer-ledger',
           name: 'crm.customer-ledger',
           component: () => import('../views/crm/CustomerLedgerView.vue'),
+          meta: { permission: 'customers.view' }
+        },
+        {
+          path: 'crm/customer-pricing',
+          name: 'crm.customer-pricing',
+          component: () => import('../views/crm/CustomerPricingView.vue'),
           meta: { permission: 'customers.view' }
         },
         {
@@ -262,6 +298,30 @@ const router = createRouter({
           meta: { permission: 'saas_admin.view' }
         },
         {
+          path: 'saas/billing',
+          name: 'saas.billing',
+          component: () => import('../views/saas/BillingCenter.vue'),
+          meta: { requiresAuth: true }
+        },
+        {
+          path: 'saas/marketplace',
+          name: 'saas.marketplace',
+          component: () => import('../views/saas/PluginMarketplace.vue'),
+          meta: { permission: 'settings.view' }
+        },
+        {
+          path: 'fleet',
+          name: 'fleet.dashboard',
+          component: () => import('../views/fleet/FleetDashboard.vue'),
+          meta: { permission: 'vehicles.view' }
+        },
+        {
+          path: 'developer',
+          name: 'developer.portal',
+          component: () => import('../views/developer/DeveloperPortal.vue'),
+          meta: { permission: 'settings.view' }
+        },
+        {
           path: 'ai-operations',
           name: 'ai.index',
           component: () => import('../views/ai/AiDashboard.vue'),
@@ -290,6 +350,48 @@ const router = createRouter({
           name: 'activity-logs.index',
           component: () => import('../views/settings/ActivityLogs.vue'),
           meta: { permission: 'activity_logs.view' }
+        },
+        {
+          path: 'incident-center',
+          name: 'settings.incident-center',
+          component: () => import('../views/settings/IncidentCenter.vue'),
+          meta: { permission: 'settings.view' }
+        },
+        {
+          path: 'production-operations',
+          name: 'settings.production-operations',
+          component: () => import('../views/settings/ProductionOperationsDashboard.vue'),
+          meta: { permission: 'settings.view' }
+        },
+        {
+          path: 'security-audit',
+          name: 'settings.security-audit',
+          component: () => import('../views/settings/SecurityAuditCenter.vue'),
+          meta: { permission: 'settings.view' }
+        },
+        {
+          path: 'onboarding',
+          name: 'settings.onboarding',
+          component: () => import('../views/onboarding/OnboardingWizard.vue'),
+          meta: { permission: 'settings.view' }
+        },
+        {
+          path: 'support',
+          name: 'settings.support-center',
+          component: () => import('../views/support/SupportCenter.vue'),
+          meta: { requiresAuth: true }
+        },
+        {
+          path: 'support/incidents',
+          name: 'support.incident-center',
+          component: () => import('../views/support/IncidentCenter.vue'),
+          meta: { requiresAuth: true }
+        },
+        {
+          path: 'saas/success',
+          name: 'saas.customer-success',
+          component: () => import('../views/saas/CustomerSuccessDashboard.vue'),
+          meta: { permission: 'saas_admin.view' }
         }
       ]
     }

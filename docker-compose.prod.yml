@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: mamun_app_prod
+    restart: always
+    environment:
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      REDIS_HOST: redis
+    volumes:
+      - .:/var/www/html
+    networks:
+      - mamun_network
+
+  web:
+    image: nginx:alpine
+    container_name: mamun_web_prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www/html
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    networks:
+      - mamun_network
+
+  db:
+    image: postgres:15-alpine
+    container_name: mamun_db_prod
+    restart: always
+    environment:
+      POSTGRES_DB: mamun_erp
+      POSTGRES_USER: mamun_user
+      POSTGRES_PASSWORD: secret_password_change_me
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mamun_network
+
+  redis:
+    image: redis:alpine
+    container_name: mamun_redis_prod
+    restart: always
+    volumes:
+      - redisdata:/data
+    networks:
+      - mamun_network
+
+  horizon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mamun_horizon_prod
+    restart: always
+    command: php artisan horizon
+    depends_on:
+      - redis
+      - db
+    networks:
+      - mamun_network
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  mamun_network:
+    driver: bridge

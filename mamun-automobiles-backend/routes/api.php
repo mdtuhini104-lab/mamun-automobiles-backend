@@ -35,6 +35,8 @@ Route::prefix('v1')->group(function () {
 
     // Public Verification Route
     Route::get('/verify/invoice/{invoice_no}', [App\Http\Controllers\Api\VerificationController::class, 'verifyInvoice']);
+    Route::get('/portal/access/{uuid}', [App\Http\Controllers\Api\V1\CustomerPortalController::class, 'accessViaUuid']);
+    Route::post('/portal/analytics/log-event', [App\Http\Controllers\Api\V1\CustomerPortalAnalyticsController::class, 'logEvent']);
 
     // Auth routes (Public)
     Route::post('/auth/login', [App\Http\Controllers\Api\V1\AuthController::class, 'login'])->middleware('throttle:5,1');
@@ -109,6 +111,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/saas/tenants', [App\Http\Controllers\Api\V1\SuperAdminController::class, 'getTenants']);
         Route::patch('/saas/tenants/{id}/status', [App\Http\Controllers\Api\V1\SuperAdminController::class, 'updateTenantStatus']);
         Route::get('/saas/stats', [App\Http\Controllers\Api\V1\SuperAdminController::class, 'getSystemStats']);
+        Route::get('/saas/portal-analytics', [App\Http\Controllers\Api\V1\CustomerPortalAnalyticsController::class, 'getAnalyticsSummary']);
 
         // AI & Automations
         Route::get('/ai/insights', [App\Http\Controllers\Api\V1\AiAutomationController::class, 'getInsights']);
@@ -134,6 +137,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/vehicles', [App\Http\Controllers\Api\V1\VehicleController::class, 'store']);
         Route::get('/customers/{customerId}/vehicles', [App\Http\Controllers\Api\V1\VehicleController::class, 'index']);
         Route::get('/vehicles/{id}', [App\Http\Controllers\Api\V1\VehicleController::class, 'show']);
+        Route::get('/vehicles/{id}/health-prediction', [App\Http\Controllers\Api\V1\VehicleController::class, 'getHealthPrediction']);
         Route::put('/vehicles/{id}', [App\Http\Controllers\Api\V1\VehicleController::class, 'update']);
         Route::delete('/vehicles/{id}', [App\Http\Controllers\Api\V1\VehicleController::class, 'destroy']);
         
@@ -151,10 +155,32 @@ Route::prefix('v1')->group(function () {
         Route::put('/job-cards/{id}', [App\Http\Controllers\Api\V1\JobCardController::class, 'update']);
         Route::delete('/job-cards/{id}', [App\Http\Controllers\Api\V1\JobCardController::class, 'destroy']);
         
+        // Quotation routes
+        Route::get('/quotations', [App\Http\Controllers\Api\V1\QuotationController::class, 'index'])->middleware('permission:quotations.view');
+        Route::post('/quotations', [App\Http\Controllers\Api\V1\QuotationController::class, 'store'])->middleware(['permission:quotations.create', 'idempotent']);
+        Route::get('/quotations/{id}', [App\Http\Controllers\Api\V1\QuotationController::class, 'show'])->middleware('permission:quotations.view');
+        Route::put('/quotations/{id}/revise', [App\Http\Controllers\Api\V1\QuotationController::class, 'revise'])->middleware(['permission:quotations.revise', 'idempotent']);
+        Route::post('/quotations/{id}/approve', [App\Http\Controllers\Api\V1\QuotationController::class, 'approve'])->middleware(['permission:quotations.approve', 'idempotent']);
+        Route::delete('/quotation-items/{itemId}', [App\Http\Controllers\Api\V1\QuotationController::class, 'destroyItem'])->middleware('permission:quotations.edit');
+
+        // Work Order routes
+        Route::get('/work-orders', [App\Http\Controllers\Api\V1\WorkOrderController::class, 'index'])->middleware('permission:work_orders.view');
+        Route::get('/live-workshop-board', [App\Http\Controllers\Api\V1\WorkOrderController::class, 'liveBoard'])->middleware('permission:work_orders.view');
+        Route::get('/work-orders/{id}', [App\Http\Controllers\Api\V1\WorkOrderController::class, 'show'])->middleware('permission:work_orders.view');
+        Route::put('/work-orders/{id}/status', [App\Http\Controllers\Api\V1\WorkOrderController::class, 'updateStatus'])->middleware('permission:work_orders.edit');
+        Route::post('/work-orders/{id}/additional-consumption', [App\Http\Controllers\Api\V1\WorkOrderController::class, 'addConsumption'])->middleware(['permission:work_orders.edit', 'idempotent']);
+
+        // Customer Pricing routes
+        Route::get('/customers/{customerId}/pricing', [App\Http\Controllers\Api\V1\CustomerPricingController::class, 'index']);
+        Route::get('/customers/{customerId}/pricing/calculate', [App\Http\Controllers\Api\V1\CustomerPricingController::class, 'getRate']);
+        Route::post('/customers/pricing', [App\Http\Controllers\Api\V1\CustomerPricingController::class, 'storeRate']);
+
+        
         // Workshop Bay routes
         Route::get('/workshop-bays', [App\Http\Controllers\Api\V1\WorkshopBayController::class, 'index']);
         Route::post('/workshop-bays', [App\Http\Controllers\Api\V1\WorkshopBayController::class, 'store']);
         Route::get('/workshop-bays/{id}/utilization', [App\Http\Controllers\Api\V1\WorkshopBayController::class, 'getUtilization']);
+        Route::get('/workshop/suggestions', [App\Http\Controllers\Api\V1\WorkshopSuggestionsController::class, 'getSuggestions']);
 
         // Workforce Assignment routes
         Route::get('/workforce/employees', [App\Http\Controllers\Api\V1\WorkforceAssignmentController::class, 'listEmployees']);
@@ -181,6 +207,10 @@ Route::prefix('v1')->group(function () {
         // Settings Routes
         Route::get('/settings', [App\Http\Controllers\Api\V1\SettingsController::class, 'index'])->middleware('permission:settings.view');
         Route::post('/settings', [App\Http\Controllers\Api\V1\SettingsController::class, 'update'])->middleware('permission:settings.edit');
+
+        // QC & Delivery Routes
+        Route::post('/quality-control', [App\Http\Controllers\Api\V1\QcAndDeliveryController::class, 'submitQc'])->middleware('permission:quality_controls.manage');
+        Route::post('/vehicle-delivery', [App\Http\Controllers\Api\V1\QcAndDeliveryController::class, 'submitDelivery'])->middleware('permission:vehicle_deliveries.manage');
 
         // Activity Logs Routes
         Route::get('/activity-logs', [App\Http\Controllers\ActivityLogController::class, 'index'])->middleware('permission:activity_logs.view');
@@ -228,6 +258,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/suppliers/{id}', [App\Http\Controllers\Api\V1\SupplierController::class, 'show']);
         Route::put('/suppliers/{id}', [App\Http\Controllers\Api\V1\SupplierController::class, 'update']);
         Route::delete('/suppliers/{id}', [App\Http\Controllers\Api\V1\SupplierController::class, 'destroy']);
+        Route::post('/suppliers/{id}/payments', [App\Http\Controllers\Api\V1\SupplierController::class, 'recordPayment']);
+        Route::get('/suppliers/{id}/ledgers', [App\Http\Controllers\Api\V1\SupplierController::class, 'ledgerHistory']);
 
         // Purchase routes
         Route::get('/purchases', [App\Http\Controllers\Api\V1\PurchaseController::class, 'index']);
@@ -274,24 +306,94 @@ Route::prefix('v1')->group(function () {
         // AI Automation
         Route::get('/ai/dashboard', [App\Http\Controllers\Api\V1\AiController::class, 'dashboard']);
         Route::post('/ai/run-automation', [App\Http\Controllers\Api\V1\AiController::class, 'runAutomation']);
+        Route::get('/ai/recommendations', [App\Http\Controllers\Api\V1\AiRecommendationController::class, 'index']);
+        Route::post('/ai/recommendations/{id}/approve', [App\Http\Controllers\Api\V1\AiRecommendationController::class, 'approve']);
+        Route::post('/ai/recommendations/{id}/reject', [App\Http\Controllers\Api\V1\AiRecommendationController::class, 'reject']);
+        Route::post('/ai/anomalies/{id}/override', [App\Http\Controllers\Api\V1\AiRecommendationController::class, 'overrideAnomaly']);
 
         // Mobile App APIs
         Route::post('/mobile/login', [App\Http\Controllers\Api\V1\MobileApiController::class, 'login']);
         Route::post('/mobile/sync', [App\Http\Controllers\Api\V1\MobileApiController::class, 'sync']);
         Route::get('/mobile/dashboard', [App\Http\Controllers\Api\V1\MobileApiController::class, 'dashboard']);
+        Route::get('/mobile/tasks', [App\Http\Controllers\Api\V1\MobileApiController::class, 'getTasks']);
+        Route::put('/mobile/tasks/{id}/status', [App\Http\Controllers\Api\V1\MobileApiController::class, 'updateTaskStatus'])->middleware('idempotent');
 
         // System & Monitoring APIs
         Route::get('/system/health', [App\Http\Controllers\Api\V1\SystemController::class, 'getHealth']);
         Route::post('/system/backup', [App\Http\Controllers\Api\V1\SystemController::class, 'createBackup']);
         Route::post('/system/restore', [App\Http\Controllers\Api\V1\SystemController::class, 'restoreBackup']);
+        Route::get('/system/production-health', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getHealth']);
+        Route::post('/system/maintenance', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'toggleMaintenance']);
+        Route::post('/system/failed-jobs/clear', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'clearFailedJobs']);
+        Route::get('/system/failed-jobs', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getFailedJobs']);
+        Route::post('/system/failed-jobs/{id}/retry', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'retryJob']);
+        Route::post('/system/failed-jobs/retry-all', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'bulkRetryJobs']);
+        Route::delete('/system/failed-jobs/{id}', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'deleteFailedJob']);
+        Route::get('/system/performance/telemetry', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getPerformanceTelemetry']);
+        Route::get('/system/operations/predictive-metrics', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getPredictiveMetrics']);
+        Route::post('/system/operations/trigger-escalations', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'triggerEscalations']);
+        Route::get('/system/operations/adaptive-analytics', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getAdaptiveAnalytics']);
+        Route::get('/system/operations/load-balancing', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getLoadBalancingRecommendations']);
+        Route::get('/system/operations/anomalies', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getAnomalyDetections']);
+        Route::post('/system/operations/recommendations/{id}/action', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'actionRecommendation']);
+        Route::post('/system/operations/simulate', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'simulateCoordination']);
+        Route::get('/system/operations/learning-metrics', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getLearningMetrics']);
+        Route::get('/system/operations/customer-quick-load', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'quickLoadCustomer']);
+        Route::get('/system/operations/supervisor-dashboard', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getSupervisorDashboard']);
+        Route::post('/system/operations/webhook-receiver', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'webhookCallback']);
+        Route::get('/system/operations/excellence-kpis', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getExcellenceKpis']);
+        Route::get('/system/operations/continuous-optimization', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getContinuousOptimization']);
+        Route::get('/system/operations/executive-observation', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getExecutiveObservation']);
+        Route::get('/system/operations/executive-governance', [App\Http\Controllers\Api\V1\ProductionOperationsController::class, 'getExecutiveGovernance']);
+        Route::post('/system/stress/slow-query', [App\Http\Controllers\Api\V1\ReliabilityStressController::class, 'simulateSlowQuery'])->middleware('throttle:5,1,stress');
+        Route::post('/system/stress/failed-job', [App\Http\Controllers\Api\V1\ReliabilityStressController::class, 'simulateFailedJob'])->middleware('throttle:5,1,stress');
+        Route::post('/system/stress/websocket-disconnect', [App\Http\Controllers\Api\V1\ReliabilityStressController::class, 'simulateWebsocketDisconnect'])->middleware('throttle:5,1,stress');
+        Route::get('/security/incidents', [App\Http\Controllers\Api\V1\SecurityIncidentController::class, 'index']);
+        Route::post('/security/incidents/{id}/resolve', [App\Http\Controllers\Api\V1\SecurityIncidentController::class, 'resolve']);
+        Route::post('/security/ip-block', [App\Http\Controllers\Api\V1\SecurityIncidentController::class, 'blockIp']);
+
+        // Onboarding APIs
+        Route::post('/onboarding/import-customers', [App\Http\Controllers\Api\V1\OnboardingController::class, 'importCustomers']);
+        Route::post('/onboarding/import-parts', [App\Http\Controllers\Api\V1\OnboardingController::class, 'importParts']);
+        Route::post('/onboarding/generate-demo', [App\Http\Controllers\Api\V1\OnboardingController::class, 'generateDemoData']);
 
         // SaaS & Billing APIs
         Route::post('/saas/register', [App\Http\Controllers\Api\V1\SaasController::class, 'register']);
         Route::post('/saas/activate', [App\Http\Controllers\Api\V1\SaasController::class, 'activate']);
+        Route::get('/saas/plugins', [App\Http\Controllers\Api\V1\SaasController::class, 'getPlugins']);
+        Route::post('/saas/plugins/toggle', [App\Http\Controllers\Api\V1\SaasController::class, 'togglePlugin']);
+        Route::get('/saas/subscription', [App\Http\Controllers\Api\V1\SubscriptionController::class, 'index']);
+        Route::post('/saas/subscription/checkout', [App\Http\Controllers\Api\V1\SubscriptionController::class, 'checkout']);
+        Route::post('/saas/subscription/cancel', [App\Http\Controllers\Api\V1\SubscriptionController::class, 'cancel']);
+        Route::post('/saas/subscription/mock-webhook', [App\Http\Controllers\Api\V1\SubscriptionController::class, 'mockWebhook']);
+        Route::get('/saas/success-metrics', [App\Http\Controllers\Api\V1\CustomerSuccessController::class, 'getMetrics']);
+        Route::get('/saas/global-success', [App\Http\Controllers\Api\V1\CustomerSuccessController::class, 'getGlobalSuccessDashboard']);
+        Route::get('/saas/success-history', [App\Http\Controllers\Api\V1\CustomerSuccessController::class, 'getHistory']);
+        Route::get('/saas/success-history/{id}', [App\Http\Controllers\Api\V1\CustomerSuccessController::class, 'getHistory']);
+
+        // Support & Ticketing APIs
+        Route::get('/support/tickets', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'index']);
+        Route::post('/support/tickets', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'store']);
+        Route::post('/support/tickets/{id}/resolve', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'resolve']);
+        Route::post('/support/tickets/{id}/feedback', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'submitFeedback']);
+        Route::get('/support/diagnostics', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'exportDiagnostics']);
+        Route::get('/support/tickets/{id}/suggestions', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'getSuggestions']);
+        Route::post('/support/tickets/{id}/incident', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'createIncident']);
+        Route::get('/support/incidents', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'getIncidents']);
+        Route::post('/support/incidents/{id}/workflow', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'createResolutionWorkflow']);
+        Route::post('/support/workflows/{id}/publish-kb', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'publishWorkflowToKb']);
+        Route::get('/support/kb', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'getKbArticles']);
+        Route::get('/support/kb/{slug}', [App\Http\Controllers\Api\V1\SupportTicketController::class, 'getKbArticleBySlug']);
 
         // Payment Webhooks
         Route::post('/webhooks/sslcommerz', [App\Http\Controllers\Api\V1\WebhookController::class, 'sslcommerzIPN']);
         Route::post('/webhooks/stripe', [App\Http\Controllers\Api\V1\WebhookController::class, 'stripeWebhook']);
+
+        // Fleet Management routes
+        Route::get('/fleet/contracts', [App\Http\Controllers\Api\V1\FleetController::class, 'index']);
+        Route::post('/fleet/contracts', [App\Http\Controllers\Api\V1\FleetController::class, 'store']);
+        Route::get('/fleet/metrics', [App\Http\Controllers\Api\V1\FleetController::class, 'metrics']);
+        Route::post('/fleet/quotations/bulk-approve', [App\Http\Controllers\Api\V1\FleetController::class, 'bulkApprove']);
 
         // Finance routes
         Route::get('/accounts', [App\Http\Controllers\Api\V1\AccountController::class, 'index']);
@@ -318,6 +420,12 @@ Route::prefix('v1')->group(function () {
         // Notification routes
         Route::get('/notifications', [App\Http\Controllers\Api\V1\NotificationController::class, 'index']);
         Route::put('/notifications/{id}/read', [App\Http\Controllers\Api\V1\NotificationController::class, 'markAsRead']);
+        Route::delete('/notifications/clear', [App\Http\Controllers\Api\V1\NotificationController::class, 'clear']);
+
+        // Warranty & Comeback routes
+        Route::get('/warranties', [App\Http\Controllers\Api\V1\WarrantyAndComebackController::class, 'warranties']);
+        Route::get('/comebacks', [App\Http\Controllers\Api\V1\WarrantyAndComebackController::class, 'comebacks']);
+        Route::post('/comebacks', [App\Http\Controllers\Api\V1\WarrantyAndComebackController::class, 'storeComeback']);
 
         // Settings
         Route::get('/settings', [App\Http\Controllers\Api\V1\SettingController::class, 'index']);
@@ -333,5 +441,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/print/job-card/{id}', [App\Http\Controllers\Api\V1\PrintController::class, 'jobCard']);
         Route::get('/print/purchase/{id}', [App\Http\Controllers\Api\V1\PrintController::class, 'purchase']);
         Route::get('/print/payroll/{id}', [App\Http\Controllers\Api\V1\PrintController::class, 'payroll']);
+
+        // Customer Self-Service Portal Routes
+        Route::get('/portal/repair-status/{job_card_id}', [App\Http\Controllers\Api\V1\CustomerPortalController::class, 'getRepairStatus']);
+        Route::get('/portal/quotations/{id}', [App\Http\Controllers\Api\V1\CustomerPortalController::class, 'getQuotation']);
+        Route::post('/portal/quotations/{id}/approve', [App\Http\Controllers\Api\V1\CustomerPortalController::class, 'approveQuotation']);
+        Route::get('/portal/vehicles/{id}/history', [App\Http\Controllers\Api\V1\CustomerPortalController::class, 'getVehicleHistory']);
     });
 });

@@ -56,4 +56,60 @@ class NotificationController extends Controller
 
         return response()->json(['message' => 'Notification queued successfully'], 202);
     }
+
+    /**
+     * Get database notifications for the authenticated user.
+     */
+    public function index(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        $notifications = $user->notifications()->paginate(20);
+        $unreadCount = $user->unreadNotifications()->count();
+
+        return response()->json([
+            'notifications' => $notifications,
+            'unread_count' => $unreadCount,
+        ]);
+    }
+
+    /**
+     * Mark a specific notification as read.
+     */
+    public function markAsRead($id)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        $notification = $user->notifications()->findOrFail($id);
+        $notification->markAsRead();
+
+        return response()->json([
+            'message' => 'Notification marked as read',
+            'unread_count' => $user->unreadNotifications()->count()
+        ]);
+    }
+
+    /**
+     * Clear all read notifications.
+     */
+    public function clear()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        $user->notifications()->whereNotNull('read_at')->delete();
+
+        return response()->json([
+            'message' => 'Read notifications cleared successfully',
+            'unread_count' => $user->unreadNotifications()->count()
+        ]);
+    }
 }

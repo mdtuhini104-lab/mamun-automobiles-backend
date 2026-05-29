@@ -79,7 +79,8 @@ class JobCardRepository extends BaseRepository
             'department',
             'workshopBay',
             'assignments.employee.user',
-            'tasks.assignments.employee.user'
+            'tasks.assignments.employee.user',
+            'workflowHistory.user'
         ])->find($id);
     }
 

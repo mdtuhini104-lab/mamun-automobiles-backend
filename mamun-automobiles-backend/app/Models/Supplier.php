@@ -31,4 +31,22 @@ class Supplier extends Model
     {
         return $this->hasMany(Purchase::class);
     }
+
+    /**
+     * Get the ledgers for the supplier.
+     */
+    public function ledgers(): HasMany
+    {
+        return $this->hasMany(SupplierLedger::class);
+    }
+
+    /**
+     * Get dynamic outstanding due balance for the supplier.
+     */
+    public function getBalanceAttribute()
+    {
+        $purchaseSum = $this->ledgers()->where('transaction_type', 'purchase')->sum('amount');
+        $paymentSum = $this->ledgers()->where('transaction_type', 'payment')->sum('amount');
+        return round($purchaseSum - $paymentSum, 2);
+    }
 }

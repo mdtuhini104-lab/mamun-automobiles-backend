@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\MultitenantSafe;
+use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Part extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, MultitenantSafe, BranchScoped;
     protected $fillable = [
         'name',
         'sku',
@@ -17,6 +19,7 @@ class Part extends Model
         'cost_price',
         'sale_price',
         'stock_quantity',
+        'reserved_quantity',
         'low_stock_threshold',
         'category_id',
         'rack_location',

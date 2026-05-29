@@ -62,4 +62,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(\App\Models\Designation::class);
     }
+
+    public function shift()
+    {
+        return $this->belongsTo(\App\Models\Shift::class);
+    }
 }

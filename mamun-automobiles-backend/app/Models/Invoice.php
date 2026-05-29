@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\MultitenantSafe;
+use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, MultitenantSafe, BranchScoped;
     protected $fillable = [
         'invoice_number',
         'customer_id',

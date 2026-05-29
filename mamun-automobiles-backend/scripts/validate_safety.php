@@ -32,9 +32,10 @@ $lintPassed = true;
 foreach ($phpFiles as $file) {
     if ($file->isDir()) continue;
     $filePath = $file->getPathname();
-    if (strpos($filePath, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) !== false) continue;
-    if (strpos($filePath, DIRECTORY_SEPARATOR . 'node_modules' . DIRECTORY_SEPARATOR) !== false) continue;
-    if (strpos($filePath, DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR) !== false) continue;
+    $normalizedPath = str_replace('\\', '/', $filePath);
+    if (strpos($normalizedPath, '/vendor/') !== false) continue;
+    if (strpos($normalizedPath, '/node_modules/') !== false) continue;
+    if (strpos($normalizedPath, '/bootstrap/cache/') !== false) continue;
     if ($file->getExtension() !== 'php') continue;
 
     $output = [];
@@ -57,8 +58,9 @@ $encodingPassed = true;
 foreach ($phpFiles as $file) {
     if ($file->isDir()) continue;
     $filePath = $file->getPathname();
-    if (strpos($filePath, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) !== false) continue;
-    if (strpos($filePath, DIRECTORY_SEPARATOR . 'node_modules' . DIRECTORY_SEPARATOR) !== false) continue;
+    $normalizedPath = str_replace('\\', '/', $filePath);
+    if (strpos($normalizedPath, '/vendor/') !== false) continue;
+    if (strpos($normalizedPath, '/node_modules/') !== false) continue;
     if ($file->getExtension() !== 'php') continue;
 
     $content = file_get_contents($filePath);

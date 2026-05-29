@@ -40,7 +40,7 @@ class CrmController extends Controller
         return $this->successResponse($appointments, 'Appointments loaded');
     }
 
-    public function storeAppointment(Request $request): JsonResponse
+    public function storeAppointment(Request $request, \App\Services\AppointmentSchedulerService $scheduler): JsonResponse
     {
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
@@ -52,7 +52,11 @@ class CrmController extends Controller
             'remarks' => 'nullable|string'
         ]);
 
-        $appointment = Appointment::create($validated);
+        try {
+            $appointment = $scheduler->reserveSlot($validated);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 422);
+        }
         
         CustomerActivity::create([
             'customer_id' => $appointment->customer_id,

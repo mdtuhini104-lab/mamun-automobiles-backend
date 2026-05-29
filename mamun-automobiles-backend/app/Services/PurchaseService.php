@@ -94,6 +94,10 @@ class PurchaseService extends BaseService
                 }
             }
 
+            if ($purchase->status->value === 'received' || $purchase->status->value === 'approved') {
+                $this->logPurchaseToSupplierLedger($purchase);
+            }
+
             $this->auditLogService->log('create', 'Purchase', $purchase->id, $data);
 
             return $purchase;
@@ -123,6 +127,7 @@ class PurchaseService extends BaseService
                     foreach ($items as $item) {
                         $this->increaseStock($item->part_id, $item->quantity, $purchase->id);
                     }
+                    $this->logPurchaseToSupplierLedger($purchase);
                 }
 
                 // Send notification
@@ -160,5 +165,36 @@ class PurchaseService extends BaseService
             'purchase',
             $purchaseId
         );
+    }
+
+    /**
+     * Log the purchase and paid amounts into the supplier ledger.
+     */
+    protected function logPurchaseToSupplierLedger(Purchase $purchase): void
+    {
+        // Prevent duplicate ledger logging for the same purchase
+        $alreadyLogged = \App\Models\SupplierLedger::where('supplier_id', $purchase->supplier_id)
+            ->where('notes', 'like', "%{$purchase->purchase_no}%")
+            ->exists();
+
+        if (!$alreadyLogged) {
+            // Log the purchase charge (debit - increases outstanding dues)
+            \App\Models\SupplierLedger::logTransaction(
+                $purchase->supplier_id,
+                $purchase->total_amount,
+                'purchase',
+                "Purchase order {$purchase->purchase_no} finalized"
+            );
+
+            // Log any payment made on this purchase (credit - decreases outstanding dues)
+            if ($purchase->paid_amount > 0) {
+                \App\Models\SupplierLedger::logTransaction(
+                    $purchase->supplier_id,
+                    $purchase->paid_amount,
+                    'payment',
+                    "Payment for purchase order {$purchase->purchase_no}"
+                );
+            }
+        }
     }
 }

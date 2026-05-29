@@ -97,4 +97,35 @@ class SupplierController extends Controller
         
         return $this->successResponse(null, 'Supplier deleted successfully');
     }
+
+    /**
+     * Record a payment made to a supplier.
+     */
+    public function recordPayment(Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'notes' => 'nullable|string',
+        ]);
+
+        try {
+            $ledger = $this->supplierService->recordPayment($id, $request->amount, $request->notes);
+            return $this->successResponse($ledger, 'Payment recorded successfully in supplier ledger', 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Get ledger history of a supplier.
+     */
+    public function ledgerHistory(int $id): JsonResponse
+    {
+        try {
+            $history = $this->supplierService->getLedgerHistory($id);
+            return $this->successResponse($history, 'Supplier ledger history retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 400);
+        }
+    }
 }
