@@ -64,6 +64,8 @@ Route::prefix('v1')->group(function () {
             
             $steps['select_1'] = \Illuminate\Support\Facades\DB::select('SELECT 1');
             
+            $steps['users_raw'] = \Illuminate\Support\Facades\DB::select('SELECT id, name, email FROM users LIMIT 5');
+            
             // Check driver name
             $driver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
             $steps['driver'] = $driver;
