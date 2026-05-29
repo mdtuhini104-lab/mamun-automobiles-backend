@@ -54,6 +54,41 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/debug-dash', [App\Http\Controllers\Api\V1\DashboardController::class, 'index']);
 
+    Route::get('/debug-db', function () {
+        try {
+            $steps = [];
+            
+            $steps['connection'] = 'starting';
+            $pdo = \Illuminate\Support\Facades\DB::connection()->getPdo();
+            $steps['connection'] = 'connected';
+            
+            $steps['select_1'] = \Illuminate\Support\Facades\DB::select('SELECT 1');
+            
+            // Check driver name
+            $driver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
+            $steps['driver'] = $driver;
+            
+            if ($driver === 'mysql') {
+                $steps['tables'] = \Illuminate\Support\Facades\DB::select('SHOW TABLES');
+            } elseif ($driver === 'sqlite') {
+                $steps['tables'] = \Illuminate\Support\Facades\DB::select("SELECT name FROM sqlite_master WHERE type='table'");
+            } else {
+                $steps['tables'] = 'unknown driver: ' . $driver;
+            }
+            
+            return response()->json([
+                'success' => true,
+                'steps' => $steps
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'trace' => explode("\n", $e->getTraceAsString())
+            ], 500);
+        }
+    });
+
     // Public Verification Route
     Route::get('/verify/invoice/{invoice_no}', [App\Http\Controllers\Api\VerificationController::class, 'verifyInvoice']);
     Route::get('/portal/access/{uuid}', [App\Http\Controllers\Api\V1\CustomerPortalController::class, 'accessViaUuid']);
