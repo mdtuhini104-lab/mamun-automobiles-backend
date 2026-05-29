@@ -26,6 +26,27 @@ Route::prefix('v1')->group(function () {
         ], 200);
     });
 
+    Route::get('/deploy-migrate', function () {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
+            
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'WorkforceSeeder', '--force' => true]);
+            $workforceSeederOutput = \Illuminate\Support\Facades\Artisan::output();
+
+            return response()->json([
+                'success' => true,
+                'migrate_output' => $migrateOutput,
+                'workforce_seeder_output' => $workforceSeederOutput
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+
     Route::get('/login', function () {
         return response()->json([
             'success' => false,
