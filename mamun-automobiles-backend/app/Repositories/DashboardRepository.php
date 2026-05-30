@@ -32,11 +32,22 @@ class DashboardRepository extends BaseRepository
         $invoices = Invoice::whereYear('created_at', date('Y'))->get();
         $monthlyData = [];
         foreach ($invoices as $invoice) {
-            $month = $invoice->created_at->format('n');
-            if (!isset($monthlyData[$month])) {
-                $monthlyData[$month] = 0;
+            if (!$invoice->created_at) {
+                continue;
             }
-            $monthlyData[$month] += $invoice->grand_total;
+            try {
+                $createdAt = $invoice->created_at instanceof \Carbon\Carbon 
+                    ? $invoice->created_at 
+                    : \Carbon\Carbon::parse($invoice->created_at);
+                
+                $month = $createdAt->format('n');
+                if (!isset($monthlyData[$month])) {
+                    $monthlyData[$month] = 0;
+                }
+                $monthlyData[$month] += $invoice->grand_total;
+            } catch (\Exception $e) {
+                continue;
+            }
         }
 
         $result = [];

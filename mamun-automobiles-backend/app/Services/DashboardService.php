@@ -16,7 +16,7 @@ class DashboardService extends BaseService
 
     public function getDashboardData(): array
     {
-        return Cache::remember('dashboard_data', 600, function () {
+        $fetchData = function () {
             return [
                 'summary' => $this->repository->getSummaryStats(),
                 'monthly_sales' => $this->repository->getMonthlySales(),
@@ -25,6 +25,17 @@ class DashboardService extends BaseService
                 'top_selling_parts' => $this->repository->getTopSellingParts(),
                 'job_card_status_stats' => $this->repository->getJobCardStatusStats(),
             ];
-        });
+        };
+
+        try {
+            // Bypass file cache write attempts in read-only serverless Vercel environments
+            if (env('VERCEL') || env('NOW_OUTPUT_DIR') || config('cache.default') === 'file' && app()->environment('production')) {
+                return $fetchData();
+            }
+            return Cache::remember('dashboard_data', 600, $fetchData);
+        } catch (\Throwable $e) {
+            // Safe fallback to run queries directly if cache driver fails
+            return $fetchData();
+        }
     }
 }
