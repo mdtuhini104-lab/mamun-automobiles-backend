@@ -12,7 +12,7 @@ class CategoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.view', 'web');
     }
 
     /**
@@ -20,7 +20,7 @@ class CategoryPolicy
      */
     public function view(User $user, Category $category): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.view', 'web');
     }
 
     /**
@@ -28,7 +28,7 @@ class CategoryPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.create', 'web');
     }
 
     /**
@@ -36,7 +36,7 @@ class CategoryPolicy
      */
     public function update(User $user, Category $category): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.edit', 'web');
     }
 
     /**
@@ -44,6 +44,6 @@ class CategoryPolicy
      */
     public function delete(User $user, Category $category): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.delete', 'web');
     }
 }

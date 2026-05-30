@@ -12,7 +12,7 @@ class SettingPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_users', 'web');
+        return $user->hasPermissionTo('settings.view', 'web');
     }
 
     /**
@@ -20,6 +20,6 @@ class SettingPolicy
      */
     public function update(User $user): bool
     {
-        return $user->hasPermissionTo('manage_users', 'web');
+        return $user->hasPermissionTo('settings.edit', 'web');
     }
 }

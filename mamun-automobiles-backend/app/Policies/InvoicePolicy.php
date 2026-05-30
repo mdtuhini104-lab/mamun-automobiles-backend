@@ -12,7 +12,7 @@ class InvoicePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_invoices', 'web');
+        return $user->hasPermissionTo('invoices.view', 'web');
     }
 
     /**
@@ -20,7 +20,7 @@ class InvoicePolicy
      */
     public function view(User $user, Invoice $invoice): bool
     {
-        return $user->hasPermissionTo('manage_invoices', 'web');
+        return $user->hasPermissionTo('invoices.view', 'web');
     }
 
     /**
@@ -28,7 +28,7 @@ class InvoicePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_invoices', 'web');
+        return $user->hasPermissionTo('invoices.create', 'web');
     }
 
     /**
@@ -36,7 +36,7 @@ class InvoicePolicy
      */
     public function update(User $user, Invoice $invoice): bool
     {
-        return $user->hasPermissionTo('manage_invoices', 'web');
+        return $user->hasPermissionTo('invoices.edit', 'web');
     }
 
     /**
@@ -44,6 +44,6 @@ class InvoicePolicy
      */
     public function delete(User $user, Invoice $invoice): bool
     {
-        return $user->hasPermissionTo('manage_invoices', 'web');
+        return $user->hasPermissionTo('invoices.delete', 'web');
     }
 }

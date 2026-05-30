@@ -12,7 +12,7 @@ class PartPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.view', 'web');
     }
 
     /**
@@ -20,7 +20,7 @@ class PartPolicy
      */
     public function view(User $user, Part $part): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.view', 'web');
     }
 
     /**
@@ -28,7 +28,7 @@ class PartPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.create', 'web');
     }
 
     /**
@@ -36,7 +36,7 @@ class PartPolicy
      */
     public function update(User $user, Part $part): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.edit', 'web');
     }
 
     /**
@@ -44,6 +44,6 @@ class PartPolicy
      */
     public function delete(User $user, Part $part): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.delete', 'web');
     }
 }

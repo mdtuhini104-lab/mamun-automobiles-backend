@@ -42,202 +42,215 @@
     <!-- Statistics Grid (Skeleton / Content) -->
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       <!-- 1. Today Sales Card -->
-      <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
-        <div class="flex justify-between items-start">
-          <div class="space-y-2">
-            <div class="h-3 bg-slate-200 rounded w-20"></div>
-            <div class="h-7 bg-slate-200 rounded w-28"></div>
+      <template v-if="authStore.hasPermission('invoices.view')">
+        <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
+          <div class="flex justify-between items-start">
+            <div class="space-y-2">
+              <div class="h-3 bg-slate-200 rounded w-20"></div>
+              <div class="h-7 bg-slate-200 rounded w-28"></div>
+            </div>
+            <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
           </div>
-          <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
+          <div class="h-6 bg-slate-150 rounded w-full"></div>
         </div>
-        <div class="h-6 bg-slate-150 rounded w-full"></div>
-      </div>
-      <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Today Sales</p>
-            <p class="mt-1 text-2xl font-extrabold text-slate-900">${{ todaySales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+        <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Today Sales</p>
+              <p class="mt-1 text-2xl font-extrabold text-slate-900">${{ todaySales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+            </div>
+            <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-100 transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
-          <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-100 transition-colors">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <!-- SVG Sparkline Trend -->
+          <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
+            <span class="text-xs font-semibold" :class="todaySales > 0 ? 'text-emerald-600' : 'text-slate-400'">
+              {{ todaySales > 0 ? 'Active momentum' : 'No sales today yet' }}
+            </span>
+            <svg class="w-20 h-6 text-emerald-500" stroke-width="2" fill="none" viewBox="0 0 120 30">
+              <polyline stroke="currentColor" :points="invoicesSparklinePoints" stroke-linecap="round" stroke-linejoin="round"></polyline>
             </svg>
           </div>
         </div>
-        <!-- SVG Sparkline Trend -->
-        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
-          <span class="text-xs font-semibold" :class="todaySales > 0 ? 'text-emerald-600' : 'text-slate-400'">
-            {{ todaySales > 0 ? 'Active momentum' : 'No sales today yet' }}
-          </span>
-          <svg class="w-20 h-6 text-emerald-500" stroke-width="2" fill="none" viewBox="0 0 120 30">
-            <polyline stroke="currentColor" :points="invoicesSparklinePoints" stroke-linecap="round" stroke-linejoin="round"></polyline>
-          </svg>
-        </div>
-      </div>
+      </template>
 
       <!-- 2. Monthly Revenue Card -->
-      <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
-        <div class="flex justify-between items-start">
-          <div class="space-y-2">
-            <div class="h-3 bg-slate-200 rounded w-24"></div>
-            <div class="h-7 bg-slate-200 rounded w-24"></div>
+      <template v-if="authStore.hasPermission('invoices.view')">
+        <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
+          <div class="flex justify-between items-start">
+            <div class="space-y-2">
+              <div class="h-3 bg-slate-200 rounded w-24"></div>
+              <div class="h-7 bg-slate-200 rounded w-24"></div>
+            </div>
+            <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
           </div>
-          <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
+          <div class="h-6 bg-slate-150 rounded w-full"></div>
         </div>
-        <div class="h-6 bg-slate-150 rounded w-full"></div>
-      </div>
-      <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Monthly Revenue</p>
-            <p class="mt-1 text-2xl font-extrabold text-slate-900">${{ monthlyRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+        <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Monthly Revenue</p>
+              <p class="mt-1 text-2xl font-extrabold text-slate-900">${{ monthlyRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+            </div>
+            <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-100 transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
           </div>
-          <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-100 transition-colors">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          <!-- SVG Sparkline Trend -->
+          <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
+            <span class="text-xs font-semibold text-blue-600">Current Month</span>
+            <svg class="w-20 h-6 text-blue-500" stroke-width="2" fill="none" viewBox="0 0 120 30">
+              <polyline stroke="currentColor" :points="monthlySalesSparklinePoints" stroke-linecap="round" stroke-linejoin="round"></polyline>
             </svg>
           </div>
         </div>
-        <!-- SVG Sparkline Trend -->
-        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
-          <span class="text-xs font-semibold text-blue-600">Current Month</span>
-          <svg class="w-20 h-6 text-blue-500" stroke-width="2" fill="none" viewBox="0 0 120 30">
-            <polyline stroke="currentColor" :points="monthlySalesSparklinePoints" stroke-linecap="round" stroke-linejoin="round"></polyline>
-          </svg>
-        </div>
-      </div>
+      </template>
 
       <!-- 3. Pending Invoices Card -->
-      <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
-        <div class="flex justify-between items-start">
-          <div class="space-y-2">
-            <div class="h-3 bg-slate-200 rounded w-28"></div>
-            <div class="h-7 bg-slate-200 rounded w-16"></div>
+      <template v-if="authStore.hasPermission('invoices.view')">
+        <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
+          <div class="flex justify-between items-start">
+            <div class="space-y-2">
+              <div class="h-3 bg-slate-200 rounded w-28"></div>
+              <div class="h-7 bg-slate-200 rounded w-16"></div>
+            </div>
+            <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
           </div>
-          <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
+          <div class="h-6 bg-slate-150 rounded w-full"></div>
         </div>
-        <div class="h-6 bg-slate-150 rounded w-full"></div>
-      </div>
-      <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pending Invoices</p>
-            <p class="mt-1 text-2xl font-extrabold text-slate-900">{{ pendingInvoicesCount }} Invoices</p>
+        <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pending Invoices</p>
+              <p class="mt-1 text-2xl font-extrabold text-slate-900">{{ pendingInvoicesCount }} Invoices</p>
+            </div>
+            <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl group-hover:bg-amber-100 transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
-          <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl group-hover:bg-amber-100 transition-colors">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
+            <span class="text-xs font-bold text-slate-500">
+              Due Total: <span class="text-amber-600 font-extrabold">${{ totalDueAmount.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
+            </span>
+            <!-- Dynamic pure CSS dot warning indicator -->
+            <span v-if="pendingInvoicesCount > 0" class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
           </div>
         </div>
-        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
-          <span class="text-xs font-bold text-slate-500">
-            Due Total: <span class="text-amber-600 font-extrabold">${{ totalDueAmount.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
-          </span>
-          <!-- Dynamic pure CSS dot warning indicator -->
-          <span v-if="pendingInvoicesCount > 0" class="flex h-2 w-2 relative">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-          </span>
-        </div>
-      </div>
+      </template>
 
       <!-- 4. Low Stock Items Card -->
-      <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
-        <div class="flex justify-between items-start">
-          <div class="space-y-2">
-            <div class="h-3 bg-slate-200 rounded w-24"></div>
-            <div class="h-7 bg-slate-200 rounded w-16"></div>
+      <template v-if="authStore.hasPermission('inventory.view')">
+        <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
+          <div class="flex justify-between items-start">
+            <div class="space-y-2">
+              <div class="h-3 bg-slate-200 rounded w-24"></div>
+              <div class="h-7 bg-slate-200 rounded w-16"></div>
+            </div>
+            <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
           </div>
-          <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
+          <div class="h-6 bg-slate-150 rounded w-full"></div>
         </div>
-        <div class="h-6 bg-slate-150 rounded w-full"></div>
-      </div>
-      <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Low Stock Items</p>
-            <p class="mt-1 text-2xl font-extrabold text-slate-900" :class="lowStockCount > 0 ? 'text-rose-600' : 'text-slate-900'">{{ lowStockCount }} Items</p>
+        <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Low Stock Items</p>
+              <p class="mt-1 text-2xl font-extrabold text-slate-900" :class="lowStockCount > 0 ? 'text-rose-600' : 'text-slate-900'">{{ lowStockCount }} Items</p>
+            </div>
+            <div class="p-2.5 rounded-xl transition-colors" :class="lowStockCount > 0 ? 'bg-rose-50 text-rose-600 group-hover:bg-rose-100' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100'">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
           </div>
-          <div class="p-2.5 rounded-xl transition-colors" :class="lowStockCount > 0 ? 'bg-rose-50 text-rose-600 group-hover:bg-rose-100' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100'">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
+          <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
+            <span class="text-xs font-semibold" :class="lowStockCount > 0 ? 'text-rose-600' : 'text-slate-400'">
+              {{ lowStockCount > 0 ? 'Reorder immediately' : 'Inventory stable' }}
+            </span>
+            <span v-if="lowStockCount > 0" class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+            </span>
           </div>
         </div>
-        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
-          <span class="text-xs font-semibold" :class="lowStockCount > 0 ? 'text-rose-600' : 'text-slate-400'">
-            {{ lowStockCount > 0 ? 'Reorder immediately' : 'Inventory stable' }}
-          </span>
-          <span v-if="lowStockCount > 0" class="flex h-2 w-2 relative">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-          </span>
-        </div>
-      </div>
+      </template>
+
       <!-- 5. Total Expenses Card -->
-      <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
-        <div class="flex justify-between items-start">
-          <div class="space-y-2">
-            <div class="h-3 bg-slate-200 rounded w-24"></div>
-            <div class="h-7 bg-slate-200 rounded w-16"></div>
+      <template v-if="authStore.hasPermission('accounts.view')">
+        <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
+          <div class="flex justify-between items-start">
+            <div class="space-y-2">
+              <div class="h-3 bg-slate-200 rounded w-24"></div>
+              <div class="h-7 bg-slate-200 rounded w-16"></div>
+            </div>
+            <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
           </div>
-          <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
+          <div class="h-6 bg-slate-150 rounded w-full"></div>
         </div>
-        <div class="h-6 bg-slate-150 rounded w-full"></div>
-      </div>
-      <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Expenses</p>
-            <p class="mt-1 text-2xl font-extrabold text-slate-900">${{ totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+        <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Expenses</p>
+              <p class="mt-1 text-2xl font-extrabold text-slate-900">${{ totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+            </div>
+            <div class="p-2.5 bg-red-50 text-red-600 rounded-xl group-hover:bg-red-100 transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
-          <div class="p-2.5 bg-red-50 text-red-600 rounded-xl group-hover:bg-red-100 transition-colors">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
+            <span class="text-xs font-semibold text-slate-400">All Time Expenses</span>
           </div>
         </div>
-        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
-          <span class="text-xs font-semibold text-slate-400">All Time Expenses</span>
-        </div>
-      </div>
+      </template>
 
       <!-- 6. Net Profit Card -->
-      <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
-        <div class="flex justify-between items-start">
-          <div class="space-y-2">
-            <div class="h-3 bg-slate-200 rounded w-24"></div>
-            <div class="h-7 bg-slate-200 rounded w-16"></div>
+      <template v-if="authStore.hasPermission('accounts.view')">
+        <div v-if="loading" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm animate-pulse flex flex-col justify-between h-36">
+          <div class="flex justify-between items-start">
+            <div class="space-y-2">
+              <div class="h-3 bg-slate-200 rounded w-24"></div>
+              <div class="h-7 bg-slate-200 rounded w-16"></div>
+            </div>
+            <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
           </div>
-          <div class="w-10 h-10 bg-slate-200 rounded-xl"></div>
+          <div class="h-6 bg-slate-150 rounded w-full"></div>
         </div>
-        <div class="h-6 bg-slate-150 rounded w-full"></div>
-      </div>
-      <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Net Profit</p>
-            <p class="mt-1 text-2xl font-extrabold" :class="netProfit >= 0 ? 'text-emerald-600' : 'text-red-600'">${{ netProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+        <div v-else class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-36 relative overflow-hidden group">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Net Profit</p>
+              <p class="mt-1 text-2xl font-extrabold" :class="netProfit >= 0 ? 'text-emerald-600' : 'text-red-600'">${{ netProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+            </div>
+            <div class="p-2.5 rounded-xl transition-colors" :class="netProfit >= 0 ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-red-50 text-red-600 group-hover:bg-red-100'">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
-          <div class="p-2.5 rounded-xl transition-colors" :class="netProfit >= 0 ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100' : 'bg-red-50 text-red-600 group-hover:bg-red-100'">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
+            <span class="text-xs font-semibold" :class="netProfit >= 0 ? 'text-emerald-600' : 'text-red-600'">
+              {{ netProfit >= 0 ? 'Profitable' : 'Loss' }}
+            </span>
           </div>
         </div>
-        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
-          <span class="text-xs font-semibold" :class="netProfit >= 0 ? 'text-emerald-600' : 'text-red-600'">
-            {{ netProfit >= 0 ? 'Profitable' : 'Loss' }}
-          </span>
-        </div>
-      </div>
+      </template>
     </div>
 
     <!-- Main Content Tables (Skeletons / Real Data) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Recent Invoices Table Card -->
-      <div class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden flex flex-col">
+      <div v-if="authStore.hasPermission('invoices.view')" class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden flex flex-col">
         <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
           <div class="flex items-center space-x-2">
             <span class="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
@@ -311,7 +324,7 @@
       </div>
 
       <!-- Recent Purchases Table Card -->
-      <div class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden flex flex-col">
+      <div v-if="authStore.hasPermission('purchases.view')" class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden flex flex-col">
         <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
           <div class="flex items-center space-x-2">
             <span class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
@@ -390,12 +403,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import api from '../../services/api';
+import { useAuthStore } from '../../stores/auth';
 import { useDashboardSocket } from '../../composables/useDashboardSocket';
 import { useInvoiceSocket } from '../../composables/useInvoiceSocket';
 import { usePurchaseSocket } from '../../composables/usePurchaseSocket';
 import { useStockSocket } from '../../composables/useStockSocket';
 
 // States
+const authStore = useAuthStore();
 const dashboardData = ref(null);
 const invoices = ref([]);
 const purchases = ref([]);
@@ -407,11 +422,24 @@ const fetchData = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const [dashboardRes, invoicesRes, purchasesRes] = await Promise.all([
-      api.get('/dashboard'),
-      api.get('/invoices', { params: { per_page: 50 } }),
-      api.get('/purchases', { params: { per_page: 5 } })
-    ]);
+    const promises = [api.get('/dashboard')];
+
+    const canViewInvoices = authStore.hasPermission('invoices.view');
+    const canViewPurchases = authStore.hasPermission('purchases.view');
+
+    if (canViewInvoices) {
+      promises.push(api.get('/invoices', { params: { per_page: 50 } }));
+    } else {
+      promises.push(Promise.resolve({ data: { data: [] } }));
+    }
+
+    if (canViewPurchases) {
+      promises.push(api.get('/purchases', { params: { per_page: 5 } }));
+    } else {
+      promises.push(Promise.resolve({ data: { data: [] } }));
+    }
+
+    const [dashboardRes, invoicesRes, purchasesRes] = await Promise.all(promises);
     
     dashboardData.value = dashboardRes.data.data;
     invoices.value = invoicesRes.data.data;
@@ -427,11 +455,24 @@ const fetchData = async () => {
 // Silent fetch for real-time websocket updates
 const refreshDataSilently = async () => {
   try {
-    const [dashboardRes, invoicesRes, purchasesRes] = await Promise.all([
-      api.get('/dashboard'),
-      api.get('/invoices', { params: { per_page: 50 } }),
-      api.get('/purchases', { params: { per_page: 5 } })
-    ]);
+    const promises = [api.get('/dashboard')];
+
+    const canViewInvoices = authStore.hasPermission('invoices.view');
+    const canViewPurchases = authStore.hasPermission('purchases.view');
+
+    if (canViewInvoices) {
+      promises.push(api.get('/invoices', { params: { per_page: 50 } }));
+    } else {
+      promises.push(Promise.resolve({ data: { data: [] } }));
+    }
+
+    if (canViewPurchases) {
+      promises.push(api.get('/purchases', { params: { per_page: 5 } }));
+    } else {
+      promises.push(Promise.resolve({ data: { data: [] } }));
+    }
+
+    const [dashboardRes, invoicesRes, purchasesRes] = await Promise.all(promises);
     
     dashboardData.value = dashboardRes.data.data;
     invoices.value = invoicesRes.data.data;

@@ -12,7 +12,7 @@ class VehiclePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_vehicles', 'web');
+        return $user->hasPermissionTo('vehicles.view', 'web');
     }
 
     /**
@@ -20,7 +20,7 @@ class VehiclePolicy
      */
     public function view(User $user, Vehicle $vehicle): bool
     {
-        return $user->hasPermissionTo('manage_vehicles', 'web');
+        return $user->hasPermissionTo('vehicles.view', 'web');
     }
 
     /**
@@ -28,7 +28,7 @@ class VehiclePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_vehicles', 'web');
+        return $user->hasPermissionTo('vehicles.create', 'web');
     }
 
     /**
@@ -36,7 +36,7 @@ class VehiclePolicy
      */
     public function update(User $user, Vehicle $vehicle): bool
     {
-        return $user->hasPermissionTo('manage_vehicles', 'web');
+        return $user->hasPermissionTo('vehicles.edit', 'web');
     }
 
     /**
@@ -44,6 +44,6 @@ class VehiclePolicy
      */
     public function delete(User $user, Vehicle $vehicle): bool
     {
-        return $user->hasPermissionTo('manage_vehicles', 'web');
+        return $user->hasPermissionTo('vehicles.delete', 'web');
     }
 }

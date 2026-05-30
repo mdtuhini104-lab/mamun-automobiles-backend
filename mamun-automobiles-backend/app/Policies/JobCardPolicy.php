@@ -12,7 +12,7 @@ class JobCardPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_job_cards', 'web');
+        return $user->hasPermissionTo('job_cards.view', 'web');
     }
 
     /**
@@ -20,7 +20,7 @@ class JobCardPolicy
      */
     public function view(User $user, JobCard $jobCard): bool
     {
-        return $user->hasPermissionTo('manage_job_cards', 'web');
+        return $user->hasPermissionTo('job_cards.view', 'web');
     }
 
     /**
@@ -28,7 +28,7 @@ class JobCardPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_job_cards', 'web');
+        return $user->hasPermissionTo('job_cards.create', 'web');
     }
 
     /**
@@ -36,7 +36,7 @@ class JobCardPolicy
      */
     public function update(User $user, JobCard $jobCard): bool
     {
-        return $user->hasPermissionTo('manage_job_cards', 'web');
+        return $user->hasPermissionTo('job_cards.edit', 'web');
     }
 
     /**
@@ -44,6 +44,6 @@ class JobCardPolicy
      */
     public function delete(User $user, JobCard $jobCard): bool
     {
-        return $user->hasPermissionTo('manage_job_cards', 'web');
+        return $user->hasPermissionTo('job_cards.delete', 'web');
     }
 }

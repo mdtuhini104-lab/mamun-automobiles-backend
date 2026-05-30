@@ -12,7 +12,7 @@ class SupplierPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_purchases', 'web');
+        return $user->hasPermissionTo('purchases.view', 'web');
     }
 
     /**
@@ -20,7 +20,7 @@ class SupplierPolicy
      */
     public function view(User $user, Supplier $supplier): bool
     {
-        return $user->hasPermissionTo('manage_purchases', 'web');
+        return $user->hasPermissionTo('purchases.view', 'web');
     }
 
     /**
@@ -28,7 +28,7 @@ class SupplierPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_purchases', 'web');
+        return $user->hasPermissionTo('purchases.create', 'web');
     }
 
     /**
@@ -36,7 +36,7 @@ class SupplierPolicy
      */
     public function update(User $user, Supplier $supplier): bool
     {
-        return $user->hasPermissionTo('manage_purchases', 'web');
+        return $user->hasPermissionTo('purchases.edit', 'web');
     }
 
     /**
@@ -44,6 +44,6 @@ class SupplierPolicy
      */
     public function delete(User $user, Supplier $supplier): bool
     {
-        return $user->hasPermissionTo('manage_purchases', 'web');
+        return $user->hasPermissionTo('purchases.delete', 'web');
     }
 }

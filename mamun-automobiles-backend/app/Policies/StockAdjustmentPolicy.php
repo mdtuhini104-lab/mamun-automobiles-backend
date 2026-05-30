@@ -12,15 +12,15 @@ class StockAdjustmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.view', 'web');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, StockAdjustment $adjustment): bool
+    public function view(User $user, StockAdjustment $stockAdjustment): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.view', 'web');
     }
 
     /**
@@ -28,22 +28,22 @@ class StockAdjustmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.create', 'web');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, StockAdjustment $adjustment): bool
+    public function update(User $user, StockAdjustment $stockAdjustment): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.edit', 'web');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, StockAdjustment $adjustment): bool
+    public function delete(User $user, StockAdjustment $stockAdjustment): bool
     {
-        return $user->hasPermissionTo('manage_inventory', 'web');
+        return $user->hasPermissionTo('inventory.delete', 'web');
     }
 }

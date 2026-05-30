@@ -12,7 +12,7 @@ class TransactionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.view', 'web');
     }
 
     /**
@@ -20,7 +20,7 @@ class TransactionPolicy
      */
     public function view(User $user, Transaction $transaction): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.view', 'web');
     }
 
     /**
@@ -28,7 +28,7 @@ class TransactionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.create', 'web');
     }
 
     /**
@@ -36,7 +36,7 @@ class TransactionPolicy
      */
     public function update(User $user, Transaction $transaction): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.edit', 'web');
     }
 
     /**
@@ -44,6 +44,6 @@ class TransactionPolicy
      */
     public function delete(User $user, Transaction $transaction): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.delete', 'web');
     }
 }

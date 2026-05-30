@@ -12,7 +12,7 @@ class AccountPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.view', 'web');
     }
 
     /**
@@ -20,7 +20,7 @@ class AccountPolicy
      */
     public function view(User $user, Account $account): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.view', 'web');
     }
 
     /**
@@ -28,7 +28,7 @@ class AccountPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.create', 'web');
     }
 
     /**
@@ -36,7 +36,7 @@ class AccountPolicy
      */
     public function update(User $user, Account $account): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.edit', 'web');
     }
 
     /**
@@ -44,6 +44,6 @@ class AccountPolicy
      */
     public function delete(User $user, Account $account): bool
     {
-        return $user->hasPermissionTo('manage_finance', 'web');
+        return $user->hasPermissionTo('accounts.delete', 'web');
     }
 }
