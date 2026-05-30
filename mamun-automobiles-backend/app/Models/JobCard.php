@@ -7,6 +7,7 @@ use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\ServiceStatus;
 
@@ -121,6 +122,14 @@ class JobCard extends Model
      * Get the workflow state history logs.
      */
     public function workflowHistories(): HasMany
+    {
+        return $this->hasMany(WorkflowHistory::class);
+    }
+
+    /**
+     * Get the workflow state history logs (alias for backward compatibility).
+     */
+    public function workflowHistory(): HasMany
     {
         return $this->hasMany(WorkflowHistory::class);
     }

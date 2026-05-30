@@ -35,6 +35,15 @@ class CreateJobCardRequest extends FormRequest
             'start_date' => 'nullable|date',
             'delivery_date' => 'nullable|date|after_or_equal:start_date',
             'notes' => 'nullable|string',
+            'fuel_level' => 'nullable|string|max:50',
+            'odometer_reading' => 'nullable|integer|min:0',
+            'emergency_level' => 'nullable|string|in:low,medium,high,critical',
+            'expected_delivery_date' => 'nullable|date',
+            'inspection_notes' => 'nullable|string',
+            'priority_level' => 'nullable|string|in:normal,high,urgent',
+            'safety_warnings' => 'nullable|string',
+            'images_paths' => 'nullable|array',
+            'documents_paths' => 'nullable|array',
         ];
     }
 }

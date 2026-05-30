@@ -1,19 +1,15 @@
 <template>
   <div class="max-w-6xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
-    <!-- Header -->
-    <div class="flex items-center justify-between border-b border-slate-850 pb-5">
-      <div class="flex items-center space-x-4">
-        <router-link :to="{ name: 'workshop.hub' }" class="text-slate-400 hover:text-slate-200 transition-colors">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-        </router-link>
-        <div v-if="workOrder">
-          <h1 class="text-2xl font-black tracking-tight text-white uppercase">Parts Consumption Workspace</h1>
-          <p class="text-xs text-slate-400 mt-1">{{ workOrder.work_order_number }} — JC #{{ workOrder.job_card_id }} ({{ workOrder.job_card?.vehicle?.make }} {{ workOrder.job_card?.vehicle?.model }})</p>
+    <JobDetailsLayout :jobCard="workOrder?.job_card || null" :activeStage="6">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-slate-850 pb-5">
+        <div class="flex items-center space-x-4">
+          <div v-if="workOrder">
+            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Parts Consumption Workspace</h1>
+            <p class="text-xs text-slate-400 mt-1">{{ workOrder.work_order_number }}</p>
+          </div>
         </div>
       </div>
-    </div>
 
     <div v-if="loading" class="animate-pulse space-y-6">
       <div class="h-8 bg-slate-800 rounded w-1/4"></div>
@@ -153,6 +149,7 @@
       </div>
     </div>
 
+    </JobDetailsLayout>
   </div>
 </template>
 
@@ -161,6 +158,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
+import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
 
 const route = useRoute();
 const router = useRouter();

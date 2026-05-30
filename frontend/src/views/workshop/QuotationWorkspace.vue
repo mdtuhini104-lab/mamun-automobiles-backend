@@ -1,23 +1,19 @@
 <template>
   <div class="max-w-7xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-850 pb-5">
-      <div class="flex items-center space-x-4">
-        <router-link :to="{ name: 'workshop.hub' }" class="text-slate-400 hover:text-slate-200 transition-colors">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-        </router-link>
-        <div v-if="jobCard">
-          <h1 class="text-2xl font-black tracking-tight text-white uppercase">Quotation Workspace</h1>
-          <p class="text-xs text-slate-400 mt-1">JC #{{ String(jobCard.id).padStart(5, '0') }} — Customer: {{ jobCard.customer?.name }} ({{ jobCard.vehicle?.make }} {{ jobCard.vehicle?.model }})</p>
+    <JobDetailsLayout :jobCard="jobCard" :activeStage="3">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-850 pb-5">
+        <div class="flex items-center space-x-4">
+          <div v-if="jobCard">
+            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Quotation Workspace</h1>
+            <p class="text-xs text-slate-400 mt-1">JC #{{ String(jobCard.id).padStart(5, '0') }}</p>
+          </div>
+        </div>
+        <div v-if="jobCard && jobCard.diagnosis" class="bg-indigo-950/40 border border-indigo-900/60 p-3 rounded-xl max-w-md text-[11px]">
+          <span class="text-indigo-400 font-extrabold uppercase block tracking-wider mb-0.5">Diagnosed Findings:</span>
+          <span class="text-slate-300 italic">"{{ jobCard.diagnosis }}"</span>
         </div>
       </div>
-      <div v-if="jobCard && jobCard.diagnosis" class="bg-indigo-950/40 border border-indigo-900/60 p-3 rounded-xl max-w-md text-[11px]">
-        <span class="text-indigo-400 font-extrabold uppercase block tracking-wider mb-0.5">Diagnosed Findings:</span>
-        <span class="text-slate-300 italic">"{{ jobCard.diagnosis }}"</span>
-      </div>
-    </div>
 
     <div v-if="loadingJob" class="animate-pulse space-y-6">
       <div class="h-8 bg-slate-800 rounded w-1/4"></div>
@@ -253,15 +249,89 @@
                   <dt>Labor Service Total:</dt>
                   <dd class="font-bold text-white font-mono">{{ formatCurrency(quotation.total_labor_cost) }}</dd>
                 </div>
-                <div class="flex justify-between pt-2 border-t border-slate-850">
-                  <dt>Vat (15%):</dt>
-                  <dd class="font-bold text-white font-mono">+{{ formatCurrency(quotation.tax) }}</dd>
+
+                <!-- Editable Discount/Tax for draft/revised -->
+                <div v-if="quotation.status === 'draft' || quotation.status === 'revised'" class="space-y-2 pt-2 border-t border-slate-850">
+                  <div class="flex items-center justify-between">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase">Discount (৳):</label>
+                    <input
+                      v-model.number="tempDiscount"
+                      type="number"
+                      class="w-24 text-xs bg-slate-900 border border-slate-800 rounded px-2 py-1 text-right text-white font-mono"
+                    />
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase">Tax/VAT (৳):</label>
+                    <input
+                      v-model.number="tempTax"
+                      type="number"
+                      class="w-24 text-xs bg-slate-900 border border-slate-800 rounded px-2 py-1 text-right text-white font-mono"
+                    />
+                  </div>
+                  <div class="pt-2 flex justify-end">
+                    <button
+                      @click="openDiscountTaxModal"
+                      class="px-3 py-1 bg-indigo-650 hover:bg-indigo-700 text-white rounded text-[10px] font-black uppercase tracking-wider"
+                    >
+                      Apply Changes
+                    </button>
+                  </div>
                 </div>
+
+                <!-- Read-only for other statuses -->
+                <div v-else class="space-y-2 pt-2 border-t border-slate-850">
+                  <div class="flex justify-between">
+                    <dt>Discount (৳):</dt>
+                    <dd class="font-bold text-white font-mono">-{{ formatCurrency(quotation.discount) }}</dd>
+                  </div>
+                  <div class="flex justify-between">
+                    <dt>Vat/Tax (৳):</dt>
+                    <dd class="font-bold text-white font-mono">+{{ formatCurrency(quotation.tax) }}</dd>
+                  </div>
+                </div>
+
                 <div class="flex justify-between items-center border-t border-slate-800 pt-3 text-sm">
                   <dt class="font-extrabold text-white">Grand Total</dt>
                   <dd class="font-black text-indigo-400 font-mono text-base">{{ formatCurrency(quotation.grand_total) }}</dd>
                 </div>
               </dl>
+            </div>
+          </div>
+
+          <!-- Print & Dispatch Controls -->
+          <div class="bg-slate-950/20 border border-slate-850 rounded-2xl overflow-hidden shadow-xl">
+            <div class="px-6 py-4 border-b border-slate-850 bg-slate-950/40">
+              <h3 class="text-xs font-black text-white uppercase tracking-wider">Print & Dispatch</h3>
+            </div>
+            <div class="p-6 space-y-4">
+              <p class="text-xs text-slate-400">Generate an official corporate PDF or send the versioned quotation to the customer for digital approval.</p>
+
+              <div class="grid grid-cols-2 gap-3">
+                <!-- PDF Download -->
+                <button
+                  @click="downloadQuotationPdf"
+                  class="flex flex-col items-center justify-center p-3 border border-slate-800 hover:border-slate-700 bg-slate-900 hover:bg-slate-850 rounded-xl transition text-center group"
+                >
+                  <svg class="w-6 h-6 text-slate-400 group-hover:text-indigo-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  <span class="text-[10px] font-black text-slate-300 group-hover:text-white uppercase tracking-wider">Download PDF</span>
+                </button>
+
+                <!-- Send to Customer -->
+                <button
+                  @click="sendQuotationToCustomer"
+                  :disabled="sendingQuotation"
+                  class="flex flex-col items-center justify-center p-3 border border-slate-800 hover:border-slate-700 bg-slate-900 hover:bg-slate-850 rounded-xl transition text-center group disabled:opacity-50"
+                >
+                  <svg class="w-6 h-6 text-slate-400 group-hover:text-emerald-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  <span class="text-[10px] font-black text-slate-300 group-hover:text-white uppercase tracking-wider">
+                    {{ sendingQuotation ? 'Sending...' : 'Send to Customer' }}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -350,6 +420,44 @@
       </div>
     </div>
 
+    <!-- Auditable Discount/Tax Revision Modal -->
+    <div v-if="showDiscountModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4 text-slate-900">
+        <h3 class="text-lg font-black text-slate-950 flex items-center">
+          ⚠️ Auditable Pricing Change
+        </h3>
+        <p class="text-xs text-slate-500">To maintain safety compliance and audit tracking, please input the rationale for revising the discount and tax values (minimum 10 characters).</p>
+        <textarea
+          v-model="discountTaxReason"
+          rows="3"
+          required
+          class="w-full text-xs rounded-xl border-slate-300 p-3 border focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="e.g. Approved 5% corporate loyalty discount override after supervisor review..."
+        ></textarea>
+        <p class="text-[10px] text-rose-600 font-bold" v-if="discountTaxReason.length < 10 && discountTaxReason.length > 0">
+          Reason too short! Supply at least 10 characters (currently: {{ discountTaxReason.length }}).
+        </p>
+        <div class="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            @click="showDiscountModal = false"
+            class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            @click="applyDiscountTaxConfirmed"
+            :disabled="discountTaxReason.length < 10 || applyingDiscountTax"
+            class="px-4 py-2 bg-indigo-650 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-md"
+          >
+            {{ applyingDiscountTax ? 'Applying...' : 'Log & Apply Changes' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    </JobDetailsLayout>
   </div>
 </template>
 
@@ -358,6 +466,7 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
+import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -385,6 +494,13 @@ const itemToRemove = ref(null);
 const removalReason = ref('');
 const deletingItem = ref(false);
 
+const tempDiscount = ref(0);
+const tempTax = ref(0);
+const showDiscountModal = ref(false);
+const discountTaxReason = ref('');
+const applyingDiscountTax = ref(false);
+const sendingQuotation = ref(false);
+
 const productItems = computed(() => {
   if (!quotation.value || !quotation.value.items) return [];
   return quotation.value.items.filter(i => i.item_type === 'product');
@@ -406,6 +522,8 @@ const fetchJobDetails = async () => {
     if (qoRes.data.data && qoRes.data.data.length > 0) {
       const details = await api.get(`/quotations/${qoRes.data.data[0].id}`);
       quotation.value = details.data.data;
+      tempDiscount.value = quotation.value.discount || 0;
+      tempTax.value = quotation.value.tax || 0;
     }
   } catch (err) {
     toast.error('Failed to load Job Card or associated Quotations');
@@ -567,6 +685,78 @@ const getQuotationStatusClass = (status) => {
     'rejected': 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
   };
   return map[status] || 'bg-slate-800 text-slate-405';
+};
+
+const downloadQuotationPdf = async () => {
+  try {
+    const response = await api.get(`/print/quotation/${quotation.value.id}`, {
+      responseType: 'blob'
+    });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = `Quotation_${String(quotation.value.quotation_number).replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('PDF downloaded successfully.');
+  } catch (err) {
+    toast.error('Failed to download quotation PDF.');
+  }
+};
+
+const sendQuotationToCustomer = async () => {
+  sendingQuotation.value = true;
+  try {
+    await api.post(`/quotations/${quotation.value.id}/send`);
+    toast.success('Quotation sent to customer successfully.');
+    await fetchJobDetails();
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Failed to send quotation to customer.');
+  } finally {
+    sendingQuotation.value = false;
+  }
+};
+
+const openDiscountTaxModal = () => {
+  discountTaxReason.value = '';
+  showDiscountModal.value = true;
+};
+
+const applyDiscountTaxConfirmed = async () => {
+  if (discountTaxReason.value.length < 10) {
+    toast.warning('Please provide a reason of at least 10 characters.');
+    return;
+  }
+  
+  applyingDiscountTax.value = true;
+  try {
+    const revisionItems = quotation.value.items.map(item => ({
+      item_type: item.item_type,
+      part_id: item.part_id,
+      service_name: item.service_name,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      labor_cost: item.labor_cost,
+      estimated_hours: item.estimated_hours,
+      source_type: item.source_type,
+    }));
+
+    const response = await api.put(`/quotations/${quotation.value.id}/revise`, {
+      reason: discountTaxReason.value,
+      discount: tempDiscount.value,
+      tax: tempTax.value,
+      items: revisionItems,
+    });
+
+    quotation.value = response.data.data;
+    toast.success('Discount and Tax updated successfully (version incremented).');
+    showDiscountModal.value = false;
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Failed to update discount and tax.');
+  } finally {
+    applyingDiscountTax.value = false;
+  }
 };
 
 onMounted(() => {

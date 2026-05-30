@@ -153,4 +153,17 @@ class QuotationController extends Controller
             return $this->errorResponse($e->getMessage(), 400);
         }
     }
+
+    /**
+     * Send quotation to customer.
+     */
+    public function send(Request $request, int $id): JsonResponse
+    {
+        try {
+            $this->quotationService->sendToCustomer($id);
+            return $this->successResponse(null, 'Quotation sent to customer successfully');
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 400);
+        }
+    }
 }

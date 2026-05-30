@@ -1,19 +1,15 @@
 <template>
   <div class="max-w-7xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
-    <!-- Header -->
-    <div class="flex items-center justify-between border-b border-slate-850 pb-5">
-      <div class="flex items-center space-x-4">
-        <router-link :to="{ name: 'workshop.hub' }" class="text-slate-400 hover:text-slate-200 transition-colors">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-        </router-link>
-        <div>
-          <h1 class="text-2xl font-black tracking-tight text-white uppercase">Work Order Command Center</h1>
-          <p class="text-xs text-slate-400 mt-1">Real-time coordinator dashboard. Delegate technician tasks, oversee repair statuses, and alert on stalled or delayed work.</p>
+    <JobDetailsLayout :jobCard="workOrdersList[0]?.job_card || null" :activeStage="5">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-slate-850 pb-5">
+        <div class="flex items-center space-x-4">
+          <div>
+            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Work Order Command Center</h1>
+            <p class="text-xs text-slate-400 mt-1">Real-time coordinator dashboard. Delegate technician tasks, oversee repair statuses, and alert on stalled or delayed work.</p>
+          </div>
         </div>
       </div>
-    </div>
 
     <!-- Alert / Live Diagnostics Deck -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -292,6 +288,7 @@
       </div>
     </div>
 
+    </JobDetailsLayout>
   </div>
 </template>
 
@@ -299,6 +296,7 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
+import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
 
 const toast = useToastStore();
 const loading = ref(true);
@@ -350,7 +348,7 @@ const fetchData = async () => {
     overloadedBays.value = bays.filter(b => b.current_load >= b.max_vehicle_capacity);
 
     // Fetch employee workload list explicitly to get active workload
-    const emplRes = await api.get('/staff'); // Fetch list of employees
+    const emplRes = await api.get('/workforce/employees'); // Fetch list of employees
     const emplList = emplRes.data?.data || [];
     activeTechnicians.value = emplList.filter(e => e.department?.name?.toLowerCase().includes('technic') || e.department?.name?.toLowerCase().includes('worksh') || e.designation?.name?.toLowerCase().includes('mechan'));
 

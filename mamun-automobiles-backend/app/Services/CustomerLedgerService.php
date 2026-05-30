@@ -117,20 +117,23 @@ class CustomerLedgerService
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            return DB::table('customer_ledgers')->where('id', $id)->first();
+            $ledger = DB::table('customer_ledgers')->where('id', $id)->first();
         }
         
-        // Convert to a simple updateable class mock for the above updates
-        return (object) [
-            'id' => $ledger->id,
-            'customer_id' => $ledger->customer_id,
-            'total_debit' => $ledger->total_debit,
-            'total_credit' => $ledger->total_credit,
-            'current_balance' => $ledger->current_balance,
-            'update' => function($data) use ($ledger) {
-                DB::table('customer_ledgers')->where('id', $ledger->id)->update($data);
+        return new class($ledger) {
+            private $ledger;
+            public function __construct($ledger) {
+                $this->ledger = $ledger;
             }
-        ];
+            public function __get($name) {
+                return $this->ledger->$name;
+            }
+            public function update($data) {
+                DB::table('customer_ledgers')->where('id', $this->ledger->id)->update(
+                    array_merge($data, ['updated_at' => now()])
+                );
+            }
+        };
     }
     
     private function logActivity($action, $note)

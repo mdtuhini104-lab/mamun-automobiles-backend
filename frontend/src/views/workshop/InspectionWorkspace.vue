@@ -1,44 +1,12 @@
 <template>
-  <div class="max-w-4xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
+  <div class="max-w-6xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
     
     <div v-if="loading" class="animate-pulse space-y-6">
       <div class="h-8 bg-slate-800 rounded w-1/4"></div>
       <div class="h-96 bg-slate-800 rounded"></div>
     </div>
 
-    <div v-else-if="jobCard" class="space-y-6">
-      <!-- Header -->
-      <div class="flex items-center justify-between border-b border-slate-850 pb-5">
-        <div class="flex items-center space-x-4">
-          <router-link :to="{ name: 'workshop.hub' }" class="text-slate-400 hover:text-slate-200 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-          </router-link>
-          <div>
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Vehicle Intake Inspection</h1>
-            <p class="text-xs text-slate-400 mt-1">JC #{{ String(jobCard.id).padStart(5, '0') }} — {{ jobCard.vehicle?.make }} {{ jobCard.vehicle?.model }} ({{ jobCard.vehicle?.license_plate || jobCard.vehicle?.registration_no }})</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Summary Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-slate-950/20 border border-slate-850 p-4 rounded-xl text-xs space-y-2">
-          <span class="text-slate-500 font-bold uppercase block tracking-wider">Customer Details</span>
-          <p class="font-extrabold text-white text-sm">{{ jobCard.customer?.name }}</p>
-          <p class="text-slate-400 font-mono">{{ jobCard.customer?.phone }}</p>
-        </div>
-        <div class="bg-slate-950/20 border border-slate-850 p-4 rounded-xl text-xs space-y-2">
-          <span class="text-slate-500 font-bold uppercase block tracking-wider">Initial Intake Complaint</span>
-          <p class="text-rose-400 font-semibold italic">"{{ jobCard.complaint }}"</p>
-        </div>
-        <div class="bg-slate-950/20 border border-slate-850 p-4 rounded-xl text-xs space-y-2">
-          <span class="text-slate-500 font-bold uppercase block tracking-wider">Assigned Lead Technician</span>
-          <p class="font-extrabold text-white text-sm">{{ jobCard.mechanic?.name || 'Unassigned' }}</p>
-        </div>
-      </div>
-
+    <JobDetailsLayout v-else-if="jobCard" :jobCard="jobCard" :activeStage="2">
       <!-- Form -->
       <form @submit.prevent="saveInspection" class="space-y-6">
         
@@ -54,9 +22,9 @@
               <input 
                 type="checkbox" 
                 v-model="checklist[key]"
-                class="w-4 h-4 text-indigo-600 border-slate-750 bg-slate-900 rounded focus:ring-indigo-500"
+                class="w-4 h-4 text-indigo-650 bg-slate-950 border-slate-750 rounded focus:ring-indigo-500"
               />
-              <span class="text-[11px] font-bold text-slate-300 capitalize">{{ key.replace('_', ' ') }} Passed</span>
+              <span class="text-[11px] font-bold text-slate-350 capitalize">{{ key.replace('_', ' ') }} Passed</span>
             </label>
           </div>
         </div>
@@ -141,7 +109,7 @@
                 v-model="form.safety_warnings"
                 rows="2"
                 placeholder="BALD TIRES, BRAKE FAILURE HAZARD, FUEL LINE LEAK..."
-                class="w-full text-xs bg-slate-900 border border-red-900/60 bg-red-950/10 rounded-lg p-2.5 text-red-200 focus:border-red-500"
+                class="w-full text-xs bg-slate-900 border border-red-905/60 bg-red-950/10 rounded-lg p-2.5 text-red-200 focus:border-red-500"
               ></textarea>
             </div>
           </div>
@@ -172,14 +140,14 @@
           <button
             type="submit"
             :disabled="saving"
-            class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-black uppercase tracking-wider transition disabled:opacity-50"
+            class="px-6 py-2 bg-indigo-650 hover:bg-indigo-700 text-white rounded-lg text-xs font-black uppercase tracking-wider transition disabled:opacity-50"
           >
             {{ saving ? 'Submitting...' : 'Save Inspection Findings' }}
           </button>
         </div>
 
       </form>
-    </div>
+    </JobDetailsLayout>
   </div>
 </template>
 
@@ -188,6 +156,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
+import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -242,10 +211,20 @@ const fetchJobDetails = async () => {
 const saveInspection = async () => {
   saving.value = true;
   try {
+    // Serialize visual checklist state directly to inspection_notes to persist it safely
+    const checklistStr = Object.entries(checklist)
+      .map(([k, v]) => `${k.replace('_', ' ')}: ${v ? 'Passed' : 'Failed'}`)
+      .join(', ');
+
+    const combinedNotes = form.inspection_notes 
+      ? `${form.inspection_notes}\n\n[Visual Checklist]\n${checklistStr}`
+      : `[Visual Checklist]\n${checklistStr}`;
+
     // Save inspection findings and update job card diagnosis
     await api.put(`/job-cards/${jobCard.value.id}`, {
       ...jobCard.value,
       ...form,
+      inspection_notes: combinedNotes,
       service_status: 'pending' // Moves the card to "Waiting Quotation"
     });
     

@@ -7,15 +7,17 @@ All notable changes to the Mamun Automobiles ERP platform will be documented in 
 ## [2.6.0] - 2026-05-31
 
 ### Added
-- **Connected Workshop Lifecycle Dashboard**: Integrated 13 dedicated workspace views in `frontend/src/views/workshop/` mapped through Vue router configurations.
-- **Central Workshop Operations Hub**: Interactive Kanban board visualizing 10 operational queues (Waiting Inspection, Waiting Quotation, Waiting Approval, Waiting Bay, Waiting Parts, In Progress, Waiting QC, Ready Delivery, Delivered, and Comeback Vehicles) with direct workflow access.
-- **High-Speed Intake & Repeat Client Prefill**: Added real-time auto-suggest lookup, instant customer & vehicle metadata autofills, and VIP/Corporate pricing contract auto-calculation.
-- **Touch-Friendly Mobile Swipe Engine**: Deployed swipable status tracking for task lists, offline indicators, and customer-supplied vs workshop parts selection (setting customer-provided items at zero cost).
-- **Settlement & Delivery Signature Handovers**: Integrated ledger-based advance deposit offsets for invoicing, validation forms with road test checks, and collection signatures with photo attachments to close job cards.
-- **Invoice Payment Recording System**: Resolved the missing payment recording dialog in `InvoiceDetails.vue` by adding a reactive modal overlay linked to `/api/invoices/{id}/pay`.
-- **Staff Profile Auto-Generation & Unique Validation**: Fixed the backend server 500 error when saving/updating user profiles with empty employee codes or without existing employee records. Auto-generates unique employee codes and enforces uniqueness at the request validation layer.
-- **Payroll & Attendance Module Loading Fix**: Fixed a frontend "Module Loading Failed" runtime crash (reading 'length' of undefined) when accessing the HR & Payroll dashboard `/payrolls` and `/attendances` by adding response body envelopment fallbacks in the Pinia store `hr.js`.
-- **Read-Only Vercel Dashboard Caching Protect**: Resolved server 500 error when loading the main dashboard on read-only serverless platforms like Vercel. Safe-guards the query pipeline against disk write limits and adds safety checks for null or malformed Carbon timestamps during monthly sales groupings.
+- **Unified Job Details Layout Wrapper**: Created a premium `JobDetailsLayout.vue` wrapper and integrated it across all 12 operational workspaces to ensure technician, bay, customer, vehicle plate, and current status are visible.
+- **Visual Stage Lifecycle Stepper**: Deployed `WorkflowLifecycleTracker.vue` at the top of all workspaces to track step-by-step progress (Intake -> Closed) dynamically.
+- **Interactive Quotation Customizations**: Added discount/tax editable input fields, auditable revision justification modals, customer-dispatch SMS/email notification actions, and authenticated PDF download stream triggers.
+- **End-to-End Operational Lifecycle Simulator**: Created `simulate_workflow.php` to simulate all 10 stages from check-in to delivery, validating parts consumption calculations, ledger adjustments, and invoice totals.
+
+### Fixed
+- **Endpoint Lookup Corrections**: Changed `/staff` to `/workforce/employees` in `WorkOrderCommandCenter.vue`, and `/crm/customer-ledger/{id}` to `/customer-ledgers/{id}` in `InvoiceSettlementWorkspace.vue`.
+- **Customer Ledger stdClass Method Error**: Rewrote `getOrCreateLedger` in `CustomerLedgerService.php` to return a clean PHP anonymous class wrapper, resolving undefined `update()` exceptions during payment tracking.
+- **Undefined Relationship Eager Loading**: Fixed invalid `'tasks.assignments.employee.user'` reference in `JobCardRepository.php` to target `'tasks.taskAssignments.employee.user'` correctly.
+- **JobCard Eager Loading Alias**: Added a backward-compatible `workflowHistory` relation alias to `JobCard.php` to prevent relation not found exceptions during invoice compilations.
+- **Vite CSS Decimal Class Compiler Crash**: Renamed invalid CSS classes `.w-9.5` and `.h-9.5` to `.w-9_5` and `.h-9_5` to resolve lightningcss minifier syntax compilation failures.
 
 ---
 

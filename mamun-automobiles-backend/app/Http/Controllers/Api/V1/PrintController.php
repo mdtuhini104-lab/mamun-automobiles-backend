@@ -149,6 +149,54 @@ class PrintController extends Controller
         return $this->pdfService->stream('print.payroll', $data, "payroll-{$id}.pdf", 'A4');
     }
 
+    public function quotation(Request $request, $id)
+    {
+        $this->authorizePermission('quotations.print');
+
+        $quotationModel = \App\Models\Quotation::with(['jobCard.customer', 'jobCard.vehicle', 'items.part'])->find($id);
+
+        if (!$quotationModel) {
+            abort(404, 'Quotation not found');
+        }
+
+        $quotationData = [
+            'id' => $quotationModel->id,
+            'quotation_number' => $quotationModel->quotation_number,
+            'date' => $quotationModel->created_at->format('d M Y'),
+            'subtotal' => $quotationModel->total_product_cost + $quotationModel->total_labor_cost,
+            'discount' => $quotationModel->discount,
+            'vat' => $quotationModel->tax,
+            'total' => $quotationModel->grand_total,
+            'notes' => $quotationModel->notes,
+            'customer_name' => $quotationModel->jobCard && $quotationModel->jobCard->customer ? $quotationModel->jobCard->customer->name : 'Walk-in',
+            'customer_phone' => $quotationModel->jobCard && $quotationModel->jobCard->customer ? $quotationModel->jobCard->customer->phone : '',
+            'vehicle_no' => $quotationModel->jobCard && $quotationModel->jobCard->vehicle ? ($quotationModel->jobCard->vehicle->license_plate ?? $quotationModel->jobCard->vehicle->registration_no) : '',
+            'items' => $quotationModel->items->map(function ($item) {
+                return [
+                    'description' => $item->item_type === 'product' ? ($item->part->name ?? 'Part') : $item->service_name,
+                    'qty' => $item->quantity,
+                    'rate' => $item->item_type === 'product' ? $item->unit_price : $item->labor_cost,
+                    'amount' => $item->item_type === 'product' ? $item->quantity * $item->unit_price : $item->labor_cost,
+                ];
+            })->toArray()
+        ];
+
+        $data = [
+            'type' => 'Quotation',
+            'invoice' => $quotationData,
+            'company_name' => 'Mamun Automobiles',
+            'is_thermal' => false,
+        ];
+
+        $this->logPrint('Quotation', 'Print PDF', $id, $request);
+
+        if ($request->query('action') === 'download') {
+            return $this->pdfService->download('print.quotation', $data, "quotation-{$id}.pdf", 'A4');
+        }
+
+        return $this->pdfService->stream('print.quotation', $data, "quotation-{$id}.pdf", 'A4');
+    }
+
     private function authorizePermission($permission)
     {
         if (!auth()->user() || !auth()->user()->can($permission)) {

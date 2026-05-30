@@ -199,15 +199,56 @@
         <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Intake Complaint & Schedule</h3>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="md:col-span-2">
-            <label class="block text-[11px] text-slate-400 mb-1">Customer Complaint / Issue Description *</label>
-            <textarea
-              v-model="form.complaint"
-              required
-              rows="3"
-              placeholder="Describe the issues reported by customer (e.g. Engine oil leakage, brake squeal noise, AC cooling issue)"
-              class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
-            ></textarea>
+          <div class="md:col-span-2 space-y-4">
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Customer Complaint / Issue Description *</label>
+              <textarea
+                v-model="form.complaint"
+                required
+                rows="3"
+                placeholder="Describe the issues reported by customer (e.g. Engine oil leakage, brake squeal noise, AC cooling issue)"
+                class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+              ></textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Odometer Reading (KM) *</label>
+                <input
+                  v-model.number="form.odometer_reading"
+                  type="number"
+                  required
+                  class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Fuel Level *</label>
+                <select
+                  v-model="form.fuel_level"
+                  required
+                  class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                >
+                  <option value="Empty">Empty</option>
+                  <option value="1/4">1/4 Tank</option>
+                  <option value="1/2">1/2 Tank</option>
+                  <option value="3/4">3/4 Tank</option>
+                  <option value="Full">Full Tank</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Emergency Hazard Level *</label>
+                <select
+                  v-model="form.emergency_level"
+                  required
+                  class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                >
+                  <option value="low">Low (Standard)</option>
+                  <option value="medium">Medium (Repair Advised)</option>
+                  <option value="high">High (Major Faults)</option>
+                  <option value="critical">Critical (Safety Hazard)</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <div class="space-y-3">
@@ -231,6 +272,37 @@
                 required
                 class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
               />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Media attachments (Mock Upload) -->
+      <div class="space-y-4 bg-slate-950/20 border border-slate-850 p-5 rounded-2xl">
+        <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400">Media Attachments (Photographs / Walkaround Video)</h3>
+        <p class="text-[11px] text-slate-400">Click to attach photographs or diagnostic check-in walkaround videos.</p>
+        <div class="flex flex-wrap gap-4 items-center">
+          <button 
+            type="button" 
+            @click="mockImageUpload" 
+            class="px-4 py-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2"
+          >
+            📸 Capture Photo / Walkaround Video
+          </button>
+          <div v-if="form.images_paths.length > 0" class="flex gap-2">
+            <div 
+              v-for="(img, i) in form.images_paths" 
+              :key="i"
+              class="w-16 h-16 rounded-xl bg-cover bg-center border border-slate-700 relative shadow-md"
+              :style="{ backgroundImage: `url(${img})` }"
+            >
+              <button 
+                type="button" 
+                @click="form.images_paths.splice(i, 1)" 
+                class="absolute -top-1.5 -right-1.5 bg-rose-505 text-white rounded-full w-5 h-5 flex items-center justify-center text-[9px] font-black border border-white"
+              >
+                ✕
+              </button>
             </div>
           </div>
         </div>
@@ -287,8 +359,21 @@ const form = reactive({
   vin: '',
   complaint: '',
   priority_level: 'normal',
-  service_date: new Date().toISOString().split('T')[0]
+  service_date: new Date().toISOString().split('T')[0],
+  odometer_reading: 35000,
+  fuel_level: '1/2',
+  emergency_level: 'medium',
+  images_paths: []
 });
+
+const mockImageUpload = () => {
+  const list = [
+    'https://images.unsplash.com/photo-1517524206127-48bbd363f3d7?w=400',
+    'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=400'
+  ];
+  form.images_paths.push(list[Math.floor(Math.random() * list.length)]);
+  toast.success('Mock photo attached to job card.');
+};
 
 // Instant customer lookup
 const lookupCustomer = async () => {
@@ -414,7 +499,11 @@ const registerJob = async () => {
       complaint: form.complaint,
       priority_level: form.priority_level,
       service_status: 'pending',
-      service_date: form.service_date
+      service_date: form.service_date,
+      odometer_reading: form.odometer_reading,
+      fuel_level: form.fuel_level,
+      emergency_level: form.emergency_level,
+      images_paths: form.images_paths
     });
 
     toast.success('Frontdesk check-in completed. Job card generated successfully!');

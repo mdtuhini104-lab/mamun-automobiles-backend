@@ -318,6 +318,24 @@ class QuotationService
     }
 
     /**
+     * Send quotation to customer (logs activity and triggers dispatch).
+     */
+    public function sendToCustomer(int $id): bool
+    {
+        $quotation = Quotation::findOrFail($id);
+        $jobCard = $quotation->jobCard;
+
+        // Transition workflow state to 'quotation_sent'
+        $this->transitionWorkflowState($jobCard, 'quotation_sent', 'Quotation dispatched to customer.');
+
+        // Update quotation status to sent/pending approval
+        $quotation->status = 'draft'; // remains in draft but is sent
+        $quotation->save();
+
+        return true;
+    }
+
+    /**
      * Transitions dynamic workflow state and records in history.
      */
     private function transitionWorkflowState(JobCard $jobCard, string $toStateName, string $notes = '')

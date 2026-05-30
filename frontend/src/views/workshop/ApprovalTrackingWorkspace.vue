@@ -1,22 +1,18 @@
 <template>
   <div class="max-w-7xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
-    <!-- Header -->
-    <div class="flex items-center justify-between border-b border-slate-850 pb-5">
-      <div class="flex items-center space-x-4">
-        <router-link :to="{ name: 'workshop.hub' }" class="text-slate-400 hover:text-slate-200 transition-colors">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-        </router-link>
-        <div>
-          <h1 class="text-2xl font-black tracking-tight text-white uppercase">Customer Approval Tracker</h1>
-          <p class="text-xs text-slate-400 mt-1">Supervise pending quotations, track feedback loop, and record customer decisions with secure digital signatures.</p>
+    <JobDetailsLayout :jobCard="selectedQuotation?.job_card || null" :activeStage="4">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-slate-850 pb-5">
+        <div class="flex items-center space-x-4">
+          <div>
+            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Customer Approval Tracker</h1>
+            <p class="text-xs text-slate-400 mt-1">Supervise pending quotations, track feedback loop, and record customer decisions with secure digital signatures.</p>
+          </div>
         </div>
+        <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+          {{ pendingApprovals.length }} Pending approvals
+        </span>
       </div>
-      <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-        {{ pendingApprovals.length }} Pending approvals
-      </span>
-    </div>
 
     <!-- Layout Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -211,6 +207,7 @@
       </div>
 
     </div>
+    </JobDetailsLayout>
   </div>
 </template>
 
@@ -218,6 +215,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
+import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
 
 const toast = useToastStore();
 const loading = ref(true);

@@ -33,6 +33,15 @@ class JobCardResource extends JsonResource
             'start_date' => $this->start_date,
             'delivery_date' => $this->delivery_date,
             'notes' => $this->notes,
+            'fuel_level' => $this->fuel_level,
+            'odometer_reading' => $this->odometer_reading,
+            'emergency_level' => $this->emergency_level,
+            'expected_delivery_date' => $this->expected_delivery_date ? $this->expected_delivery_date->toIso8601String() : null,
+            'inspection_notes' => $this->inspection_notes,
+            'priority_level' => $this->priority_level,
+            'safety_warnings' => $this->safety_warnings,
+            'images_paths' => $this->images_paths,
+            'documents_paths' => $this->documents_paths,
             'department_id' => $this->department_id,
             'department' => $this->whenLoaded('department', function () {
                 return $this->department ? [

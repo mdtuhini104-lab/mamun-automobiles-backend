@@ -105,7 +105,7 @@ class QcAndDeliveryController extends Controller
             event(new \App\Events\VehicleDelivered($delivery));
 
             // Transition JobCard status to 'closed'
-            $jobCard->service_status = \App\Enums\ServiceStatus::COMPLETED;
+            $jobCard->service_status = \App\Enums\ServiceStatus::DELIVERED;
             $jobCard->save();
 
             \App\Models\WorkflowHistory::create([

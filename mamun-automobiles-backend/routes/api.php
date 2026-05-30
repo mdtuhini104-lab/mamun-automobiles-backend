@@ -160,6 +160,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/quotations/{id}', [App\Http\Controllers\Api\V1\QuotationController::class, 'show'])->middleware('permission:quotations.view');
         Route::put('/quotations/{id}/revise', [App\Http\Controllers\Api\V1\QuotationController::class, 'revise'])->middleware(['permission:quotations.revise', 'idempotent']);
         Route::post('/quotations/{id}/approve', [App\Http\Controllers\Api\V1\QuotationController::class, 'approve'])->middleware(['permission:quotations.approve', 'idempotent']);
+        Route::post('/quotations/{id}/send', [App\Http\Controllers\Api\V1\QuotationController::class, 'send'])->middleware(['permission:quotations.create', 'idempotent']);
         Route::delete('/quotation-items/{itemId}', [App\Http\Controllers\Api\V1\QuotationController::class, 'destroyItem'])->middleware('permission:quotations.edit');
 
         // Work Order routes
@@ -440,6 +441,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/print/job-card/{id}', [App\Http\Controllers\Api\V1\PrintController::class, 'jobCard']);
         Route::get('/print/purchase/{id}', [App\Http\Controllers\Api\V1\PrintController::class, 'purchase']);
         Route::get('/print/payroll/{id}', [App\Http\Controllers\Api\V1\PrintController::class, 'payroll']);
+        Route::get('/print/quotation/{id}', [App\Http\Controllers\Api\V1\PrintController::class, 'quotation']);
 
         // Customer Self-Service Portal Routes
         Route::get('/portal/repair-status/{job_card_id}', [App\Http\Controllers\Api\V1\CustomerPortalController::class, 'getRepairStatus']);
