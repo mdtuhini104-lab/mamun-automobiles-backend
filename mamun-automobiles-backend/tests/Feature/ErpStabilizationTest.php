@@ -563,4 +563,37 @@ class ErpStabilizationTest extends TestCase
             ->where('action', 'subscription_renewal_reminder')
             ->exists()); // Skipped sending due to opt-out
     }
+
+    public function test_update_user_without_employee_profile_auto_generates_employee_code()
+    {
+        $admin = \App\Models\User::first();
+        $this->actingAs($admin);
+
+        // 1. Create a user who does NOT have an employee profile yet
+        $user = \App\Models\User::create([
+            'name' => 'John Technician',
+            'email' => 'john.tech@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->assertFalse(\App\Models\Employee::where('user_id', $user->id)->exists());
+
+        // 2. Perform PUT request to update user, without passing employee_code (leave it blank)
+        $response = $this->putJson("/api/v1/users/{$user->id}", [
+            'name' => 'John Technician Updated',
+            'email' => 'john.tech@example.com',
+            'role' => 'Technician',
+            'salary' => 25000,
+            'employee_code' => '', // blank like in the frontend screen
+        ]);
+
+        $response->assertStatus(200);
+
+        // 3. Assert that employee profile was created and employee_code was auto-generated
+        $employee = \App\Models\Employee::where('user_id', $user->id)->first();
+        $this->assertNotNull($employee);
+        $this->assertNotEmpty($employee->employee_code);
+        $this->assertStringStartsWith('EMP-', $employee->employee_code);
+        $this->assertEquals(25000, $employee->salary);
+    }
 }

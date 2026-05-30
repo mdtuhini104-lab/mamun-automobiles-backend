@@ -27,7 +27,7 @@ class CreateUserRequest extends FormRequest
             'department_id' => 'nullable|integer|exists:departments,id',
             'designation_id' => 'nullable|integer|exists:designations,id',
             'shift_id' => 'nullable|integer|exists:shifts,id',
-            'employee_code' => 'nullable|string|max:50',
+            'employee_code' => 'nullable|string|max:50|unique:employees,employee_code',
             'status' => 'nullable|string',
             'availability_status' => 'nullable|string',
             'skills' => 'nullable|array',

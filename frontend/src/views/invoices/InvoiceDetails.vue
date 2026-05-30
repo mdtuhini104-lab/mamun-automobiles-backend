@@ -154,6 +154,56 @@
           
         </div>
       </div>
+
+      <!-- Payment Modal -->
+      <div v-if="showPaymentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full border border-slate-100 overflow-hidden transform transition-all">
+          <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 text-lg">Record Invoice Payment</h3>
+            <button @click="showPaymentModal = false" class="text-slate-400 hover:text-slate-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <form @submit.prevent="submitPayment" class="p-6 space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">Due Amount</label>
+              <div class="text-xl font-bold text-slate-900 bg-slate-100 px-3 py-2 rounded-lg border border-slate-200">
+                {{ formatCurrency(invoice.due_amount) }}
+              </div>
+            </div>
+            <div>
+              <label for="payment-amount" class="block text-sm font-semibold text-slate-700 mb-1">Payment Amount (BDT)</label>
+              <input
+                id="payment-amount"
+                type="number"
+                step="0.01"
+                :max="invoice.due_amount"
+                v-model.number="paymentAmount"
+                class="w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                required
+              />
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                @click="showPaymentModal = false"
+                class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                :disabled="processingPayment"
+                class="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              >
+                {{ processingPayment ? 'Processing...' : 'Confirm Payment' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -170,16 +220,48 @@ const toast = useToastStore();
 
 const invoice = ref(null);
 const loading = ref(true);
+const showPaymentModal = ref(false);
+const paymentAmount = ref(0);
+const processingPayment = ref(false);
 
 const fetchInvoice = async () => {
   try {
     const response = await api.get(`/invoices/${route.params.id}`);
     invoice.value = response.data.data;
+    if (invoice.value) {
+      paymentAmount.value = invoice.value.due_amount;
+    }
   } catch (error) {
     toast.error('Failed to load invoice details');
     router.push({ name: 'invoices.index' });
   } finally {
     loading.value = false;
+  }
+};
+
+const submitPayment = async () => {
+  if (paymentAmount.value <= 0) {
+    toast.error('Payment amount must be greater than zero');
+    return;
+  }
+  if (paymentAmount.value > invoice.value.due_amount) {
+    toast.error('Payment amount cannot exceed the due amount');
+    return;
+  }
+  
+  processingPayment.value = true;
+  try {
+    await api.post(`/invoices/${invoice.value.id}/pay`, {
+      amount: paymentAmount.value
+    });
+    toast.success('Payment recorded successfully');
+    showPaymentModal.value = false;
+    await fetchInvoice();
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || 'Failed to record payment';
+    toast.error(errorMsg);
+  } finally {
+    processingPayment.value = false;
   }
 };
 

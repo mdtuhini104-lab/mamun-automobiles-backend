@@ -34,6 +34,10 @@
 
         <!-- WORKSHOP -->
         <div class="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mt-4">Workshop Operations</div>
+        <router-link :to="{ name: 'workshop.hub' }" class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-bold text-slate-700 bg-slate-100/50 hover:bg-slate-100 hover:text-slate-900 transition-all border-l-3 border-transparent" active-class="!text-indigo-600 !border-indigo-600 bg-indigo-50/50 shadow-sm">
+          <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 8.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"></path></svg>
+          Workshop Operations Hub
+        </router-link>
         <router-link v-if="authStore.hasPermission('customers.view')" :to="{ name: 'customers.index' }" class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all border-l-3 border-transparent" active-class="!text-indigo-600 !border-indigo-600 bg-indigo-50/50 shadow-sm">
           <svg class="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
           Customers

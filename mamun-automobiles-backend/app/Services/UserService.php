@@ -123,6 +123,25 @@ class UserService extends BaseService
                 'availability_status' => $data['availability_status'] ?? null,
             ];
 
+            // Ensure employee_code is generated or preserved if not provided in the update request
+            $existingEmployee = \App\Models\Employee::where('user_id', $user->id)->first();
+            if ($existingEmployee) {
+                if (empty($employeeData['employee_code'])) {
+                    $employeeData['employee_code'] = $existingEmployee->employee_code;
+                }
+            } else {
+                if (empty($employeeData['employee_code'])) {
+                    $nextId = (\App\Models\Employee::max('id') ?? 0) + 1;
+                    $employeeData['employee_code'] = 'EMP-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
+                }
+                if (empty($employeeData['status'])) {
+                    $employeeData['status'] = \App\Constants\WorkforceConstants::STATUS_ACTIVE;
+                }
+                if (empty($employeeData['availability_status'])) {
+                    $employeeData['availability_status'] = \App\Constants\WorkforceConstants::AVAIL_AVAILABLE;
+                }
+            }
+
             // Remove null entries to avoid overwriting with nulls if they were not provided in simple form
             $employeeData = array_filter($employeeData, fn($val) => $val !== null);
 

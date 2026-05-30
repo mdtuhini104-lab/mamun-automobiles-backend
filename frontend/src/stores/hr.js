@@ -13,7 +13,7 @@ export const useHrStore = defineStore('hr', {
       this.loading = true;
       try {
         const response = await api.get('/hr/attendances');
-        this.attendances = response.data.data;
+        this.attendances = response.data.data || response.data;
       } finally {
         this.loading = false;
       }
@@ -22,7 +22,7 @@ export const useHrStore = defineStore('hr', {
       this.loading = true;
       try {
         const response = await api.get('/hr/payrolls');
-        this.payrolls = response.data.data;
+        this.payrolls = response.data.data || response.data;
       } finally {
         this.loading = false;
       }

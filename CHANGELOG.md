@@ -4,6 +4,20 @@ All notable changes to the Mamun Automobiles ERP platform will be documented in 
 
 ---
 
+## [2.6.0] - 2026-05-31
+
+### Added
+- **Connected Workshop Lifecycle Dashboard**: Integrated 13 dedicated workspace views in `frontend/src/views/workshop/` mapped through Vue router configurations.
+- **Central Workshop Operations Hub**: Interactive Kanban board visualizing 10 operational queues (Waiting Inspection, Waiting Quotation, Waiting Approval, Waiting Bay, Waiting Parts, In Progress, Waiting QC, Ready Delivery, Delivered, and Comeback Vehicles) with direct workflow access.
+- **High-Speed Intake & Repeat Client Prefill**: Added real-time auto-suggest lookup, instant customer & vehicle metadata autofills, and VIP/Corporate pricing contract auto-calculation.
+- **Touch-Friendly Mobile Swipe Engine**: Deployed swipable status tracking for task lists, offline indicators, and customer-supplied vs workshop parts selection (setting customer-provided items at zero cost).
+- **Settlement & Delivery Signature Handovers**: Integrated ledger-based advance deposit offsets for invoicing, validation forms with road test checks, and collection signatures with photo attachments to close job cards.
+- **Invoice Payment Recording System**: Resolved the missing payment recording dialog in `InvoiceDetails.vue` by adding a reactive modal overlay linked to `/api/invoices/{id}/pay`.
+- **Staff Profile Auto-Generation & Unique Validation**: Fixed the backend server 500 error when saving/updating user profiles with empty employee codes or without existing employee records. Auto-generates unique employee codes and enforces uniqueness at the request validation layer.
+- **Payroll & Attendance Module Loading Fix**: Fixed a frontend "Module Loading Failed" runtime crash (reading 'length' of undefined) when accessing the HR & Payroll dashboard `/payrolls` and `/attendances` by adding response body envelopment fallbacks in the Pinia store `hr.js`.
+
+---
+
 ## [2.5.0] - 2026-05-29
 
 ### Added

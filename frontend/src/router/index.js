@@ -202,6 +202,84 @@ const router = createRouter({
           meta: { permission: 'job_cards.edit' }
         },
         {
+          path: 'workshop/hub',
+          name: 'workshop.hub',
+          component: () => import('../views/workshop/WorkshopOperationsHub.vue'),
+          meta: { permission: 'job_cards.view' }
+        },
+        {
+          path: 'workshop/intake',
+          name: 'workshop.intake',
+          component: () => import('../views/workshop/FrontdeskIntake.vue'),
+          meta: { permission: 'job_cards.create' }
+        },
+        {
+          path: 'workshop/inspection/:id',
+          name: 'workshop.inspection',
+          component: () => import('../views/workshop/InspectionWorkspace.vue'),
+          meta: { permission: 'job_cards.edit' }
+        },
+        {
+          path: 'workshop/quotation/:id',
+          name: 'workshop.quotation',
+          component: () => import('../views/workshop/QuotationWorkspace.vue'),
+          meta: { permission: 'quotations.create' }
+        },
+        {
+          path: 'workshop/approvals',
+          name: 'workshop.approvals',
+          component: () => import('../views/workshop/ApprovalTrackingWorkspace.vue'),
+          meta: { permission: 'quotations.approve' }
+        },
+        {
+          path: 'workshop/work-orders',
+          name: 'workshop.work-orders',
+          component: () => import('../views/workshop/WorkOrderCommandCenter.vue'),
+          meta: { permission: 'work_orders.view' }
+        },
+        {
+          path: 'workshop/bays',
+          name: 'workshop.bays',
+          component: () => import('../views/workshop/BayOperationsBoard.vue'),
+          meta: { permission: 'work_orders.view' }
+        },
+        {
+          path: 'workshop/technician-tasks',
+          name: 'workshop.technician-tasks',
+          component: () => import('../views/workshop/TechnicianMobileTaskScreen.vue'),
+          meta: { permission: 'work_orders.edit' }
+        },
+        {
+          path: 'workshop/parts-consumption/:id',
+          name: 'workshop.parts-consumption',
+          component: () => import('../views/workshop/PartsConsumptionWorkspace.vue'),
+          meta: { permission: 'work_orders.edit' }
+        },
+        {
+          path: 'workshop/qc/:id',
+          name: 'workshop.qc',
+          component: () => import('../views/workshop/QcVerificationWorkspace.vue'),
+          meta: { permission: 'quality_controls.manage' }
+        },
+        {
+          path: 'workshop/delivery/:id',
+          name: 'workshop.delivery',
+          component: () => import('../views/workshop/DeliveryHandoverWorkspace.vue'),
+          meta: { permission: 'vehicle_deliveries.manage' }
+        },
+        {
+          path: 'workshop/settlement/:id',
+          name: 'workshop.settlement',
+          component: () => import('../views/workshop/InvoiceSettlementWorkspace.vue'),
+          meta: { permission: 'invoices.view' }
+        },
+        {
+          path: 'workshop/warranty-comeback',
+          name: 'workshop.warranty-comeback',
+          component: () => import('../views/workshop/WarrantyComebackWorkspace.vue'),
+          meta: { permission: 'job_cards.view' }
+        },
+        {
           path: 'accounts',
           name: 'accounts.index',
           component: () => import('../views/accounts/AccountList.vue'),
