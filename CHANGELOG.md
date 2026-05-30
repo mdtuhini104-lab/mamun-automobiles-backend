@@ -15,6 +15,7 @@ All notable changes to the Mamun Automobiles ERP platform will be documented in 
 - **Invoice Payment Recording System**: Resolved the missing payment recording dialog in `InvoiceDetails.vue` by adding a reactive modal overlay linked to `/api/invoices/{id}/pay`.
 - **Staff Profile Auto-Generation & Unique Validation**: Fixed the backend server 500 error when saving/updating user profiles with empty employee codes or without existing employee records. Auto-generates unique employee codes and enforces uniqueness at the request validation layer.
 - **Payroll & Attendance Module Loading Fix**: Fixed a frontend "Module Loading Failed" runtime crash (reading 'length' of undefined) when accessing the HR & Payroll dashboard `/payrolls` and `/attendances` by adding response body envelopment fallbacks in the Pinia store `hr.js`.
+- **Read-Only Vercel Dashboard Caching Protect**: Resolved server 500 error when loading the main dashboard on read-only serverless platforms like Vercel. Safe-guards the query pipeline against disk write limits and adds safety checks for null or malformed Carbon timestamps during monthly sales groupings.
 
 ---
 
