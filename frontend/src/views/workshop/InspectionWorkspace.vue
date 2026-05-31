@@ -242,7 +242,7 @@ const saveInspection = async () => {
     });
     
     toast.success('Vehicle inspection findings completed and logged.');
-    router.push({ name: 'workshop.quotation', params: { id: jobCard.value.id } }); // Chains directly to next stage
+    router.push({ name: 'workshop.diagnosis', params: { id: jobCard.value.id } }); // Chains directly to next stage
   } catch (err) {
     console.error('Inspection submit failed', err);
     toast.error(err.response?.data?.message || 'Failed to submit inspection reports.');

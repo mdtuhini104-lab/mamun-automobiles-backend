@@ -92,6 +92,12 @@
             <span class="text-3xl">✔</span>
             <h4 class="font-bold text-emerald-400">Invoice Fully Settled</h4>
             <p class="text-xs text-slate-500">No balance is due on this invoice. Settle keys handover and dispatch delivery details.</p>
+            <router-link
+              :to="{ name: 'workshop.qc-delivery' }"
+              class="mt-4 px-4 py-2.5 bg-emerald-650 hover:bg-emerald-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition block text-center"
+            >
+              Proceed to Handover Checkout
+            </router-link>
           </div>
 
           <form v-else @submit.prevent="recordPayment" class="space-y-4 text-xs">

@@ -213,11 +213,13 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
 import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
 
 const toast = useToastStore();
+const router = useRouter();
 const loading = ref(true);
 const submitting = ref(false);
 
@@ -355,7 +357,7 @@ const submitApproval = async () => {
     
     await api.post(`/quotations/${selectedQuotation.value.id}/approve`, payload);
     toast.success('Approval decision recorded. Active Work Order dispatched.');
-    fetchPendingQuotations();
+    router.push({ name: 'workshop.work-orders' });
   } catch (err) {
     console.error('Failed to submit customer approval', err);
     toast.error(err.response?.data?.message || 'Approval submission failed.');

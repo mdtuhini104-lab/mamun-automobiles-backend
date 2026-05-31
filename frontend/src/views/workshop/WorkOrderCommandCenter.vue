@@ -5,193 +5,381 @@
       <div class="flex items-center justify-between border-b border-slate-850 pb-5">
         <div class="flex items-center space-x-4">
           <div>
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Work Order Command Center</h1>
-            <p class="text-xs text-slate-400 mt-1">Real-time coordinator dashboard. Delegate technician tasks, oversee repair statuses, and alert on stalled or delayed work.</p>
+            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Work Order & Bay Management</h1>
+            <p class="text-xs text-slate-400 mt-1">Real-time workshop command hub. Dispatch repairs, allocate service bays, delegate tech tasks, and manage bay occupancy flows.</p>
           </div>
         </div>
       </div>
 
-    <!-- Alert / Live Diagnostics Deck -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <!-- Stalled/Delayed Alerts -->
-      <div class="bg-red-950/20 border border-red-900/40 p-4 rounded-2xl space-y-3">
-        <h3 class="text-[10px] font-black uppercase tracking-wider text-rose-400 flex items-center gap-2">
-          <span class="w-2 h-2 bg-rose-500 rounded-full animate-ping"></span>
-          Operational Warnings (Delayed Tasks)
-        </h3>
-        <div v-if="delayedTasks.length === 0" class="text-xs text-slate-500 italic">No tasks currently exceeding estimations.</div>
-        <div v-else class="space-y-2 max-h-24 overflow-y-auto pr-1">
-          <div v-for="t in delayedTasks" :key="t.id" class="text-[11px] bg-red-950/40 p-2 rounded border border-red-900/20 flex justify-between">
-            <span>{{ t.task_name }} (JC #{{ t.jcId }})</span>
-            <span class="font-bold text-rose-400 font-mono">+{{ t.delayedBy }}m</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Overloaded Bays Alert -->
-      <div class="bg-amber-950/20 border border-amber-900/40 p-4 rounded-2xl space-y-3">
-        <h3 class="text-[10px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
-          <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
-          Congestion Warnings (Overloaded Bays)
-        </h3>
-        <div v-if="overloadedBays.length === 0" class="text-xs text-slate-500 italic">All workshop bays running within nominal limits.</div>
-        <div v-else class="space-y-2 max-h-24 overflow-y-auto pr-1">
-          <div v-for="b in overloadedBays" :key="b.id" class="text-[11px] bg-amber-955/40 p-2 rounded border border-amber-900/20 flex justify-between">
-            <span>{{ b.name }} (Capacity Limit)</span>
-            <span class="font-bold text-amber-400 font-mono">{{ b.current_load }}/{{ b.max_vehicle_capacity }} vh</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Technician workload summary -->
-      <div class="bg-indigo-950/20 border border-indigo-900/40 p-4 rounded-2xl space-y-3">
-        <h3 class="text-[10px] font-black uppercase tracking-wider text-indigo-400 flex items-center gap-2">
-          <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
-          Technician Allocation Load
-        </h3>
-        <div class="flex justify-between items-center text-xs text-slate-400">
-          <span>Active Staff Checked-In:</span>
-          <span class="font-bold text-white font-mono">{{ technicians.length }}</span>
-        </div>
-        <div class="text-[10px] text-slate-500 max-h-20 overflow-y-auto">
-          <div v-for="t in technicians.slice(0, 3)" :key="t.id" class="flex justify-between py-0.5 border-b border-slate-800">
-            <span>{{ t.name }}</span>
-            <span class="font-bold text-indigo-300 font-mono">{{ t.active_jobs_count || 0 }} Active jobs</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Active Work Orders Table / Deck -->
-    <div class="grid grid-cols-1 gap-6">
-      <div class="bg-slate-950/20 border border-slate-850 rounded-3xl p-5 shadow-xl">
-        <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Active Workshop Repairs</h3>
-        
-        <div v-if="loading" class="flex justify-center py-12">
-          <div class="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-
-        <div v-else-if="workOrdersList.length === 0" class="text-center py-20 text-slate-500 text-xs italic">
-          No active work orders. Approve quotations on the approvals tab to dispatch repair orders.
-        </div>
-
-        <div v-else class="space-y-6">
-          <div 
-            v-for="wo in workOrdersList" 
-            :key="wo.id"
-            class="border border-slate-800/80 rounded-2xl p-5 bg-slate-900/60 space-y-4 hover:border-slate-700 transition"
+      <!-- Tab Selection -->
+      <div class="border-b border-slate-800 mb-6">
+        <nav class="flex space-x-6" aria-label="Tabs">
+          <button
+            @click="activeTab = 'dispatch'"
+            :class="[
+              activeTab === 'dispatch'
+                ? 'border-indigo-500 text-indigo-400 font-bold border-b-2'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            ]"
+            class="pb-4 px-1 font-black text-xs uppercase tracking-wider transition-all focus:outline-none"
           >
-            <!-- Top bar -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-850 pb-3">
-              <div>
-                <div class="flex items-center gap-3">
-                  <h4 class="text-sm font-black text-white font-mono">{{ wo.work_order_number }}</h4>
-                  <span class="text-[10px] font-bold text-slate-500 font-mono">Job ID: #{{ wo.job_card_id }}</span>
-                  <span class="px-2 py-0.5 rounded text-[8px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">
-                    {{ wo.department_allocations?.join(', ') || 'Diagnostics' }}
-                  </span>
-                </div>
-                <p class="text-[11px] text-slate-400 font-bold mt-1">Vehicle: {{ wo.job_card?.vehicle?.make }} {{ wo.job_card?.vehicle?.model }} ({{ wo.job_card?.vehicle?.license_plate || wo.job_card?.vehicle?.registration_no }})</p>
-              </div>
+            Work Order Dispatch
+          </button>
+          <button
+            @click="activeTab = 'bays'"
+            :class="[
+              activeTab === 'bays'
+                ? 'border-indigo-500 text-indigo-400 font-bold border-b-2'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            ]"
+            class="pb-4 px-1 font-black text-xs uppercase tracking-wider transition-all focus:outline-none"
+          >
+            Bay Allocation Board
+          </button>
+        </nav>
+      </div>
 
-              <!-- Status controllers -->
-              <div class="flex items-center gap-2">
-                <select 
-                  v-model="wo.status" 
-                  @change="updateWorkOrderStatus(wo)"
-                  class="text-[10px] font-bold uppercase tracking-wider bg-slate-850 border border-slate-700 rounded-lg p-1.5 text-slate-200"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="paused">Paused / Shortage</option>
-                  <option value="completed">Completed (Triggers QC)</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-                <router-link
-                  :to="{ name: 'workshop.parts-consumption', params: { id: wo.id } }"
-                  class="px-3 py-1.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider"
-                >
-                  Log Mid-Repair Parts
-                </router-link>
+      <!-- TAB 1: WORK ORDER DISPATCH -->
+      <div v-if="activeTab === 'dispatch'" class="space-y-6">
+        <!-- Alert / Live Diagnostics Deck -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Stalled/Delayed Alerts -->
+          <div class="bg-red-955/20 border border-red-900/40 p-4 rounded-2xl space-y-3">
+            <h3 class="text-[10px] font-black uppercase tracking-wider text-rose-400 flex items-center gap-2">
+              <span class="w-2 h-2 bg-rose-500 rounded-full animate-ping"></span>
+              Operational Warnings (Delayed Tasks)
+            </h3>
+            <div v-if="delayedTasks.length === 0" class="text-xs text-slate-500 italic">No tasks currently exceeding estimations.</div>
+            <div v-else class="space-y-2 max-h-24 overflow-y-auto pr-1">
+              <div v-for="t in delayedTasks" :key="t.id" class="text-[11px] bg-red-955/40 p-2 rounded border border-red-900/20 flex justify-between">
+                <span>{{ t.task_name }} (JC #{{ t.jcId }})</span>
+                <span class="font-bold text-rose-400 font-mono">+{{ t.delayedBy }}m</span>
               </div>
             </div>
+          </div>
 
-            <!-- Workforce & Decomposed Tasks Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
-              <!-- Assigned Mechanics list -->
-              <div class="bg-slate-950/30 p-4 border border-slate-850 rounded-xl space-y-3">
-                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-450">
-                  <span>Assigned Workforce</span>
-                  <button @click="openDelegationDrawer(wo)" class="text-indigo-400 hover:text-indigo-300">Assign Staff</button>
-                </div>
-                <div class="space-y-2 text-xs">
-                  <div v-if="wo.job_card?.assignments?.length === 0" class="text-slate-500 italic p-1 text-[11px]">No technicians delegated yet.</div>
-                  <div 
-                    v-else
-                    v-for="asm in wo.job_card?.assignments" 
-                    :key="asm.id"
-                    class="flex justify-between bg-slate-900 border border-slate-850 p-2 rounded text-[11px] items-center text-slate-350"
-                  >
-                    <div>
-                      <span class="font-bold text-white block">{{ asm.employee?.first_name }} {{ asm.employee?.last_name }}</span>
-                      <span class="text-[9px] text-slate-500 uppercase tracking-widest">{{ asm.assignment_type }}</span>
-                    </div>
-                    <button 
-                      v-if="asm.status === 'active'"
-                      @click="completeTechnicianAssignment(asm.id)" 
-                      class="text-emerald-450 hover:text-emerald-400 text-[9px] uppercase font-black"
-                    >
-                      Complete
-                    </button>
-                    <span v-else class="text-slate-500 text-[9px] uppercase">Completed</span>
-                  </div>
-                </div>
+          <!-- Overloaded Bays Alert -->
+          <div class="bg-amber-955/20 border border-amber-900/40 p-4 rounded-2xl space-y-3">
+            <h3 class="text-[10px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
+              <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+              Congestion Warnings (Overloaded Bays)
+            </h3>
+            <div v-if="overloadedBays.length === 0" class="text-xs text-slate-500 italic">All workshop bays running within nominal limits.</div>
+            <div v-else class="space-y-2 max-h-24 overflow-y-auto pr-1">
+              <div v-for="b in overloadedBays" :key="b.id" class="text-[11px] bg-amber-955/40 p-2 rounded border border-amber-900/20 flex justify-between">
+                <span>{{ b.name }} (Capacity Limit)</span>
+                <span class="font-bold text-amber-400 font-mono">{{ b.current_load }}/{{ b.max_vehicle_capacity }} vh</span>
               </div>
+            </div>
+          </div>
 
-              <!-- Tasks tracking -->
-              <div class="md:col-span-2 bg-slate-950/30 p-4 border border-slate-850 rounded-xl space-y-3">
-                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-450">
-                  <span>Task checklist items</span>
-                  <button @click="promptCreateTask(wo)" class="text-indigo-400 hover:text-indigo-300">+ Add Task</button>
-                </div>
-                <div class="space-y-2 text-xs max-h-40 overflow-y-auto pr-1">
-                  <div v-if="wo.job_card?.tasks?.length === 0" class="text-slate-500 italic p-1 text-[11px]">No tasks decomposed. Assign lines.</div>
-                  <div 
-                    v-else
-                    v-for="task in wo.job_card?.tasks" 
-                    :key="task.id"
-                    class="bg-slate-900 border border-slate-850 p-2.5 rounded-lg flex flex-col sm:flex-row justify-between sm:items-center gap-3 text-slate-350"
-                  >
-                    <div>
-                      <span class="font-bold text-white block">{{ task.name }}</span>
-                      <span class="text-[9px] text-slate-550 font-mono">Est: {{ task.estimated_minutes }} mins | Actual: {{ task.actual_minutes }} mins</span>
-                    </div>
+          <!-- Technician workload summary -->
+          <div class="bg-indigo-950/20 border border-indigo-900/40 p-4 rounded-2xl space-y-3">
+            <h3 class="text-[10px] font-black uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+              <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+              Technician Allocation Load
+            </h3>
+            <div class="flex justify-between items-center text-xs text-slate-400">
+              <span>Active Staff Checked-In:</span>
+              <span class="font-bold text-white font-mono">{{ technicians.length }}</span>
+            </div>
+            <div class="text-[10px] text-slate-500 max-h-20 overflow-y-auto">
+              <div v-for="t in technicians.slice(0, 3)" :key="t.id" class="flex justify-between py-0.5 border-b border-slate-800">
+                <span>{{ t.name }}</span>
+                <span class="font-bold text-indigo-300 font-mono">{{ t.active_jobs_count || 0 }} Active jobs</span>
+              </div>
+            </div>
+          </div>
 
-                    <div class="flex items-center gap-2">
-                      <!-- Assign button for task -->
-                      <button 
-                        v-if="task.status === 'pending'"
-                        @click="promptAssignTask(task)"
-                        class="px-2 py-1 bg-slate-800 hover:bg-slate-750 text-white border border-slate-750 rounded text-[9px] uppercase font-bold"
-                      >
-                        Assign Task
-                      </button>
-                      <span :class="getTaskStatusClass(task.status)" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">
-                        {{ task.status }}
+        </div>
+
+        <!-- Active Work Orders Table / Deck -->
+        <div class="grid grid-cols-1 gap-6">
+          <div class="bg-slate-950/20 border border-slate-850 rounded-3xl p-5 shadow-xl">
+            <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Active Workshop Repairs</h3>
+            
+            <div v-if="loading" class="flex justify-center py-12">
+              <div class="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+
+            <div v-else-if="workOrdersList.length === 0" class="text-center py-20 text-slate-500 text-xs italic">
+              No active work orders. Approve quotations on the approvals tab to dispatch repair orders.
+            </div>
+
+            <div v-else class="space-y-6">
+              <div 
+                v-for="wo in workOrdersList" 
+                :key="wo.id"
+                class="border border-slate-800/80 rounded-2xl p-5 bg-slate-900/60 space-y-4 hover:border-slate-700 transition"
+              >
+                <!-- Top bar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-850 pb-3">
+                  <div>
+                    <div class="flex items-center gap-3">
+                      <h4 class="text-sm font-black text-white font-mono">{{ wo.work_order_number }}</h4>
+                      <span class="text-[10px] font-bold text-slate-500 font-mono">Job ID: #{{ wo.job_card_id }}</span>
+                      <span class="px-2 py-0.5 rounded text-[8px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">
+                        {{ wo.department_allocations?.join(', ') || 'Diagnostics' }}
                       </span>
                     </div>
+                    <p class="text-[11px] text-slate-400 font-bold mt-1">Vehicle: {{ wo.job_card?.vehicle?.make }} {{ wo.job_card?.vehicle?.model }} ({{ wo.job_card?.vehicle?.license_plate || wo.job_card?.vehicle?.registration_no }})</p>
+                  </div>
+
+                  <!-- Status controllers -->
+                  <div class="flex items-center gap-2">
+                    <select 
+                      v-model="wo.status" 
+                      @change="updateWorkOrderStatus(wo)"
+                      class="text-[10px] font-bold uppercase tracking-wider bg-slate-850 border border-slate-700 rounded-lg p-1.5 text-slate-200"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="paused">Paused / Shortage</option>
+                      <option value="completed">Completed (Triggers QC)</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                    <router-link
+                      :to="{ name: 'workshop.parts-consumption', params: { id: wo.id } }"
+                      class="px-3 py-1.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider"
+                    >
+                      Log Mid-Repair Parts
+                    </router-link>
                   </div>
                 </div>
-              </div>
 
+                <!-- Workforce & Decomposed Tasks Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  
+                  <!-- Assigned Mechanics list -->
+                  <div class="bg-slate-950/30 p-4 border border-slate-850 rounded-xl space-y-3">
+                    <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-450">
+                      <span>Assigned Workforce</span>
+                      <button @click="openDelegationDrawer(wo)" class="text-indigo-400 hover:text-indigo-300">Assign Staff</button>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                      <div v-if="wo.job_card?.assignments?.length === 0" class="text-slate-500 italic p-1 text-[11px]">No technicians delegated yet.</div>
+                      <div 
+                        v-else
+                        v-for="asm in wo.job_card?.assignments" 
+                        :key="asm.id"
+                        class="flex justify-between bg-slate-900 border border-slate-850 p-2 rounded text-[11px] items-center text-slate-350"
+                      >
+                        <div>
+                          <span class="font-bold text-white block">{{ asm.employee?.first_name }} {{ asm.employee?.last_name }}</span>
+                          <span class="text-[9px] text-slate-500 uppercase tracking-widest">{{ asm.assignment_type }}</span>
+                        </div>
+                        <button 
+                          v-if="asm.status === 'active'"
+                          @click="completeTechnicianAssignment(asm.id)" 
+                          class="text-emerald-400 hover:text-emerald-305 text-[9px] uppercase font-black"
+                        >
+                          Complete
+                        </button>
+                        <span v-else class="text-slate-500 text-[9px] uppercase">Completed</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Tasks tracking -->
+                  <div class="md:col-span-2 bg-slate-950/30 p-4 border border-slate-850 rounded-xl space-y-3">
+                    <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-450">
+                      <span>Task checklist items</span>
+                      <button @click="promptCreateTask(wo)" class="text-indigo-400 hover:text-indigo-300">+ Add Task</button>
+                    </div>
+                    <div class="space-y-2 text-xs max-h-40 overflow-y-auto pr-1">
+                      <div v-if="wo.job_card?.tasks?.length === 0" class="text-slate-500 italic p-1 text-[11px]">No tasks decomposed. Assign lines.</div>
+                      <div 
+                        v-else
+                        v-for="task in wo.job_card?.tasks" 
+                        :key="task.id"
+                        class="bg-slate-900 border border-slate-850 p-2.5 rounded-lg flex flex-col sm:flex-row justify-between sm:items-center gap-3 text-slate-350"
+                      >
+                        <div>
+                          <span class="font-bold text-white block">{{ task.name }}</span>
+                          <span class="text-[9px] text-slate-550 font-mono">Est: {{ task.estimated_minutes }} mins | Actual: {{ task.actual_minutes }} mins</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                          <!-- Assign button for task -->
+                          <button 
+                            v-if="task.status === 'pending'"
+                            @click="promptAssignTask(task)"
+                            class="px-2 py-1 bg-slate-800 hover:bg-slate-750 text-white border border-slate-750 rounded text-[9px] uppercase font-bold"
+                          >
+                            Assign Task
+                          </button>
+                          <span :class="getTaskStatusClass(task.status)" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">
+                            {{ task.status }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- TAB 2: BAY ALLOCATION BOARD -->
+      <div v-else-if="activeTab === 'bays'" class="space-y-6">
+        <!-- Stats Grid Panel -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+            <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">Busy Bays</span>
+            <div class="text-2xl font-black text-indigo-400 font-mono mt-1">{{ busyBaysCount }}</div>
+          </div>
+          <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+            <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">Idle Bays</span>
+            <div class="text-2xl font-black text-slate-350 font-mono mt-1">{{ idleBaysCount }}</div>
+          </div>
+          <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+            <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">Waiting Vehicles</span>
+            <div class="text-2xl font-black text-yellow-500 font-mono mt-1">{{ waitingVehiclesCount }}</div>
+          </div>
+          <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+            <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">QC Occupied Bays</span>
+            <div class="text-2xl font-black text-purple-400 font-mono mt-1">{{ qcBaysCount }}</div>
+          </div>
+          <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+            <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">Delayed Vehicles</span>
+            <div class="text-2xl font-black text-rose-500 font-mono mt-1">{{ delayedVehiclesCount }}</div>
+          </div>
+        </div>
+
+        <!-- Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          
+          <!-- Left side: Unallocated Job Cards Queue -->
+          <div class="lg:col-span-1 bg-slate-950/20 border border-slate-850 rounded-2xl p-4 space-y-4 flex flex-col justify-between h-[600px]">
+            <div>
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
+                <span>Awaiting Bay Allocation</span>
+                <span class="bg-indigo-500/10 text-indigo-400 text-[10px] px-2 py-0.5 rounded-full">
+                  {{ unallocatedJobs.length }}
+                </span>
+              </h3>
+
+              <div v-if="loading" class="flex justify-center py-12">
+                <div class="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+
+              <div v-else-if="unallocatedJobs.length === 0" class="text-center py-16 text-slate-550 text-xs italic">
+                All active vehicles are currently allocated to bays.
+              </div>
+
+              <div v-else class="space-y-3 overflow-y-auto max-h-[480px] pr-1">
+                <div 
+                  v-for="job in unallocatedJobs" 
+                  :key="job.id"
+                  class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 space-y-3 hover:border-slate-700 transition flex flex-col justify-between"
+                >
+                  <div>
+                    <span class="text-[9px] font-mono text-slate-500">#JC-{{ String(job.id).padStart(5, '0') }}</span>
+                    <h4 class="font-bold text-white text-xs mt-1">{{ job.vehicle?.make }} {{ job.vehicle?.model }}</h4>
+                    <p class="text-[9px] text-slate-450 font-mono mt-0.5">Plate: {{ job.vehicle?.license_plate || job.vehicle?.registration_no }}</p>
+                    <p class="text-[10px] text-rose-400 italic mt-2">"{{ job.complaint }}"</p>
+                  </div>
+
+                  <!-- Bay select dropdown -->
+                  <div class="pt-2 border-t border-slate-850 flex gap-2">
+                    <select 
+                      v-model="job.tempBayId"
+                      class="flex-1 bg-slate-850 border border-slate-750 rounded p-1 text-[10px] text-slate-200"
+                    >
+                      <option value="" disabled>Select Bay...</option>
+                      <option 
+                        v-for="b in baysList" 
+                        :key="b.id" 
+                        :value="b.id"
+                        :disabled="b.current_load >= b.max_vehicle_capacity"
+                      >
+                        {{ b.name }} ({{ b.current_load }}/{{ b.max_vehicle_capacity }})
+                      </option>
+                    </select>
+                    <button 
+                      @click="allocateBay(job.id, job.tempBayId)"
+                      :disabled="!job.tempBayId"
+                      class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded text-[10px] font-black uppercase tracking-wider"
+                    >
+                      Set
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right side: Visual Bay Grid -->
+          <div class="lg:col-span-3 bg-slate-950/20 border border-slate-850 rounded-3xl p-5 shadow-xl min-h-[500px]">
+            <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Workshop Bay Status Grid</h3>
+
+            <div v-if="loading" class="flex justify-center py-20">
+              <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div 
+                v-for="bay in baysList" 
+                :key="bay.id"
+                :class="getBayOccupancyClass(bay)"
+                class="border rounded-2xl p-5 bg-slate-900/40 flex flex-col justify-between gap-5 transition hover:shadow-md"
+              >
+                <div>
+                  <!-- Title -->
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h4 class="text-sm font-black text-white">{{ bay.name }}</h4>
+                      <span class="text-[9px] text-slate-550 font-mono">{{ bay.code }}</span>
+                    </div>
+                    <span :class="getUtilizationBadgeClass(bay)" class="px-2 py-0.5 rounded text-[9px] font-black uppercase font-mono tracking-wider">
+                      {{ bay.current_load }} / {{ bay.max_vehicle_capacity }} vehicles
+                    </span>
+                  </div>
+
+                  <!-- Utilization Progress Bar -->
+                  <div class="w-full bg-slate-850 rounded-full h-1.5 mt-3">
+                    <div 
+                      :class="getProgressBarClass(bay)"
+                      class="h-1.5 rounded-full transition-all duration-300"
+                      :style="{ width: getUtilizationPercentage(bay) + '%' }"
+                    ></div>
+                  </div>
+
+                  <!-- Vehicles list inside this bay -->
+                  <div class="mt-4 space-y-2 border-t border-slate-850/60 pt-4">
+                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-500 block">Occupying Vehicles</span>
+                    <div v-if="getVehiclesInBay(bay.id).length === 0" class="text-[10px] text-slate-500 italic py-1">Bay is currently vacant.</div>
+                    <div 
+                      v-else
+                      v-for="v in getVehiclesInBay(bay.id)" 
+                      :key="v.id"
+                      class="bg-slate-955/40 border border-slate-850 p-2.5 rounded-lg text-xs flex justify-between items-center text-slate-350"
+                    >
+                      <div>
+                        <span class="font-bold text-white block">{{ v.vehicle?.make }} {{ v.vehicle?.model }}</span>
+                        <span class="text-[9px] text-slate-450 font-mono">Plate: {{ v.vehicle?.license_plate || v.vehicle?.registration_no }}</span>
+                      </div>
+                      <button 
+                        @click="releaseBay(v.id)"
+                        class="text-rose-450 hover:text-rose-400 text-[9px] uppercase font-black tracking-wide"
+                      >
+                        Release
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </JobDetailsLayout>
 
     <!-- Assign Workforce Delegation Drawer / Modal -->
     <div v-if="showDelegationDrawer" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
@@ -257,7 +445,7 @@
             />
           </div>
           <div class="flex justify-end gap-3 pt-2 border-t border-slate-850">
-            <button type="button" @click="showTaskModal = false" class="px-4 py-2 border border-slate-700 rounded-xl text-xs font-bold text-slate-405">Cancel</button>
+            <button type="button" @click="showTaskModal = false" class="px-4 py-2 border border-slate-700 rounded-xl text-xs font-bold text-slate-400">Cancel</button>
             <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black uppercase tracking-wider">Create</button>
           </div>
         </form>
@@ -287,8 +475,6 @@
         </form>
       </div>
     </div>
-
-    </JobDetailsLayout>
   </div>
 </template>
 
@@ -300,10 +486,15 @@ import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
 
 const toast = useToastStore();
 const loading = ref(true);
+const activeTab = ref('dispatch');
 
 const workOrdersList = ref([]);
 const technicians = ref([]);
 const activeTechnicians = ref([]);
+
+// Bays specific states
+const baysList = ref([]);
+const activeJobsList = ref([]);
 
 // Alert analytics states
 const delayedTasks = ref([]);
@@ -331,21 +522,63 @@ const taskAssignForm = reactive({
   employee_id: '',
 });
 
+// Bays Computed properties
+const busyBaysCount = computed(() => {
+  return baysList.value.filter(b => b.current_load > 0).length;
+});
+
+const idleBaysCount = computed(() => {
+  return baysList.value.filter(b => b.current_load === 0).length;
+});
+
+const waitingVehiclesCount = computed(() => {
+  return unallocatedJobs.value.length;
+});
+
+const qcBaysCount = computed(() => {
+  return baysList.value.filter(b => {
+    const jobs = getVehiclesInBay(b.id);
+    return jobs.some(j => j.service_status === 'qc' || j.service_status === 'completed');
+  }).length;
+});
+
+const delayedVehiclesCount = computed(() => {
+  return activeJobsList.value.filter(j => j.priority_level === 'critical' || j.priority_level === 'urgent' || j.priority_level === 'high').length;
+});
+
+const unallocatedJobs = computed(() => {
+  return activeJobsList.value.filter(j => !j.workshop_bay_id);
+});
+
+const getVehiclesInBay = (bayId) => {
+  return activeJobsList.value.filter(j => j.workshop_bay_id === bayId);
+};
+
 const fetchData = async () => {
   loading.value = true;
   try {
-    const [woRes, techRes, bayRes] = await Promise.all([
+    const [woRes, techRes, bayRes, jcRes] = await Promise.all([
       api.get('/work-orders', { params: { per_page: 150 } }),
       api.get('/users', { params: { role: 'Technician' } }),
-      api.get('/workshop-bays')
+      api.get('/workshop-bays'),
+      api.get('/job-cards', { params: { per_page: 200 } })
     ]);
 
     workOrdersList.value = woRes.data?.data || woRes.data || [];
     technicians.value = techRes.data?.data || techRes.data || [];
 
     // Filter overloaded bays
-    const bays = bayRes.data?.data || bayRes.data || [];
-    overloadedBays.value = bays.filter(b => b.current_load >= b.max_vehicle_capacity);
+    baysList.value = bayRes.data?.data || bayRes.data || [];
+    overloadedBays.value = baysList.value.filter(b => b.current_load >= b.max_vehicle_capacity);
+
+    // Job cards / active jobs
+    const rawJobs = jcRes.data?.data || jcRes.data || [];
+    activeJobsList.value = rawJobs.filter(
+      jc => jc.service_status === 'pending' || jc.service_status === 'in_progress'
+    ).map(jc => ({
+      ...jc,
+      tempBayId: ''
+    }));
 
     // Fetch employee workload list explicitly to get active workload
     const emplRes = await api.get('/workforce/employees'); // Fetch list of employees
@@ -464,6 +697,54 @@ const getTaskStatusClass = (status) => {
     'completed': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
   };
   return map[status] || 'bg-slate-800 text-slate-400';
+};
+
+// Bays Operations methods
+const allocateBay = async (jobCardId, bayId) => {
+  try {
+    await api.post(`/job-cards/${jobCardId}/assign`, { workshop_bay_id: bayId });
+    toast.success('Vehicle allocated to bay successfully.');
+    fetchData();
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Allocation failed.');
+  }
+};
+
+const releaseBay = async (jobCardId) => {
+  try {
+    await api.post(`/job-cards/${jobCardId}/assign`, { workshop_bay_id: null });
+    toast.success('Vehicle released from bay.');
+    fetchData();
+  } catch (err) {
+    toast.error('Release failed.');
+  }
+};
+
+// Styling calculations
+const getUtilizationPercentage = (bay) => {
+  if (!bay || !bay.max_vehicle_capacity) return 0;
+  return Math.min(100, Math.round((bay.current_load / bay.max_vehicle_capacity) * 100));
+};
+
+const getBayOccupancyClass = (bay) => {
+  const pct = getUtilizationPercentage(bay);
+  if (pct >= 100) return 'border-red-900/60 bg-red-950/5';
+  if (pct >= 75) return 'border-amber-900/60 bg-amber-950/5';
+  return 'border-slate-800/80 bg-slate-900/10';
+};
+
+const getUtilizationBadgeClass = (bay) => {
+  const pct = getUtilizationPercentage(bay);
+  if (pct >= 100) return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+  if (pct >= 75) return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+  return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+};
+
+const getProgressBarClass = (bay) => {
+  const pct = getUtilizationPercentage(bay);
+  if (pct >= 100) return 'bg-rose-500';
+  if (pct >= 75) return 'bg-amber-500';
+  return 'bg-indigo-500';
 };
 
 onMounted(() => {

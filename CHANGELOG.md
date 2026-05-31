@@ -4,6 +4,17 @@ All notable changes to the Mamun Automobiles ERP platform will be documented in 
 
 ---
 
+## [2.8.0] - 2026-05-31
+
+### Changed
+- **Professional Reorganized Sidebar Navigation**: Structured the sidebar menu inside `DashboardLayout.vue` into six explicit operational blocks: OPERATIONS, CUSTOMERS, FINANCE, WORKFORCE, REPORTS, SYSTEM, and a dedicated hidden SUPER ADMIN AREA.
+- **Role-Based Visibility Enforcement**: Gated administrative, telemetry, and system-level actions strictly behind `Super Admin` and `Manager` roles. Cashiers/Frontdesk are restricted to Intake, Customers, Quotations, and QC & Delivery Handover. Technicians are restricted to Assigned Jobs, Parts Usage, and Technician Tasks.
+- **CRM & Appointment Integration**: Merged CRM bookings and confirmation grids as a tabbed section inside Customer Directory (`CustomerList.vue`), using `useCrmStore`.
+- **Bay Allocation Consolidation**: Integrated the live Workshop Bay Occupancy grid and allocation selectors as a tabbed view inside Work Order Command Center (`WorkOrderCommandCenter.vue`).
+- **Accounts & Transactions Consolidation**: Merged Transaction Ledger history and Income/Expense logging action drawers as a tabbed view under Accounts (`AccountList.vue`).
+- **Unified AI Operations Center**: Consolidated advanced explainable AI intelligence panels, model telemetry configurations, and anomalous incident centers under a unified AI Dashboard (`AiDashboard.vue`).
+- **Direct Operational Chaining**: Linked the intake workflow end-to-end (Intake redirects to Inspection -> Inspection redirects to Diagnosis -> Approvals redirect to Work Orders -> Parts log links to QC Handover -> Settled Invoices link to Delivery Handover) to eliminate operational dead-ends.
+
 ## [2.7.0] - 2026-05-31
 
 ### Added

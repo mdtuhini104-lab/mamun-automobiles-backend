@@ -117,16 +117,41 @@ const invoicesList = ref([]);
 const fetchData = async () => {
   loading.value = true;
   try {
-    const [jcRes, qoRes, woRes, invRes] = await Promise.all([
-      api.get('/job-cards', { params: { per_page: 200 } }),
-      api.get('/quotations', { params: { per_page: 200 } }),
-      api.get('/work-orders', { params: { per_page: 200 } }),
-      api.get('/invoices', { params: { per_page: 200 } })
-    ]);
-    jobCards.value = jcRes.data?.data || jcRes.data || [];
-    quotations.value = qoRes.data?.data || qoRes.data || [];
-    workOrders.value = woRes.data?.data || woRes.data || [];
-    invoicesList.value = invRes.data?.data || invRes.data || [];
+    const promises = [
+      api.get('/job-cards', { params: { per_page: 200 } })
+    ];
+
+    const needsQuotations = props.stage === 'quotation';
+    const needsWorkOrders = props.stage === 'parts' || props.stage === 'qc';
+    const needsInvoices = props.stage === 'delivery' || props.stage === 'settlement';
+
+    if (needsQuotations) {
+      promises.push(api.get('/quotations', { params: { per_page: 200 } }));
+    }
+    if (needsWorkOrders) {
+      promises.push(api.get('/work-orders', { params: { per_page: 200 } }));
+    }
+    if (needsInvoices) {
+      promises.push(api.get('/invoices', { params: { per_page: 200 } }));
+    }
+
+    const results = await Promise.all(promises);
+
+    jobCards.value = results[0].data?.data || results[0].data || [];
+
+    let idx = 1;
+    if (needsQuotations) {
+      quotations.value = results[idx].data?.data || results[idx].data || [];
+      idx++;
+    }
+    if (needsWorkOrders) {
+      workOrders.value = results[idx].data?.data || results[idx].data || [];
+      idx++;
+    }
+    if (needsInvoices) {
+      invoicesList.value = results[idx].data?.data || results[idx].data || [];
+      idx++;
+    }
   } catch (err) {
     console.error('Selector sync failed', err);
     toast.error('Failed to sync queue list. Operating in display-only mode.');

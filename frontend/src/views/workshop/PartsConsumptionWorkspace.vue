@@ -56,6 +56,16 @@
             </table>
           </div>
         </div>
+
+        <div class="flex justify-between items-center bg-slate-950/20 border border-slate-850 rounded-2xl p-5 mt-4">
+          <p class="text-xs text-slate-400">All parts logged? You can proceed to check the vehicle's Quality Control status.</p>
+          <router-link
+            :to="{ name: 'workshop.qc-delivery' }"
+            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition"
+          >
+            Proceed to QC & Delivery
+          </router-link>
+        </div>
       </div>
 
       <!-- Add Mid-repair consumption (Right Column) -->

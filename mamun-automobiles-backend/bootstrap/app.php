@@ -56,11 +56,25 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 404);
         });
 
+        $exceptions->render(function (\Spatie\Permission\Exceptions\UnauthorizedException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 403);
+        });
+
         $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage() ?: 'This action is unauthorized.',
             ], 403);
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
         });
 
         $exceptions->render(function (\Throwable $e) {

@@ -493,7 +493,7 @@ const registerJob = async () => {
     }
 
     // 3. Create Job Card
-    await api.post('/job-cards', {
+    const jcRes = await api.post('/job-cards', {
       customer_id: customerId,
       vehicle_id: vehicleId,
       complaint: form.complaint,
@@ -506,8 +506,13 @@ const registerJob = async () => {
       images_paths: form.images_paths
     });
 
+    const newJcId = jcRes.data?.data?.id || jcRes.data?.id;
     toast.success('Frontdesk check-in completed. Job card generated successfully!');
-    router.push({ name: 'workshop.hub' });
+    if (newJcId) {
+      router.push({ name: 'workshop.inspection', params: { id: newJcId } });
+    } else {
+      router.push({ name: 'workshop.hub' });
+    }
   } catch (err) {
     console.error('Intake submission failed', err);
     toast.error(err.response?.data?.message || 'Check-in failed. Verify form errors.');
