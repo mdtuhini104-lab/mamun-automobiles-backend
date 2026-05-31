@@ -309,6 +309,13 @@ class ProductionOperationsController extends Controller
      */
     public function getPerformanceTelemetry(Request $request)
     {
+        if (!$request->user()->hasAnyRole(['Super Admin', 'Admin', 'Manager'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized. Telemetry access is restricted to Administrator and Management staff.'
+            ], 403);
+        }
+
         try {
             // Apply rolling retention (30 days) to cached telemetry logs
             $slowQueries = Cache::get('slow_queries', []);

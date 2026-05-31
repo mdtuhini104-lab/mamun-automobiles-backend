@@ -15,6 +15,30 @@
       </div>
     </div>
 
+    <!-- Stats Grid Panel -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+        <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">Busy Bays</span>
+        <div class="text-2xl font-black text-indigo-400 font-mono mt-1">{{ busyBaysCount }}</div>
+      </div>
+      <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+        <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">Idle Bays</span>
+        <div class="text-2xl font-black text-slate-350 font-mono mt-1">{{ idleBaysCount }}</div>
+      </div>
+      <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+        <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">Waiting Vehicles</span>
+        <div class="text-2xl font-black text-yellow-500 font-mono mt-1">{{ waitingVehiclesCount }}</div>
+      </div>
+      <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+        <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">QC Occupied Bays</span>
+        <div class="text-2xl font-black text-purple-400 font-mono mt-1">{{ qcBaysCount }}</div>
+      </div>
+      <div class="bg-slate-950/40 border border-slate-800 p-4.5 rounded-2xl">
+        <span class="text-[9px] font-black uppercase text-slate-500 block tracking-widest font-mono">Delayed Vehicles</span>
+        <div class="text-2xl font-black text-rose-500 font-mono mt-1">{{ delayedVehiclesCount }}</div>
+      </div>
+    </div>
+
     <!-- Layout Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
       
@@ -155,6 +179,29 @@ const loading = ref(true);
 
 const baysList = ref([]);
 const activeJobsList = ref([]);
+
+const busyBaysCount = computed(() => {
+  return baysList.value.filter(b => b.current_load > 0).length;
+});
+
+const idleBaysCount = computed(() => {
+  return baysList.value.filter(b => b.current_load === 0).length;
+});
+
+const waitingVehiclesCount = computed(() => {
+  return unallocatedJobs.value.length;
+});
+
+const qcBaysCount = computed(() => {
+  return baysList.value.filter(b => {
+    const jobs = getVehiclesInBay(b.id);
+    return jobs.some(j => j.service_status === 'qc' || j.service_status === 'completed');
+  }).length;
+});
+
+const delayedVehiclesCount = computed(() => {
+  return activeJobsList.value.filter(j => j.priority_level === 'critical' || j.priority_level === 'urgent' || j.priority_level === 'high').length;
+});
 
 const fetchData = async () => {
   loading.value = true;

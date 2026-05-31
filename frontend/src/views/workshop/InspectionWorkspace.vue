@@ -1,7 +1,15 @@
 <template>
   <div class="max-w-6xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
     
-    <div v-if="loading" class="animate-pulse space-y-6">
+    <!-- Fallback Stage Selector -->
+    <WorkspaceJobSelector 
+      v-if="!route.params.id" 
+      stage="inspection" 
+      title="Select Vehicle for Visual & OBD Inspection" 
+      @selected="handleJobSelected"
+    />
+
+    <div v-else-if="loading" class="animate-pulse space-y-6">
       <div class="h-8 bg-slate-800 rounded w-1/4"></div>
       <div class="h-96 bg-slate-800 rounded"></div>
     </div>
@@ -132,7 +140,7 @@
         <!-- Save Button -->
         <div class="flex justify-end gap-3 border-t border-slate-850 pt-4">
           <router-link
-            :to="{ name: 'workshop.hub' }"
+            :to="{ name: 'workshop.inspection' }"
             class="px-4 py-2 border border-slate-700 rounded-lg text-xs font-bold text-slate-450 hover:bg-slate-850 transition"
           >
             Cancel
@@ -152,11 +160,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
 import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
+import WorkspaceJobSelector from '../../components/workshop/WorkspaceJobSelector.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -186,6 +195,10 @@ const form = reactive({
   safety_warnings: '',
 });
 
+const handleJobSelected = (id) => {
+  router.push({ name: 'workshop.inspection', params: { id } });
+};
+
 const fetchJobDetails = async () => {
   loading.value = true;
   try {
@@ -202,7 +215,7 @@ const fetchJobDetails = async () => {
     form.safety_warnings = jobCard.value.safety_warnings || '';
   } catch (err) {
     toast.error('Failed to load Job Card details');
-    router.push({ name: 'workshop.hub' });
+    router.push({ name: 'workshop.inspection' });
   } finally {
     loading.value = false;
   }
@@ -229,7 +242,7 @@ const saveInspection = async () => {
     });
     
     toast.success('Vehicle inspection findings completed and logged.');
-    router.push({ name: 'workshop.hub' });
+    router.push({ name: 'workshop.quotation', params: { id: jobCard.value.id } }); // Chains directly to next stage
   } catch (err) {
     console.error('Inspection submit failed', err);
     toast.error(err.response?.data?.message || 'Failed to submit inspection reports.');
@@ -238,7 +251,20 @@ const saveInspection = async () => {
   }
 };
 
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    fetchJobDetails();
+  } else {
+    jobCard.value = null;
+    loading.value = false;
+  }
+});
+
 onMounted(() => {
-  fetchJobDetails();
+  if (route.params.id) {
+    fetchJobDetails();
+  } else {
+    loading.value = false;
+  }
 });
 </script>

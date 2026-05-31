@@ -1,6 +1,15 @@
 <template>
   <div class="max-w-7xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
-    <JobDetailsLayout :jobCard="jobCard" :activeStage="3">
+    
+    <!-- Fallback Stage Selector -->
+    <WorkspaceJobSelector 
+      v-if="!route.params.id" 
+      stage="quotation" 
+      title="Select Vehicle for Quotation Builder" 
+      @selected="handleJobSelected"
+    />
+
+    <JobDetailsLayout v-else :jobCard="jobCard" :activeStage="3">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-850 pb-5">
         <div class="flex items-center space-x-4">
@@ -462,11 +471,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
 import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
+import WorkspaceJobSelector from '../../components/workshop/WorkspaceJobSelector.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -501,6 +511,14 @@ const discountTaxReason = ref('');
 const applyingDiscountTax = ref(false);
 const sendingQuotation = ref(false);
 
+const handleJobSelected = (id) => {
+  router.push({ name: 'workshop.quotation', params: { id } });
+};
+
+watch(() => route.params.id, () => {
+  fetchJobDetails();
+});
+
 const productItems = computed(() => {
   if (!quotation.value || !quotation.value.items) return [];
   return quotation.value.items.filter(i => i.item_type === 'product');
@@ -512,6 +530,12 @@ const serviceItems = computed(() => {
 });
 
 const fetchJobDetails = async () => {
+  if (!route.params.id) {
+    jobCard.value = null;
+    quotation.value = null;
+    loadingJob.value = false;
+    return;
+  }
   loadingJob.value = true;
   try {
     const jcRes = await api.get(`/job-cards/${route.params.id}`);
@@ -527,7 +551,7 @@ const fetchJobDetails = async () => {
     }
   } catch (err) {
     toast.error('Failed to load Job Card or associated Quotations');
-    router.push({ name: 'workshop.hub' });
+    router.push({ name: 'workshop.quotation' });
   } finally {
     loadingJob.value = false;
   }
@@ -760,7 +784,11 @@ const applyDiscountTaxConfirmed = async () => {
 };
 
 onMounted(() => {
-  fetchJobDetails();
+  if (route.params.id) {
+    fetchJobDetails();
+  } else {
+    loadingJob.value = false;
+  }
   fetchParts();
 });
 </script>

@@ -4,6 +4,17 @@ All notable changes to the Mamun Automobiles ERP platform will be documented in 
 
 ---
 
+## [2.7.0] - 2026-05-31
+
+### Added
+- **Full Operational Sidebar Navigation**: Fully exposed all 13 workshop operations routes under "Workshop Operations" with touch-friendly spacing and unique icons to ensure real staff can operate without hidden workflows.
+- **Dynamic Routing & Fallback Selectors**: Configured Vue Router parameters (`/:id?`) to be optional, building and integrating `WorkspaceJobSelector.vue` to allow staff to search and select vehicles at any stage when loading a workspace directly.
+- **Dedicated OBD Diagnosis Center**: Developed `DiagnosisCenter.vue` featuring live virtual OBD parameters, misfire/fuel trim check panels, diagnostic DTC code mappings (P0300, P0171), and a plan builder chaining directly to the Quotation stage.
+- **Reactive 8-Column Kanban Live Board**: Redesigned `WorkshopLiveBoard.vue` into a horizontal Kanban board tracking Pending, Inspection, Quotation, Approval, Repair, QC, Ready Delivery, and Delivered columns with Laravel Reverb WebSocket syncing.
+- **Customer-Facing Tracking Stepper**: Created `CustomerWorkflowTracker.vue` displaying a premium 5-stage milestone tracker (Approval Pending, Work Started, QC Running, Invoice Ready, Ready for Delivery) with task status checklist.
+- **Bay Occupancy Telemetry Counters**: Added real-time counters for Busy Bays, Idle Bays, Waiting Vehicles, QC Occupied Bays, and Delayed Vehicles inside `BayOperationsBoard.vue`.
+- **Mobile Offline Queue Indicator**: Added a local storage sync queue tracker badge (`mamun_offline_queue`) and media capture simulation triggers on `TechnicianMobileTaskScreen.vue` for touch-friendly field operations.
+
 ## [2.6.0] - 2026-05-31
 
 ### Added

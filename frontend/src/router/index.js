@@ -214,13 +214,19 @@ const router = createRouter({
           meta: { permission: 'job_cards.create' }
         },
         {
-          path: 'workshop/inspection/:id',
+          path: 'workshop/inspection/:id?',
           name: 'workshop.inspection',
           component: () => import('../views/workshop/InspectionWorkspace.vue'),
           meta: { permission: 'job_cards.edit' }
         },
         {
-          path: 'workshop/quotation/:id',
+          path: 'workshop/diagnosis/:id?',
+          name: 'workshop.diagnosis',
+          component: () => import('../views/workshop/DiagnosisCenter.vue'),
+          meta: { permission: 'job_cards.edit' }
+        },
+        {
+          path: 'workshop/quotation/:id?',
           name: 'workshop.quotation',
           component: () => import('../views/workshop/QuotationWorkspace.vue'),
           meta: { permission: 'quotations.create' }
@@ -250,25 +256,25 @@ const router = createRouter({
           meta: { permission: 'work_orders.edit' }
         },
         {
-          path: 'workshop/parts-consumption/:id',
+          path: 'workshop/parts-consumption/:id?',
           name: 'workshop.parts-consumption',
           component: () => import('../views/workshop/PartsConsumptionWorkspace.vue'),
           meta: { permission: 'work_orders.edit' }
         },
         {
-          path: 'workshop/qc/:id',
+          path: 'workshop/qc/:id?',
           name: 'workshop.qc',
           component: () => import('../views/workshop/QcVerificationWorkspace.vue'),
           meta: { permission: 'quality_controls.manage' }
         },
         {
-          path: 'workshop/delivery/:id',
+          path: 'workshop/delivery/:id?',
           name: 'workshop.delivery',
           component: () => import('../views/workshop/DeliveryHandoverWorkspace.vue'),
           meta: { permission: 'vehicle_deliveries.manage' }
         },
         {
-          path: 'workshop/settlement/:id',
+          path: 'workshop/settlement/:id?',
           name: 'workshop.settlement',
           component: () => import('../views/workshop/InvoiceSettlementWorkspace.vue'),
           meta: { permission: 'invoices.view' }
@@ -277,6 +283,12 @@ const router = createRouter({
           path: 'workshop/warranty-comeback',
           name: 'workshop.warranty-comeback',
           component: () => import('../views/workshop/WarrantyComebackWorkspace.vue'),
+          meta: { permission: 'job_cards.view' }
+        },
+        {
+          path: 'workshop/tracker/:id?',
+          name: 'workshop.tracker',
+          component: () => import('../views/workshop/CustomerWorkflowTracker.vue'),
           meta: { permission: 'job_cards.view' }
         },
         {

@@ -14,6 +14,17 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
+        <!-- Realtime Websocket State Badge -->
+        <div class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border bg-slate-950/80 transition-all duration-300" :class="getConnectionBorderClass(connectionState)">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="getConnectionBgClass(connectionState)"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2" :class="getConnectionBgClass(connectionState)"></span>
+          </span>
+          <span class="text-[9px] font-black uppercase tracking-widest text-slate-300">
+            WS: {{ connectionState }}
+          </span>
+        </div>
+
         <router-link
           :to="{ name: 'workshop.intake' }"
           class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition duration-200 shadow-md font-bold text-xs flex items-center gap-2"
@@ -132,9 +143,41 @@
 import { ref, computed, onMounted } from 'vue';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
+import { useEcho } from '../../composables/useEcho';
 
 const toast = useToastStore();
 const loading = ref(false);
+
+const handleRealtimeRefresh = (eventName) => {
+  toast.info(`Realtime Sync: operational event [${eventName}] triggered update`);
+  fetchData();
+};
+
+const { connectionState } = useEcho('workshop-updates', false, {
+  '.quotation.approved': () => handleRealtimeRefresh('Quotation Approved'),
+  '.workorder.created': () => handleRealtimeRefresh('Work Order Created'),
+  '.technician.assigned': () => handleRealtimeRefresh('Technician Assigned'),
+  '.task.started': () => handleRealtimeRefresh('Task Started'),
+  '.task.completed': () => handleRealtimeRefresh('Task Completed'),
+  '.consumption.added': () => handleRealtimeRefresh('Materials Consumed'),
+  '.vehicle.delivered': () => handleRealtimeRefresh('Vehicle Delivered'),
+});
+
+const getConnectionBorderClass = (state) => {
+  if (state === 'Connected') return 'border-emerald-500/30';
+  if (state === 'Reconnecting') return 'border-amber-500/30';
+  if (state === 'Degraded') return 'border-orange-500/30';
+  if (state === 'Recovering') return 'border-blue-500/30';
+  return 'border-rose-500/30';
+};
+
+const getConnectionBgClass = (state) => {
+  if (state === 'Connected') return 'bg-emerald-500';
+  if (state === 'Reconnecting') return 'bg-amber-500';
+  if (state === 'Degraded') return 'bg-orange-500';
+  if (state === 'Recovering') return 'bg-blue-500';
+  return 'bg-rose-500';
+};
 
 const jobCards = ref([]);
 const quotations = ref([]);

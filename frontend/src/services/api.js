@@ -116,7 +116,18 @@ if (typeof window !== 'undefined') {
       toast.info(`Device back online. Synchronizing ${queue.length} offline actions...`);
     } catch (e) {}
 
-    for (const req of queue) {
+    const remainingQueue = [];
+    let successCount = 0;
+    let failedCount = 0;
+    let serverDisconnected = false;
+
+    for (let i = 0; i < queue.length; i++) {
+      const req = queue[i];
+      if (serverDisconnected) {
+        remainingQueue.push(req);
+        continue;
+      }
+
       try {
         await axios({
           url: getBaseURL() + req.url,
@@ -128,16 +139,43 @@ if (typeof window !== 'undefined') {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
+        successCount++;
       } catch (err) {
         console.error('Failed to sync offline action:', req, err);
+        const status = err.response?.status;
+        const isNetworkOrServerError = !err.response || status >= 500 || status === 408;
+
+        if (isNetworkOrServerError) {
+          remainingQueue.push(req);
+          serverDisconnected = true;
+          try {
+            const toast = useToastStore();
+            toast.warning('Network sync paused. Temporary connection disruption.');
+          } catch (e) {}
+        } else {
+          failedCount++;
+          try {
+            const toast = useToastStore();
+            const errorMsg = err.response?.data?.message || 'Invalid request format';
+            toast.error(`Sync discarded: ${errorMsg}`);
+          } catch (e) {}
+        }
       }
     }
 
-    localStorage.removeItem('mamun_offline_queue');
+    if (remainingQueue.length > 0) {
+      localStorage.setItem('mamun_offline_queue', JSON.stringify(remainingQueue));
+    } else {
+      localStorage.removeItem('mamun_offline_queue');
+    }
 
     try {
       const toast = useToastStore();
-      toast.success('All offline actions synced successfully.');
+      if (successCount > 0 && remainingQueue.length === 0 && failedCount === 0) {
+        toast.success('All offline actions synced successfully.');
+      } else if (successCount > 0 || failedCount > 0) {
+        toast.info(`Offline sync report: ${successCount} succeeded, ${failedCount} discarded, ${remainingQueue.length} pending.`);
+      }
     } catch (e) {}
 
     window.dispatchEvent(new CustomEvent('offline-sync-completed'));

@@ -1,6 +1,20 @@
 <template>
   <div class="max-w-4xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
-    <JobDetailsLayout :jobCard="jobCard" :activeStage="9">
+    
+    <!-- Fallback Stage Selector -->
+    <WorkspaceJobSelector 
+      v-if="!route.params.id" 
+      stage="delivery" 
+      title="Select Vehicle for Delivery Handover" 
+      @selected="handleJobSelected"
+    />
+
+    <div v-else-if="loading" class="animate-pulse space-y-6">
+      <div class="h-8 bg-slate-800 rounded w-1/4"></div>
+      <div class="h-96 bg-slate-800 rounded"></div>
+    </div>
+
+    <JobDetailsLayout v-else-if="jobCard" :jobCard="jobCard" :activeStage="9">
       <!-- Header -->
       <div class="flex items-center justify-between border-b border-slate-850 pb-5">
         <div class="flex items-center space-x-4">
@@ -166,11 +180,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
 import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
+import WorkspaceJobSelector from '../../components/workshop/WorkspaceJobSelector.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -196,7 +211,17 @@ const sigCanvas = ref(null);
 let isDrawing = false;
 let ctx = null;
 
+const handleJobSelected = (id) => {
+  router.push({ name: 'workshop.delivery', params: { id } });
+};
+
 const fetchJobAndInvoice = async () => {
+  if (!route.params.id) {
+    jobCard.value = null;
+    invoice.value = null;
+    loading.value = false;
+    return;
+  }
   loading.value = true;
   try {
     const jcRes = await api.get(`/job-cards/${route.params.id}`);
@@ -326,8 +351,22 @@ const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT' }).format(value || 0);
 };
 
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    fetchJobAndInvoice();
+  } else {
+    jobCard.value = null;
+    invoice.value = null;
+    loading.value = false;
+  }
+});
+
 onMounted(() => {
-  fetchJobAndInvoice();
+  if (route.params.id) {
+    fetchJobAndInvoice();
+  } else {
+    loading.value = false;
+  }
 });
 </script>
 

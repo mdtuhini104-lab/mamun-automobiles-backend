@@ -1,22 +1,20 @@
 <template>
   <div class="max-w-6xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
-    <JobDetailsLayout :jobCard="workOrder?.job_card || null" :activeStage="6">
-      <!-- Header -->
-      <div class="flex items-center justify-between border-b border-slate-850 pb-5">
-        <div class="flex items-center space-x-4">
-          <div v-if="workOrder">
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Parts Consumption Workspace</h1>
-            <p class="text-xs text-slate-400 mt-1">{{ workOrder.work_order_number }}</p>
-          </div>
-        </div>
-      </div>
+    
+    <!-- Fallback Stage Selector -->
+    <WorkspaceJobSelector 
+      v-if="!route.params.id" 
+      stage="parts" 
+      title="Select Work Order for Parts Consumption" 
+      @selected="handleJobSelected"
+    />
 
-    <div v-if="loading" class="animate-pulse space-y-6">
+    <div v-else-if="loading" class="animate-pulse space-y-6">
       <div class="h-8 bg-slate-800 rounded w-1/4"></div>
       <div class="h-96 bg-slate-800 rounded"></div>
     </div>
-
-    <div v-else-if="workOrder" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <JobDetailsLayout v-else-if="workOrder" :jobCard="workOrder?.job_card || null" :activeStage="6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Active consumptions (Left Column) -->
       <div class="lg:col-span-2 space-y-6">
         <div class="bg-slate-950/20 border border-slate-850 rounded-2xl p-5 shadow-xl">
@@ -154,11 +152,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
 import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
+import WorkspaceJobSelector from '../../components/workshop/WorkspaceJobSelector.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -179,14 +178,23 @@ const form = reactive({
   notes: ''
 });
 
+const handleJobSelected = (id) => {
+  router.push({ name: 'workshop.parts-consumption', params: { id } });
+};
+
 const fetchWorkOrderDetails = async () => {
+  if (!route.params.id) {
+    workOrder.value = null;
+    loading.value = false;
+    return;
+  }
   loading.value = true;
   try {
     const res = await api.get(`/work-orders/${route.params.id}`);
     workOrder.value = res.data?.data || res.data;
   } catch (err) {
     toast.error('Failed to load Work Order details');
-    router.push({ name: 'workshop.hub' });
+    router.push({ name: 'workshop.parts-consumption' });
   } finally {
     loading.value = false;
   }
@@ -268,8 +276,21 @@ const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT' }).format(value || 0);
 };
 
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    fetchWorkOrderDetails();
+  } else {
+    workOrder.value = null;
+    loading.value = false;
+  }
+});
+
 onMounted(() => {
-  fetchWorkOrderDetails();
+  if (route.params.id) {
+    fetchWorkOrderDetails();
+  } else {
+    loading.value = false;
+  }
   fetchParts();
 });
 </script>

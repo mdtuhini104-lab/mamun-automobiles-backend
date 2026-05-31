@@ -1,6 +1,20 @@
 <template>
   <div class="max-w-4xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
-    <JobDetailsLayout :jobCard="workOrder?.job_card || null" :activeStage="7">
+    
+    <!-- Fallback Stage Selector -->
+    <WorkspaceJobSelector 
+      v-if="!route.params.id" 
+      stage="qc" 
+      title="Select Work Order for QC Verification" 
+      @selected="handleJobSelected"
+    />
+
+    <div v-else-if="loading" class="animate-pulse space-y-6">
+      <div class="h-8 bg-slate-800 rounded w-1/4"></div>
+      <div class="h-96 bg-slate-800 rounded"></div>
+    </div>
+
+    <JobDetailsLayout v-else-if="workOrder" :jobCard="workOrder?.job_card || null" :activeStage="7">
       <!-- Header -->
       <div class="flex items-center justify-between border-b border-slate-850 pb-5">
         <div class="flex items-center space-x-4">
@@ -126,11 +140,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../../services/api';
 import { useToastStore } from '../../stores/toast';
 import JobDetailsLayout from '../../components/workshop/JobDetailsLayout.vue';
+import WorkspaceJobSelector from '../../components/workshop/WorkspaceJobSelector.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -156,7 +171,16 @@ const form = reactive({
   road_test_notes: ''
 });
 
+const handleJobSelected = (id) => {
+  router.push({ name: 'workshop.qc', params: { id } });
+};
+
 const fetchWorkOrderDetails = async () => {
+  if (!route.params.id) {
+    workOrder.value = null;
+    loading.value = false;
+    return;
+  }
   loading.value = true;
   try {
     const res = await api.get(`/work-orders/${route.params.id}`);
@@ -164,7 +188,7 @@ const fetchWorkOrderDetails = async () => {
     form.work_order_id = workOrder.value.id;
   } catch (err) {
     toast.error('Failed to load Work Order details');
-    router.push({ name: 'workshop.hub' });
+    router.push({ name: 'workshop.qc' });
   } finally {
     loading.value = false;
   }
@@ -175,7 +199,11 @@ const submitQcReport = async () => {
   try {
     await api.post('/quality-control', { ...form });
     toast.success('QC Inspection Report submitted successfully.');
-    router.push({ name: 'workshop.hub' });
+    if (form.status === 'passed') {
+      router.push({ name: 'workshop.settlement', params: { id: workOrder.value.job_card_id } });
+    } else {
+      router.push({ name: 'workshop.qc' });
+    }
   } catch (err) {
     console.error('QC submission error', err);
     toast.error(err.response?.data?.message || 'QC verification report logging failed.');
@@ -184,7 +212,20 @@ const submitQcReport = async () => {
   }
 };
 
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    fetchWorkOrderDetails();
+  } else {
+    workOrder.value = null;
+    loading.value = false;
+  }
+});
+
 onMounted(() => {
-  fetchWorkOrderDetails();
+  if (route.params.id) {
+    fetchWorkOrderDetails();
+  } else {
+    loading.value = false;
+  }
 });
 </script>
