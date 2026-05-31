@@ -19,40 +19,40 @@
     
     <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- AI Management & Governance Console -->
-      <div class="bg-gradient-to-br from-indigo-950 to-slate-900 rounded-3xl shadow-lg border border-indigo-900/60 p-6 text-white lg:col-span-2">
-        <h2 class="text-sm font-black tracking-wider uppercase mb-1 text-indigo-300">AI Management & Governance Console</h2>
-        <p class="text-xs text-indigo-200 mb-6">Review system suggestions, adjust neural learning thresholds, and authorize model actions.</p>
+      <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 text-slate-800 lg:col-span-2">
+        <h2 class="text-sm font-black tracking-wider uppercase mb-1 text-indigo-600">AI Management & Governance Console</h2>
+        <p class="text-xs text-slate-500 mb-6">Review system suggestions, adjust neural learning thresholds, and authorize model actions.</p>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="bg-slate-900/80 border border-slate-800 p-4.5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/50 transition-all">
+          <div class="bg-slate-50 border border-slate-200 p-4.5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/50 transition-all">
             <div>
-              <span class="text-[9px] font-black uppercase text-indigo-400 block tracking-widest font-mono">Neural Alerts</span>
-              <h3 class="text-xs font-bold text-white mt-1">AI Recommendation Inbox</h3>
-              <p class="text-[11px] text-slate-400 mt-2">Manage automated service alerts, client SMS notifications, and predictive repair proposals.</p>
+              <span class="text-[9px] font-black uppercase text-indigo-600 block tracking-widest font-mono">Neural Alerts</span>
+              <h3 class="text-xs font-bold text-slate-800 mt-1">AI Recommendation Inbox</h3>
+              <p class="text-[11px] text-slate-500 mt-2">Manage automated service alerts, client SMS notifications, and predictive repair proposals.</p>
             </div>
             <router-link :to="{ name: 'dashboard.ai-inbox' }" class="mt-4 px-3 py-2 bg-indigo-600 hover:bg-indigo-550 text-white rounded-lg text-xs font-bold uppercase tracking-wider text-center block transition-colors">
               Open Recommendation Inbox
             </router-link>
           </div>
 
-          <div class="bg-slate-900/80 border border-slate-800 p-4.5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/50 transition-all">
+          <div class="bg-slate-50 border border-slate-200 p-4.5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/50 transition-all">
             <div>
-              <span class="text-[9px] font-black uppercase text-indigo-400 block tracking-widest font-mono">Calibration</span>
-              <h3 class="text-xs font-bold text-white mt-1">Model Telemetry Settings</h3>
-              <p class="text-[11px] text-slate-400 mt-2">Configure threshold parameters for AI capacity allocation, diagnostic precision, and booking notifications.</p>
+              <span class="text-[9px] font-black uppercase text-indigo-600 block tracking-widest font-mono">Calibration</span>
+              <h3 class="text-xs font-bold text-slate-800 mt-1">Model Telemetry Settings</h3>
+              <p class="text-[11px] text-slate-500 mt-2">Configure threshold parameters for AI capacity allocation, diagnostic precision, and booking notifications.</p>
             </div>
-            <router-link :to="{ name: 'settings.index' }" class="mt-4 px-3 py-2 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded-lg text-xs font-bold uppercase tracking-wider text-center block transition-colors">
+            <router-link :to="{ name: 'settings.index' }" class="mt-4 px-3 py-2 bg-white hover:bg-slate-105 text-slate-700 border border-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider text-center block transition-colors">
               Configure Telemetry
             </router-link>
           </div>
 
-          <div class="bg-slate-900/80 border border-slate-800 p-4.5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/50 transition-all">
+          <div class="bg-slate-50 border border-slate-200 p-4.5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/50 transition-all">
             <div>
-              <span class="text-[9px] font-black uppercase text-indigo-400 block tracking-widest font-mono">Incident Control</span>
-              <h3 class="text-xs font-bold text-white mt-1">Anomaly Incident Center</h3>
-              <p class="text-[11px] text-slate-400 mt-2">Inspect telemetry faults, network offline transitions, and recover unsynced database instances.</p>
+              <span class="text-[9px] font-black uppercase text-indigo-600 block tracking-widest font-mono">Incident Control</span>
+              <h3 class="text-xs font-bold text-slate-800 mt-1">Anomaly Incident Center</h3>
+              <p class="text-[11px] text-slate-500 mt-2">Inspect telemetry faults, network offline transitions, and recover unsynced database instances.</p>
             </div>
-            <router-link :to="{ name: 'settings.incident-center' }" class="mt-4 px-3 py-2 bg-slate-850 hover:bg-slate-750 text-slate-350 rounded-lg text-xs font-bold uppercase tracking-wider text-center block transition-colors">
+            <router-link :to="{ name: 'settings.incident-center' }" class="mt-4 px-3 py-2 bg-white hover:bg-slate-105 text-slate-700 border border-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider text-center block transition-colors">
               Access Incident Center
             </router-link>
           </div>

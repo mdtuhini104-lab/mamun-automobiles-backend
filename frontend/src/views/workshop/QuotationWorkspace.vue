@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-7xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
+  <div class="max-w-7xl mx-auto space-y-6 p-6 bg-slate-50 border border-slate-200 rounded-3xl shadow-sm text-slate-800 min-h-screen">
     
     <!-- Fallback Stage Selector -->
     <WorkspaceJobSelector 
@@ -11,34 +11,34 @@
 
     <JobDetailsLayout v-else :jobCard="jobCard" :activeStage="3">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-850 pb-5">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-5">
         <div class="flex items-center space-x-4">
           <div v-if="jobCard">
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Quotation Workspace</h1>
-            <p class="text-xs text-slate-400 mt-1">JC #{{ String(jobCard.id).padStart(5, '0') }}</p>
+            <h1 class="text-2xl font-black tracking-tight text-slate-800 uppercase">Quotation Workspace</h1>
+            <p class="text-xs text-slate-500 mt-1">JC #{{ String(jobCard.id).padStart(5, '0') }}</p>
           </div>
         </div>
-        <div v-if="jobCard && jobCard.diagnosis" class="bg-indigo-950/40 border border-indigo-900/60 p-3 rounded-xl max-w-md text-[11px]">
-          <span class="text-indigo-400 font-extrabold uppercase block tracking-wider mb-0.5">Diagnosed Findings:</span>
-          <span class="text-slate-300 italic">"{{ jobCard.diagnosis }}"</span>
+        <div v-if="jobCard && jobCard.diagnosis" class="bg-indigo-50 border border-indigo-200 p-3 rounded-xl max-w-md text-[11px]">
+          <span class="text-indigo-650 font-extrabold uppercase block tracking-wider mb-0.5">Diagnosed Findings:</span>
+          <span class="text-slate-705 italic">"{{ jobCard.diagnosis }}"</span>
         </div>
       </div>
 
     <div v-if="loadingJob" class="animate-pulse space-y-6">
-      <div class="h-8 bg-slate-800 rounded w-1/4"></div>
-      <div class="h-96 bg-slate-800 rounded"></div>
+      <div class="h-8 bg-slate-200 rounded w-1/4"></div>
+      <div class="h-96 bg-slate-200 rounded"></div>
     </div>
 
     <div v-else-if="jobCard">
       <!-- Embedded Quotation engine core logic -->
-      <div v-if="!quotation" class="bg-slate-950/40 border border-slate-850 rounded-2xl p-8 text-center max-w-xl mx-auto space-y-4 my-12">
-        <div class="inline-flex p-3 bg-indigo-500/10 rounded-full text-indigo-450 border border-indigo-500/20">
+      <div v-if="!quotation" class="bg-white border border-slate-200 rounded-2xl p-8 text-center max-w-xl mx-auto space-y-4 my-12 shadow-sm">
+        <div class="inline-flex p-3 bg-indigo-50 rounded-full text-indigo-600 border border-indigo-200">
           <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
           </svg>
         </div>
-        <h3 class="text-lg font-bold text-white">Generate Quotation Draft</h3>
-        <p class="text-xs text-slate-400">No quotation has been drafted for this Job Card yet. Initiate a versioned draft applying the corporate contract pricing engine.</p>
+        <h3 class="text-lg font-bold text-slate-800">Generate Quotation Draft</h3>
+        <p class="text-xs text-slate-505">No quotation has been drafted for this Job Card yet. Initiate a versioned draft applying the corporate contract pricing engine.</p>
         <button
           @click="initiateQuotationDraft"
           :disabled="creatingDraft"
@@ -53,13 +53,13 @@
         
         <!-- Left details panel -->
         <div class="xl:col-span-2 space-y-6">
-          <div class="bg-slate-950/20 border border-slate-850 rounded-2xl overflow-hidden shadow-xl">
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
             <!-- Details Header -->
-            <div class="px-6 py-5 border-b border-slate-850 bg-slate-950/40 flex justify-between items-center flex-wrap gap-4">
+            <div class="px-6 py-5 border-b border-slate-200 bg-slate-50 flex justify-between items-center flex-wrap gap-4">
               <div>
                 <div class="flex items-center space-x-3">
-                  <h3 class="text-base font-black text-white font-mono">{{ quotation.quotation_number }}</h3>
-                  <span class="px-2.5 py-0.5 rounded-md text-[10px] font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase">
+                  <h3 class="text-base font-black text-slate-800 font-mono">{{ quotation.quotation_number }}</h3>
+                  <span class="px-2.5 py-0.5 rounded-md text-[10px] font-black bg-indigo-50 text-indigo-650 border border-indigo-100 uppercase">
                     Version {{ quotation.version }}
                   </span>
                   <span :class="getQuotationStatusClass(quotation.status)" class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider">
@@ -83,11 +83,11 @@
               
               <!-- Product lines -->
               <div>
-                <h4 class="text-xs font-black text-indigo-400 uppercase tracking-widest mb-3">Product Line Items</h4>
+                <h4 class="text-xs font-black text-indigo-650 uppercase tracking-widest mb-3">Product Line Items</h4>
                 <div class="overflow-x-auto">
                   <table class="min-w-full text-left text-xs">
                     <thead>
-                      <tr class="border-b border-slate-800 text-slate-500 font-bold uppercase text-[9px] tracking-wider">
+                      <tr class="border-b border-slate-200 text-slate-400 font-bold uppercase text-[9px] tracking-wider">
                         <th class="pb-3 pl-2">Product Name</th>
                         <th class="pb-3">Ownership</th>
                         <th class="pb-3 text-right">Qty</th>
@@ -96,26 +96,26 @@
                         <th class="pb-3 text-center">Action</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-850">
-                      <tr v-for="item in productItems" :key="item.id" class="text-slate-350">
-                        <td class="py-3 pl-2 font-bold text-white">{{ item.part?.name || 'Part' }}</td>
+                    <tbody class="divide-y divide-slate-200">
+                      <tr v-for="item in productItems" :key="item.id" class="text-slate-600">
+                        <td class="py-3 pl-2 font-bold text-slate-800">{{ item.part?.name || 'Part' }}</td>
                         <td class="py-3">
-                          <span :class="item.source_type === 'workshop_supplied' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-amber-500/10 text-amber-400'" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider">
+                          <span :class="item.source_type === 'workshop_supplied' ? 'bg-indigo-50 text-indigo-600 border border-indigo-200/60' : 'bg-amber-50 text-amber-600 border border-amber-200/60'" class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider">
                             {{ item.source_type === 'workshop_supplied' ? 'Workshop Supplied' : 'Customer Supplied (৳0.00)' }}
                           </span>
                         </td>
                         <td class="py-3 text-right font-mono">{{ item.quantity }}</td>
                         <td class="py-3 text-right font-mono">{{ formatCurrency(item.source_type === 'workshop_supplied' ? item.unit_price : 0) }}</td>
-                        <td class="py-3 text-right font-mono font-black text-slate-100">{{ formatCurrency(item.source_type === 'workshop_supplied' ? item.quantity * item.unit_price : 0) }}</td>
+                        <td class="py-3 text-right font-mono font-black text-slate-900">{{ formatCurrency(item.source_type === 'workshop_supplied' ? item.quantity * item.unit_price : 0) }}</td>
                         <td class="py-3 text-center">
                           <button
                             v-if="quotation.status === 'draft' || quotation.status === 'revised'"
                             @click="promptRemoveItem(item)"
-                            class="text-rose-400 hover:text-rose-350 text-[10px] font-black uppercase tracking-wide"
+                            class="text-rose-600 hover:text-rose-700 text-[10px] font-black uppercase tracking-wide"
                           >
                             Remove
                           </button>
-                          <span v-else class="text-slate-600 text-[10px] font-bold">Locked</span>
+                          <span v-else class="text-slate-400 text-[10px] font-bold">Locked</span>
                         </td>
                       </tr>
                       <tr v-if="productItems.length === 0">
@@ -128,35 +128,35 @@
 
               <!-- Service lines -->
               <div>
-                <h4 class="text-xs font-black text-indigo-400 uppercase tracking-widest mb-3">Service Line Items</h4>
+                <h4 class="text-xs font-black text-indigo-650 uppercase tracking-widest mb-3">Service Line Items</h4>
                 <div class="overflow-x-auto">
                   <table class="min-w-full text-left text-xs">
                     <thead>
-                      <tr class="border-b border-slate-800 text-slate-500 font-bold uppercase text-[9px] tracking-wider">
+                      <tr class="border-b border-slate-200 text-slate-400 font-bold uppercase text-[9px] tracking-wider">
                         <th class="pb-3 pl-2">Service Description</th>
                         <th class="pb-3 text-right">Est. Hours</th>
                         <th class="pb-3 text-right">Labor Charge</th>
                         <th class="pb-3 text-center">Action</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-850">
-                      <tr v-for="item in serviceItems" :key="item.id" class="text-slate-350">
-                        <td class="py-3 pl-2 font-bold text-white">{{ item.service_name }}</td>
+                    <tbody class="divide-y divide-slate-200">
+                      <tr v-for="item in serviceItems" :key="item.id" class="text-slate-600">
+                        <td class="py-3 pl-2 font-bold text-slate-800">{{ item.service_name }}</td>
                         <td class="py-3 text-right font-mono">{{ item.estimated_hours }} hrs</td>
-                        <td class="py-3 text-right font-mono font-black text-slate-100">{{ formatCurrency(item.labor_cost) }}</td>
+                        <td class="py-3 text-right font-mono font-black text-slate-900">{{ formatCurrency(item.labor_cost) }}</td>
                         <td class="py-3 text-center">
                           <button
                             v-if="quotation.status === 'draft' || quotation.status === 'revised'"
                             @click="promptRemoveItem(item)"
-                            class="text-rose-400 hover:text-rose-350 text-[10px] font-black uppercase tracking-wide"
+                            class="text-rose-600 hover:text-rose-700 text-[10px] font-black uppercase tracking-wide"
                           >
                             Remove
                           </button>
-                          <span v-else class="text-slate-600 text-[10px] font-bold">Locked</span>
+                          <span v-else class="text-slate-400 text-[10px] font-bold">Locked</span>
                         </td>
                       </tr>
                       <tr v-if="serviceItems.length === 0">
-                        <td colspan="4" class="py-4 text-center text-slate-500 text-xs italic">No services added.</td>
+                        <td colspan="4" class="py-4 text-center text-slate-450 text-xs italic">No services added.</td>
                       </tr>
                     </tbody>
                   </table>
@@ -167,20 +167,20 @@
           </div>
 
           <!-- Add Line Item Panel -->
-          <div v-if="quotation.status === 'draft' || quotation.status === 'revised'" class="bg-slate-950/40 p-5 rounded-2xl border border-slate-850 space-y-4">
-            <h4 class="text-xs font-black text-white uppercase tracking-wider">Add Line Item (Pricing Engine Autofill)</h4>
+          <div v-if="quotation.status === 'draft' || quotation.status === 'revised'" class="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+            <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider">Add Line Item (Pricing Engine Autofill)</h4>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label class="block text-[10px] text-slate-400 mb-1">Item Type</label>
-                <select v-model="newItem.item_type" class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white">
+                <label class="block text-[10px] text-slate-500 mb-1">Item Type</label>
+                <select v-model="newItem.item_type" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                   <option value="product">Product (Parts/Materials)</option>
                   <option value="service">Service Task (Labor)</option>
                 </select>
               </div>
 
               <div v-if="newItem.item_type === 'product'">
-                <label class="block text-[10px] text-slate-400 mb-1">Product (Part)</label>
-                <select v-model="newItem.part_id" @change="calculatePricingEngineRate" class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white">
+                <label class="block text-[10px] text-slate-500 mb-1">Product (Part)</label>
+                <select v-model="newItem.part_id" @change="calculatePricingEngineRate" class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                   <option value="">Select Part...</option>
                   <option v-for="part in partsList" :key="part.id" :value="part.id">
                     {{ part.name }} (SKU: {{ part.sku }})
@@ -189,44 +189,44 @@
               </div>
 
               <div v-else>
-                <label class="block text-[10px] text-slate-400 mb-1">Service Description</label>
+                <label class="block text-[10px] text-slate-500 mb-1">Service Description</label>
                 <input
                   v-model="newItem.service_name"
                   @blur="calculatePricingEngineRate"
                   type="text"
                   placeholder="e.g. Brake Caliper Rebuild"
-                  class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                  class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label class="block text-[10px] text-slate-400 mb-1">Billed Unit Price (Auto-suggested)</label>
+                <label class="block text-[10px] text-slate-500 mb-1">Billed Unit Price (Auto-suggested)</label>
                 <input
                   v-model.number="newItem.price"
                   type="number"
-                  class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                  class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label class="block text-[10px] text-slate-400 mb-1">Qty / Est. Hours</label>
+                <label class="block text-[10px] text-slate-500 mb-1">Qty / Est. Hours</label>
                 <input
                   v-model.number="newItem.quantity"
                   type="number"
-                  class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                  class="w-full text-xs bg-white border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 />
               </div>
             </div>
 
             <div class="flex justify-between items-center pt-2">
-              <span class="text-[10px] text-indigo-400 font-bold flex items-center" v-if="calculatingRate">
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
+              <span class="text-[10px] text-indigo-600 font-bold flex items-center" v-if="calculatingRate">
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-indigo-650" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 Pricing engine matching contract fallback rates...
               </span>
-              <span v-else class="text-[10px] text-emerald-450 font-bold">
+              <span v-else class="text-[10px] text-emerald-600 font-bold">
                 ✔ Customer rate synced
               </span>
               <button
@@ -244,37 +244,37 @@
         <div class="xl:col-span-1 space-y-6">
           
           <!-- Summary card -->
-          <div class="bg-slate-950/20 border border-slate-850 rounded-2xl overflow-hidden shadow-xl">
-            <div class="px-6 py-4 border-b border-slate-850 bg-slate-950/40">
-              <h3 class="text-xs font-black text-white uppercase tracking-wider">Quotation Summary</h3>
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+              <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Quotation Summary</h3>
             </div>
             <div class="p-6 space-y-4">
-              <dl class="space-y-3 text-xs text-slate-400">
+              <dl class="space-y-3 text-xs text-slate-505">
                 <div class="flex justify-between">
                   <dt>Products Total:</dt>
-                  <dd class="font-bold text-white font-mono">{{ formatCurrency(quotation.total_product_cost) }}</dd>
+                  <dd class="font-bold text-slate-800 font-mono">{{ formatCurrency(quotation.total_product_cost) }}</dd>
                 </div>
                 <div class="flex justify-between">
                   <dt>Labor Service Total:</dt>
-                  <dd class="font-bold text-white font-mono">{{ formatCurrency(quotation.total_labor_cost) }}</dd>
+                  <dd class="font-bold text-slate-800 font-mono">{{ formatCurrency(quotation.total_labor_cost) }}</dd>
                 </div>
 
                 <!-- Editable Discount/Tax for draft/revised -->
-                <div v-if="quotation.status === 'draft' || quotation.status === 'revised'" class="space-y-2 pt-2 border-t border-slate-850">
+                <div v-if="quotation.status === 'draft' || quotation.status === 'revised'" class="space-y-2 pt-2 border-t border-slate-200">
                   <div class="flex items-center justify-between">
-                    <label class="text-[10px] text-slate-400 font-bold uppercase">Discount (৳):</label>
+                    <label class="text-[10px] text-slate-500 font-bold uppercase">Discount (৳):</label>
                     <input
                       v-model.number="tempDiscount"
                       type="number"
-                      class="w-24 text-xs bg-slate-900 border border-slate-800 rounded px-2 py-1 text-right text-white font-mono"
+                      class="w-24 text-xs bg-white border border-slate-200 rounded px-2 py-1 text-right text-slate-800 font-mono focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
                   <div class="flex items-center justify-between">
-                    <label class="text-[10px] text-slate-400 font-bold uppercase">Tax/VAT (৳):</label>
+                    <label class="text-[10px] text-slate-500 font-bold uppercase">Tax/VAT (৳):</label>
                     <input
                       v-model.number="tempTax"
                       type="number"
-                      class="w-24 text-xs bg-slate-900 border border-slate-800 rounded px-2 py-1 text-right text-white font-mono"
+                      class="w-24 text-xs bg-white border border-slate-200 rounded px-2 py-1 text-right text-slate-800 font-mono focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
                   <div class="pt-2 flex justify-end">
@@ -288,55 +288,55 @@
                 </div>
 
                 <!-- Read-only for other statuses -->
-                <div v-else class="space-y-2 pt-2 border-t border-slate-850">
+                <div v-else class="space-y-2 pt-2 border-t border-slate-200">
                   <div class="flex justify-between">
                     <dt>Discount (৳):</dt>
-                    <dd class="font-bold text-white font-mono">-{{ formatCurrency(quotation.discount) }}</dd>
+                    <dd class="font-bold text-slate-800 font-mono">-{{ formatCurrency(quotation.discount) }}</dd>
                   </div>
                   <div class="flex justify-between">
                     <dt>Vat/Tax (৳):</dt>
-                    <dd class="font-bold text-white font-mono">+{{ formatCurrency(quotation.tax) }}</dd>
+                    <dd class="font-bold text-slate-800 font-mono">+{{ formatCurrency(quotation.tax) }}</dd>
                   </div>
                 </div>
 
-                <div class="flex justify-between items-center border-t border-slate-800 pt-3 text-sm">
-                  <dt class="font-extrabold text-white">Grand Total</dt>
-                  <dd class="font-black text-indigo-400 font-mono text-base">{{ formatCurrency(quotation.grand_total) }}</dd>
+                <div class="flex justify-between items-center border-t border-slate-200 pt-3 text-sm">
+                  <dt class="font-extrabold text-slate-800">Grand Total</dt>
+                  <dd class="font-black text-indigo-600 font-mono text-base">{{ formatCurrency(quotation.grand_total) }}</dd>
                 </div>
               </dl>
             </div>
           </div>
 
           <!-- Print & Dispatch Controls -->
-          <div class="bg-slate-950/20 border border-slate-850 rounded-2xl overflow-hidden shadow-xl">
-            <div class="px-6 py-4 border-b border-slate-850 bg-slate-950/40">
-              <h3 class="text-xs font-black text-white uppercase tracking-wider">Print & Dispatch</h3>
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+              <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Print & Dispatch</h3>
             </div>
             <div class="p-6 space-y-4">
-              <p class="text-xs text-slate-400">Generate an official corporate PDF or send the versioned quotation to the customer for digital approval.</p>
+              <p class="text-xs text-slate-500">Generate an official corporate PDF or send the versioned quotation to the customer for digital approval.</p>
 
               <div class="grid grid-cols-2 gap-3">
                 <!-- PDF Download -->
                 <button
                   @click="downloadQuotationPdf"
-                  class="flex flex-col items-center justify-center p-3 border border-slate-800 hover:border-slate-700 bg-slate-900 hover:bg-slate-850 rounded-xl transition text-center group"
+                  class="flex flex-col items-center justify-center p-3 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 rounded-xl transition text-center group"
                 >
-                  <svg class="w-6 h-6 text-slate-400 group-hover:text-indigo-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-6 h-6 text-slate-500 group-hover:text-indigo-650 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
-                  <span class="text-[10px] font-black text-slate-300 group-hover:text-white uppercase tracking-wider">Download PDF</span>
+                  <span class="text-[10px] font-black text-slate-600 group-hover:text-indigo-650 uppercase tracking-wider">Download PDF</span>
                 </button>
 
                 <!-- Send to Customer -->
                 <button
                   @click="sendQuotationToCustomer"
                   :disabled="sendingQuotation"
-                  class="flex flex-col items-center justify-center p-3 border border-slate-800 hover:border-slate-700 bg-slate-900 hover:bg-slate-850 rounded-xl transition text-center group disabled:opacity-50"
+                  class="flex flex-col items-center justify-center p-3 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 rounded-xl transition text-center group disabled:opacity-50"
                 >
-                  <svg class="w-6 h-6 text-slate-400 group-hover:text-emerald-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-6 h-6 text-slate-500 group-hover:text-emerald-600 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                   </svg>
-                  <span class="text-[10px] font-black text-slate-300 group-hover:text-white uppercase tracking-wider">
+                  <span class="text-[10px] font-black text-slate-600 group-hover:text-emerald-600 uppercase tracking-wider">
                     {{ sendingQuotation ? 'Sending...' : 'Send to Customer' }}
                   </span>
                 </button>
@@ -345,41 +345,41 @@
           </div>
 
           <!-- Version histories -->
-          <div class="bg-slate-950/20 border border-slate-850 rounded-2xl overflow-hidden shadow-xl">
-            <div class="px-6 py-4 border-b border-slate-850 bg-slate-950/40">
-              <h3 class="text-xs font-black text-white uppercase tracking-wider">Revision Version Snapshot Logs</h3>
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+              <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Revision Version Snapshot Logs</h3>
             </div>
             <div class="p-6 max-h-40 overflow-y-auto">
               <div v-if="!quotation.snapshots || quotation.snapshots.length === 0" class="text-center py-4 text-xs text-slate-500 italic">
                 Initial quotation draft version.
               </div>
               <div v-else class="space-y-4 text-xs">
-                <div v-for="snap in quotation.snapshots" :key="snap.id" class="border-l-2 border-indigo-500 pl-3 py-0.5">
-                  <div class="font-bold text-white">Version {{ snap.version }} Snapshot</div>
-                  <div class="text-[9px] text-slate-500 font-mono">Date: {{ formatDate(snap.created_at) }}</div>
-                  <div class="text-slate-400 italic">"{{ snap.snapshot_data?.notes || 'Revision snapshot.' }}"</div>
+                <div v-for="snap in quotation.snapshots" :key="snap.id" class="border-l-2 border-indigo-650 pl-3 py-0.5">
+                  <div class="font-bold text-slate-800">Version {{ snap.version }} Snapshot</div>
+                  <div class="text-[9px] text-slate-505 font-mono">Date: {{ formatDate(snap.created_at) }}</div>
+                  <div class="text-slate-600 italic">"{{ snap.snapshot_data?.notes || 'Revision snapshot.' }}"</div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Deletion audits -->
-          <div class="bg-slate-950/20 border border-slate-850 rounded-2xl overflow-hidden shadow-xl">
-            <div class="px-6 py-4 border-b border-slate-850 bg-slate-950/40">
-              <h3 class="text-xs font-black text-white uppercase tracking-wider">Removed Items Audits</h3>
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+              <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">Removed Items Audits</h3>
             </div>
             <div class="p-6 max-h-40 overflow-y-auto">
               <div v-if="!quotation.removed_items || quotation.removed_items.length === 0" class="text-center py-4 text-xs text-slate-500 italic">
                 No items have been removed.
               </div>
               <div v-else class="space-y-4 text-xs">
-                <div v-for="audit in quotation.removed_items" :key="audit.id" class="bg-red-950/10 border-l-2 border-red-500 pl-3 py-1 rounded">
-                  <div class="font-bold text-slate-200 flex justify-between">
+                <div v-for="audit in quotation.removed_items" :key="audit.id" class="bg-rose-50 border-l-2 border-rose-500 pl-3 py-1 rounded">
+                  <div class="font-bold text-slate-800 flex justify-between">
                     <span>{{ audit.item_name }}</span>
-                    <span class="font-mono text-red-400">{{ formatCurrency(audit.previous_price) }}</span>
+                    <span class="font-mono text-rose-650">{{ formatCurrency(audit.previous_price) }}</span>
                   </div>
-                  <div class="text-[9px] text-slate-500">Deleted by: {{ audit.removed_by?.name || 'Advisor' }}</div>
-                  <div class="text-[10px] text-red-300 italic mt-1 bg-slate-900 p-1 rounded border border-red-950">
+                  <div class="text-[9px] text-slate-505">Deleted by: {{ audit.removed_by?.name || 'Advisor' }}</div>
+                  <div class="text-[10px] text-rose-700 italic mt-1 bg-white p-1.5 rounded border border-rose-200 shadow-sm">
                     "{{ audit.removal_reason }}"
                   </div>
                 </div>
@@ -702,13 +702,13 @@ const formatDate = (dateString) => {
 
 const getQuotationStatusClass = (status) => {
   const map = {
-    'draft': 'bg-slate-800 text-slate-350 border border-slate-700/50',
-    'revised': 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
-    'approved': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-    'partially_approved': 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
-    'rejected': 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
+    'draft': 'bg-slate-100 text-slate-600 border border-slate-200',
+    'revised': 'bg-amber-55 text-amber-600 border border-amber-200',
+    'approved': 'bg-emerald-50 text-emerald-600 border border-emerald-250',
+    'partially_approved': 'bg-blue-50 text-blue-600 border border-blue-250',
+    'rejected': 'bg-rose-50 text-rose-600 border border-rose-250',
   };
-  return map[status] || 'bg-slate-800 text-slate-405';
+  return map[status] || 'bg-slate-100 text-slate-500';
 };
 
 const downloadQuotationPdf = async () => {

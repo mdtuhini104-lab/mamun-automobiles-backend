@@ -4,6 +4,18 @@ All notable changes to the Mamun Automobiles ERP platform will be documented in 
 
 ---
 
+## [2.9.0] - 2026-05-31
+
+### Added
+- **Unified Light Enterprise UI Migration**: Converted all remaining dark workshop operational workspaces, dashboards, and components to the unified, clean, and modern light enterprise theme.
+  - Replaced all dark navy/black background overlays (`bg-slate-900`, `bg-slate-950`, `bg-slate-950/20`, etc.) with light design tokens (`bg-slate-50` for layout frames, `bg-white` for inner cards, `border-slate-200` for panels, and `text-slate-800` / `text-slate-900` for clear typography).
+  - Migrated `PartsConsumptionWorkspace.vue`, `QcVerificationWorkspace.vue`, `DeliveryHandoverWorkspace.vue`, `InvoiceSettlementWorkspace.vue`, `WarrantyComebackWorkspace.vue`, `CustomerWorkflowTracker.vue`, `WorkshopOperationsHub.vue`, `WorkshopLiveBoard.vue`, `QcDeliveryDashboard.vue`, `AiDashboard.vue`, `TechnicianMobileTaskScreen.vue`, `QuotationWorkspace.vue`, and `BayOperationsBoard.vue`.
+  - Refined status badges and priority helper classes (`getQuotationStatusClass`, `getWarrantyStatusClass`, `getPriorityClass`) to use soft light backgrounds and professional contrasting text.
+  - Confirmed and unified drawing canvas signature stroke colors (`#4f46e5` indigo) across QC and Handover screens.
+  - Standardized rounded corners (`rounded-2xl`, `rounded-3xl`) and minimal shadows (`shadow-sm`) across the entire workspace suite.
+- **Clean Frontend Compilation**: Successfully compiled the entire Vite client bundle with zero template syntax errors or Rollup warnings.
+- **Backend Regression Safety**: Executed full PHPUnit test suites ensuring 100% green integrity (53 tests, 464 assertions).
+
 ## [2.8.0] - 2026-05-31
 
 ### Changed

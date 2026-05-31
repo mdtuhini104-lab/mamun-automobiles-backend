@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
+  <div class="max-w-6xl mx-auto space-y-6 p-6 bg-slate-50 border border-gray-200 rounded-3xl shadow-sm text-slate-800 min-h-screen">
     
     <!-- Fallback Stage Selector -->
     <WorkspaceJobSelector 
@@ -10,8 +10,8 @@
     />
 
     <div v-else-if="loading" class="animate-pulse space-y-6">
-      <div class="h-8 bg-slate-800 rounded w-1/4"></div>
-      <div class="h-96 bg-slate-800 rounded"></div>
+      <div class="h-8 bg-gray-200 rounded w-1/4"></div>
+      <div class="h-96 bg-gray-200 rounded"></div>
     </div>
 
     <JobDetailsLayout v-else-if="jobCard" :jobCard="jobCard" :activeStage="2">
@@ -19,43 +19,43 @@
       <form @submit.prevent="saveInspection" class="space-y-6">
         
         <!-- Checklist of findings -->
-        <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-850 space-y-4">
-          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400">Visual & OBD Checklist</h3>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-650">Visual & OBD Checklist</h3>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <label 
               v-for="(checked, key) in checklist" 
               :key="key"
-              class="flex items-center gap-3 p-3 bg-slate-900 border border-slate-800 rounded-xl hover:border-slate-700 cursor-pointer transition"
+              class="flex items-center gap-3 p-3 bg-slate-50 border border-gray-200 rounded-xl hover:border-gray-300 cursor-pointer transition"
             >
               <input 
                 type="checkbox" 
                 v-model="checklist[key]"
-                class="w-4 h-4 text-indigo-650 bg-slate-950 border-slate-750 rounded focus:ring-indigo-500"
+                class="w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500"
               />
-              <span class="text-[11px] font-bold text-slate-350 capitalize">{{ key.replace('_', ' ') }} Passed</span>
+              <span class="text-[11px] font-bold text-slate-700 capitalize">{{ key.replace('_', ' ') }} Passed</span>
             </label>
           </div>
         </div>
 
         <!-- Intake Params -->
-        <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-850 space-y-6">
-          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400">Diagnostic Parameters</h3>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-650">Diagnostic Parameters</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-xs text-slate-400 mb-1">Odometer Reading (KM) *</label>
+              <label class="block text-xs text-slate-500 mb-1">Odometer Reading (KM) *</label>
               <input
                 v-model.number="form.odometer_reading"
                 type="number"
                 required
-                class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                class="w-full text-xs bg-slate-50 border border-gray-200 rounded-lg p-2.5 text-slate-800 focus:bg-white"
               />
             </div>
             <div>
-              <label class="block text-xs text-slate-400 mb-1">Fuel Level Gauge *</label>
+              <label class="block text-xs text-slate-500 mb-1">Fuel Level Gauge *</label>
               <select
                 v-model="form.fuel_level"
                 required
-                class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                class="w-full text-xs bg-slate-50 border border-gray-200 rounded-lg p-2.5 text-slate-800 focus:bg-white"
               >
                 <option value="Empty">Empty</option>
                 <option value="1/4">1/4 Tank</option>
@@ -65,11 +65,11 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs text-slate-400 mb-1">Emergency Hazard Level *</label>
+              <label class="block text-xs text-slate-500 mb-1">Emergency Hazard Level *</label>
               <select
                 v-model="form.emergency_level"
                 required
-                class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                class="w-full text-xs bg-slate-50 border border-gray-200 rounded-lg p-2.5 text-slate-800 focus:bg-white"
               >
                 <option value="low">Low (Standard Maintenance)</option>
                 <option value="medium">Medium (Repair Advised)</option>
@@ -78,11 +78,11 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs text-slate-400 mb-1">Workflow priority *</label>
+              <label class="block text-xs text-slate-500 mb-1">Workflow priority *</label>
               <select
                 v-model="form.priority_level"
                 required
-                class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                class="w-full text-xs bg-slate-50 border border-gray-200 rounded-lg p-2.5 text-slate-800 focus:bg-white"
               >
                 <option value="normal">Normal Priority</option>
                 <option value="high">High Priority</option>
@@ -93,62 +93,62 @@
 
           <div class="space-y-4">
             <div>
-              <label class="block text-xs text-slate-400 mb-1">Diagnostic Findings & Code Scans *</label>
+              <label class="block text-xs text-slate-500 mb-1">Diagnostic Findings & Code Scans *</label>
               <textarea
                 v-model="form.diagnosis"
                 required
                 rows="4"
                 placeholder="Log physical diagnostic notes, scan codes (e.g. P0300 misfire, P0171 lean limit), engine sounds, visual leaks..."
-                class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                class="w-full text-xs bg-slate-50 border border-gray-200 rounded-lg p-2.5 text-slate-800 focus:bg-white"
               ></textarea>
             </div>
             <div>
-              <label class="block text-xs text-slate-400 mb-1">General Workshop Notes</label>
+              <label class="block text-xs text-slate-500 mb-1">General Workshop Notes</label>
               <textarea
                 v-model="form.inspection_notes"
                 rows="2"
                 placeholder="Internal notes for service advisors, helper recommendations, cleanup state..."
-                class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                class="w-full text-xs bg-slate-50 border border-gray-200 rounded-lg p-2.5 text-slate-800 focus:bg-white"
               ></textarea>
             </div>
             <div>
-              <label class="block text-xs text-red-400 font-extrabold mb-1">Safety Warnings & Hazards</label>
+              <label class="block text-xs text-red-650 font-extrabold mb-1">Safety Warnings & Hazards</label>
               <textarea
                 v-model="form.safety_warnings"
                 rows="2"
                 placeholder="BALD TIRES, BRAKE FAILURE HAZARD, FUEL LINE LEAK..."
-                class="w-full text-xs bg-slate-900 border border-red-905/60 bg-red-950/10 rounded-lg p-2.5 text-red-200 focus:border-red-500"
+                class="w-full text-xs bg-red-50 border border-red-200 rounded-lg p-2.5 text-red-800 focus:border-red-500 focus:bg-white"
               ></textarea>
             </div>
           </div>
         </div>
 
         <!-- Document Attachments Mockups -->
-        <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-850 space-y-3">
-          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400">Media & Diagnostic Audio Notes</h3>
-          <p class="text-[11px] text-slate-400">Optional: Upload scanner output logs, engine sound voice memos, or dashboard warning photos.</p>
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-650">Media & Diagnostic Audio Notes</h3>
+          <p class="text-[11px] text-slate-500">Optional: Upload scanner output logs, engine sound voice memos, or dashboard warning photos.</p>
           <div class="flex flex-wrap gap-3">
-            <button type="button" @click="toast.success('Microphone active: Diagnostic sound memo logged.')" class="px-4 py-2 bg-slate-850 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition">
+            <button type="button" @click="toast.success('Microphone active: Diagnostic sound memo logged.')" class="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-slate-700 rounded-lg text-xs font-bold transition shadow-sm">
               🎤 Record Scanner Audio Memo
             </button>
-            <button type="button" @click="toast.success('Scanner log file attached.')" class="px-4 py-2 bg-slate-850 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition">
+            <button type="button" @click="toast.success('Scanner log file attached.')" class="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-slate-700 rounded-lg text-xs font-bold transition shadow-sm">
               📎 Upload OBD Scanner Log (PDF)
             </button>
           </div>
         </div>
 
         <!-- Save Button -->
-        <div class="flex justify-end gap-3 border-t border-slate-850 pt-4">
+        <div class="flex justify-end gap-3 border-t border-gray-200 pt-4">
           <router-link
             :to="{ name: 'workshop.inspection' }"
-            class="px-4 py-2 border border-slate-700 rounded-lg text-xs font-bold text-slate-450 hover:bg-slate-850 transition"
+            class="px-4 py-2 border border-gray-200 rounded-lg text-xs font-bold text-slate-650 bg-white hover:bg-gray-50 transition shadow-sm"
           >
             Cancel
           </router-link>
           <button
             type="submit"
             :disabled="saving"
-            class="px-6 py-2 bg-indigo-650 hover:bg-indigo-700 text-white rounded-lg text-xs font-black uppercase tracking-wider transition disabled:opacity-50"
+            class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-black uppercase tracking-wider transition disabled:opacity-50"
           >
             {{ saving ? 'Submitting...' : 'Save Inspection Findings' }}
           </button>

@@ -1,26 +1,26 @@
 <template>
-  <div class="space-y-8 p-6 bg-slate-900 min-h-screen text-slate-100">
+  <div class="space-y-8 p-6 bg-slate-50 min-h-screen text-slate-800">
     <!-- Header -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-6">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-200 pb-6">
       <div>
-        <h1 class="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+        <h1 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
           Workshop Operations Hub
           <span class="flex h-3.5 w-3.5 relative">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-indigo-500"></span>
           </span>
         </h1>
-        <p class="text-sm text-slate-400 mt-1">Real-time daily workshop execution cockpit. Monitor vehicle flow from frontdesk intake to delivery handover.</p>
+        <p class="text-sm text-slate-500 mt-1">Real-time daily workshop execution cockpit. Monitor vehicle flow from frontdesk intake to delivery handover.</p>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
         <!-- Realtime Websocket State Badge -->
-        <div class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border bg-slate-950/80 transition-all duration-300" :class="getConnectionBorderClass(connectionState)">
+        <div class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border bg-white transition-all duration-300 shadow-sm" :class="getConnectionBorderClass(connectionState)">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="getConnectionBgClass(connectionState)"></span>
             <span class="relative inline-flex rounded-full h-2 w-2" :class="getConnectionBgClass(connectionState)"></span>
           </span>
-          <span class="text-[9px] font-black uppercase tracking-widest text-slate-300">
+          <span class="text-[9px] font-black uppercase tracking-widest text-slate-650">
             WS: {{ connectionState }}
           </span>
         </div>
@@ -33,7 +33,7 @@
         </router-link>
         <button 
           @click="fetchData" 
-          class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition duration-200 border border-slate-700 shadow-md font-bold text-xs flex items-center gap-2 focus:outline-none"
+          class="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 rounded-xl transition duration-200 border border-slate-200 shadow-sm font-bold text-xs flex items-center gap-2 focus:outline-none"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -44,21 +44,21 @@
     </div>
 
     <!-- Live Queue Horizon (Horizontal Scrolling Kanban Board) -->
-    <div class="flex overflow-x-auto gap-6 pb-6 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-slate-950 min-h-[70vh]">
+    <div class="flex overflow-x-auto gap-6 pb-6 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-slate-100 min-h-[70vh]">
       
       <!-- Queue Column Template -->
       <div 
         v-for="queue in queues" 
         :key="queue.id"
-        class="flex-shrink-0 w-80 bg-slate-950/40 border border-slate-800/80 rounded-3xl p-4 flex flex-col justify-between gap-4 h-[650px]"
+        class="flex-shrink-0 w-80 bg-slate-100/50 border border-slate-200 rounded-3xl p-4 flex flex-col justify-between gap-4 h-[650px] shadow-sm"
       >
         <!-- Column Header -->
-        <div class="flex items-center justify-between border-b border-slate-850 pb-3">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
           <div class="flex items-center gap-2.5">
             <span :class="queue.indicatorColor" class="w-2.5 h-2.5 rounded-full shrink-0"></span>
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-350">{{ queue.name }}</h3>
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-800">{{ queue.name }}</h3>
           </div>
-          <span class="bg-slate-800 text-slate-300 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+          <span class="bg-slate-200 text-slate-700 text-[10px] font-black px-2.5 py-0.5 rounded-full">
             {{ queue.items.length }}
           </span>
         </div>
@@ -70,9 +70,9 @@
             <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Loading...</span>
           </div>
 
-          <div v-else-if="queue.items.length === 0" class="flex flex-col items-center justify-center py-24 text-center border border-dashed border-slate-850 rounded-2xl p-4">
+          <div v-else-if="queue.items.length === 0" class="flex flex-col items-center justify-center py-24 text-center border border-dashed border-slate-200 rounded-2xl p-4">
             <span class="text-2xl mb-2">✔</span>
-            <p class="text-[10px] text-slate-650 font-bold uppercase tracking-wider">Queue Empty</p>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Queue Empty</p>
           </div>
 
           <!-- Queue Cards -->
@@ -80,11 +80,11 @@
             v-else
             v-for="item in queue.items" 
             :key="item.id"
-            class="bg-slate-900/90 border border-slate-800/60 rounded-2xl p-4 hover:border-slate-700/80 transition-all flex flex-col justify-between gap-4 shadow-sm"
+            class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-slate-300 hover:shadow transition-all flex flex-col justify-between gap-4 shadow-sm"
           >
             <div>
               <div class="flex justify-between items-start gap-2">
-                <span class="text-[9px] font-extrabold text-slate-500 font-mono">
+                <span class="text-[9px] font-extrabold text-slate-400 font-mono">
                   ID: #{{ item.idCode }}
                 </span>
                 <span 
@@ -96,30 +96,30 @@
                 </span>
               </div>
 
-              <h4 class="font-extrabold text-white text-sm mt-2">
+              <h4 class="font-extrabold text-slate-800 text-sm mt-2">
                 {{ item.title }}
               </h4>
-              <p class="text-[10px] text-slate-400 font-mono mt-0.5">
+              <p class="text-[10px] text-slate-500 font-mono mt-0.5">
                 Plate: {{ item.plate }}
               </p>
 
               <!-- Secondary Details -->
-              <div class="mt-3 space-y-1.5 border-t border-slate-850 pt-3 text-[10px] text-slate-400">
+              <div class="mt-3 space-y-1.5 border-t border-slate-200 pt-3 text-[10px] text-slate-500">
                 <div class="flex justify-between">
                   <span>Customer:</span>
-                  <span class="font-semibold text-slate-350 truncate max-w-[150px]">{{ item.customerName }}</span>
+                  <span class="font-semibold text-slate-700 truncate max-w-[150px]">{{ item.customerName }}</span>
                 </div>
                 <div v-if="item.bayName" class="flex justify-between">
                   <span>Bay:</span>
-                  <span class="font-semibold text-emerald-450">{{ item.bayName }}</span>
+                  <span class="font-semibold text-emerald-700">{{ item.bayName }}</span>
                 </div>
                 <div v-if="item.assignedTo" class="flex justify-between">
                   <span>Technician:</span>
-                  <span class="font-semibold text-indigo-400">{{ item.assignedTo }}</span>
+                  <span class="font-semibold text-indigo-650">{{ item.assignedTo }}</span>
                 </div>
                 <div v-if="item.cost" class="flex justify-between">
                   <span>Grand Total:</span>
-                  <span class="font-mono font-bold text-slate-200">৳{{ item.cost }}</span>
+                  <span class="font-mono font-bold text-slate-800">৳{{ item.cost }}</span>
                 </div>
               </div>
             </div>
@@ -127,7 +127,7 @@
             <!-- Action Button -->
             <router-link
               :to="queue.actionLink(item)"
-              class="w-full py-2 bg-slate-800 hover:bg-slate-755 text-center text-white rounded-xl font-black text-[10px] uppercase tracking-wider transition-colors border border-slate-700/40"
+              class="w-full py-2 bg-slate-50 hover:bg-slate-100 text-center text-slate-700 rounded-xl font-black text-[10px] uppercase tracking-wider transition-colors border border-slate-200"
             >
               {{ queue.actionLabel }}
             </router-link>
@@ -164,11 +164,11 @@ const { connectionState } = useEcho('workshop-updates', false, {
 });
 
 const getConnectionBorderClass = (state) => {
-  if (state === 'Connected') return 'border-emerald-500/30';
-  if (state === 'Reconnecting') return 'border-amber-500/30';
-  if (state === 'Degraded') return 'border-orange-500/30';
-  if (state === 'Recovering') return 'border-blue-500/30';
-  return 'border-rose-500/30';
+  if (state === 'Connected') return 'border-emerald-200 bg-emerald-50/50';
+  if (state === 'Reconnecting') return 'border-amber-200 bg-amber-50/50';
+  if (state === 'Degraded') return 'border-orange-200 bg-orange-50/50';
+  if (state === 'Recovering') return 'border-blue-200 bg-blue-50/50';
+  return 'border-rose-200 bg-rose-50/50';
 };
 
 const getConnectionBgClass = (state) => {
@@ -208,14 +208,14 @@ const fetchData = async () => {
 
 const getPriorityClass = (priority) => {
   const map = {
-    'low': 'bg-slate-800 text-slate-400',
-    'normal': 'bg-slate-800 text-slate-400',
-    'medium': 'bg-yellow-950 text-yellow-400 border border-yellow-800/40',
-    'high': 'bg-rose-950 text-rose-400 border border-rose-800/40',
-    'critical': 'bg-red-950 text-red-400 border border-red-500/40 animate-pulse',
-    'urgent': 'bg-rose-950 text-rose-400 border border-rose-800/40',
+    'low': 'bg-slate-100 text-slate-500 border border-slate-200',
+    'normal': 'bg-slate-100 text-slate-500 border border-slate-200',
+    'medium': 'bg-yellow-50 text-yellow-700 border border-yellow-250',
+    'high': 'bg-rose-50 text-rose-700 border border-rose-250',
+    'critical': 'bg-red-50 text-red-700 border border-red-250 animate-pulse',
+    'urgent': 'bg-rose-50 text-rose-700 border border-rose-250',
   };
-  return map[priority?.toLowerCase()] || 'bg-slate-800 text-slate-400';
+  return map[priority?.toLowerCase()] || 'bg-slate-100 text-slate-500 border border-slate-200';
 };
 
 // Queue Definitions & Sorting Calculations
@@ -437,13 +437,13 @@ onMounted(() => {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94a3b8;
 }
 </style>

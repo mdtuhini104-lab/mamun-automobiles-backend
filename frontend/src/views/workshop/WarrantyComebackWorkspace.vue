@@ -1,12 +1,12 @@
 <template>
-  <div class="max-w-7xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
+  <div class="max-w-7xl mx-auto space-y-6 p-6 bg-slate-50 border border-slate-200 rounded-3xl shadow-sm text-slate-800 min-h-screen">
     <JobDetailsLayout :jobCard="null" :activeStage="10">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-slate-850 pb-5">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div class="flex items-center space-x-4">
           <div>
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Warranty & Repeat Repair (Comeback) Deck</h1>
-            <p class="text-xs text-slate-400 mt-1">Audit active service warranties, log return repeat repairs (comeback jobs), and monitor technician quality fault indexes.</p>
+            <h1 class="text-2xl font-black tracking-tight text-slate-850 uppercase">Warranty & Repeat Repair (Comeback) Deck</h1>
+            <p class="text-xs text-slate-500 mt-1">Audit active service warranties, log return repeat repairs (comeback jobs), and monitor technician quality fault indexes.</p>
           </div>
         </div>
         <button 
@@ -18,18 +18,18 @@
       </div>
 
     <!-- Mode Selector Tabs -->
-    <div class="flex border-b border-slate-800 gap-6">
+    <div class="flex border-b border-slate-200 gap-6">
       <button 
         @click="activeTab = 'warranties'"
         class="pb-4 text-xs font-black uppercase tracking-wider transition-all focus:outline-none relative"
-        :class="activeTab === 'warranties' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-slate-400 hover:text-slate-200'"
+        :class="activeTab === 'warranties' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'"
       >
         Active Service Warranties ({{ warrantiesList.length }})
       </button>
       <button 
         @click="activeTab = 'comebacks'"
         class="pb-4 text-xs font-black uppercase tracking-wider transition-all focus:outline-none relative"
-        :class="activeTab === 'comebacks' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-slate-400 hover:text-slate-200'"
+        :class="activeTab === 'comebacks' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'"
       >
         Repeat Repairs (Comeback Jobs) ({{ comebacksList.length }})
       </button>
@@ -42,11 +42,11 @@
       </div>
 
       <!-- 1. Warranties List -->
-      <div v-else-if="activeTab === 'warranties'" class="bg-slate-950/20 border border-slate-850 rounded-2xl p-5 shadow-xl">
+      <div v-else-if="activeTab === 'warranties'" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
             <thead>
-              <tr class="border-b border-slate-850 text-slate-500 font-bold uppercase text-[9px] tracking-wider">
+              <tr class="border-b border-slate-200 text-slate-500 font-bold uppercase text-[9px] tracking-wider">
                 <th class="pb-3 pl-2">Job Card</th>
                 <th class="pb-3">Invoice Ref</th>
                 <th class="pb-3">Customer</th>
@@ -55,16 +55,16 @@
                 <th class="pb-3">Status</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-850">
-              <tr v-for="w in warrantiesList" :key="w.id" class="text-slate-350">
-                <td class="py-3.5 pl-2 font-bold text-white font-mono">
+            <tbody class="divide-y divide-slate-200">
+              <tr v-for="w in warrantiesList" :key="w.id" class="text-slate-600">
+                <td class="py-3.5 pl-2 font-bold text-slate-850 font-mono">
                   #JC-{{ String(w.job_card_id).padStart(5, '0') }}
                 </td>
-                <td class="py-3.5 font-mono text-indigo-400">{{ w.invoice?.invoice_number || '-' }}</td>
+                <td class="py-3.5 font-mono text-indigo-650">{{ w.invoice?.invoice_number || '-' }}</td>
                 <td class="py-3.5">{{ w.job_card?.customer?.name }}</td>
                 <td class="py-3.5">
                   {{ w.job_card?.vehicle?.make }} {{ w.job_card?.vehicle?.model }} 
-                  <span class="text-[9px] font-mono text-slate-500">({{ w.job_card?.vehicle?.license_plate || w.job_card?.vehicle?.registration_no }})</span>
+                  <span class="text-[9px] font-mono text-slate-400">({{ w.job_card?.vehicle?.license_plate || w.job_card?.vehicle?.registration_no }})</span>
                 </td>
                 <td class="py-3.5 font-mono">{{ formatDate(w.warranty_expiry_date) }}</td>
                 <td class="py-3.5">
@@ -74,7 +74,7 @@
                 </td>
               </tr>
               <tr v-if="warrantiesList.length === 0">
-                <td colspan="6" class="py-6 text-center text-slate-500 italic">No service warranties active.</td>
+                <td colspan="6" class="py-6 text-center text-slate-400 italic">No service warranties active.</td>
               </tr>
             </tbody>
           </table>
@@ -82,11 +82,11 @@
       </div>
 
       <!-- 2. Comebacks List -->
-      <div v-else-if="activeTab === 'comebacks'" class="bg-slate-950/20 border border-slate-850 rounded-2xl p-5 shadow-xl">
+      <div v-else-if="activeTab === 'comebacks'" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
             <thead>
-              <tr class="border-b border-slate-850 text-slate-500 font-bold uppercase text-[9px] tracking-wider">
+              <tr class="border-b border-slate-200 text-slate-500 font-bold uppercase text-[9px] tracking-wider">
                 <th class="pb-3 pl-2">Log Date</th>
                 <th class="pb-3">Original JC</th>
                 <th class="pb-3">Repeat JC</th>
@@ -94,26 +94,26 @@
                 <th class="pb-3">Technician At Fault</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-850">
-              <tr v-for="cb in comebacksList" :key="cb.id" class="text-slate-350">
-                <td class="py-3.5 pl-2 font-mono text-[10px] text-slate-500">
+            <tbody class="divide-y divide-slate-200">
+              <tr v-for="cb in comebacksList" :key="cb.id" class="text-slate-600">
+                <td class="py-3.5 pl-2 font-mono text-[10px] text-slate-400">
                   {{ formatDate(cb.created_at) }}
                 </td>
-                <td class="py-3.5 font-bold font-mono text-white">
+                <td class="py-3.5 font-bold font-mono text-slate-850">
                   #JC-{{ String(cb.original_job_card_id).padStart(5, '0') }}
                 </td>
-                <td class="py-3.5 font-bold font-mono text-indigo-400">
+                <td class="py-3.5 font-bold font-mono text-indigo-650">
                   #JC-{{ String(cb.comeback_job_card_id).padStart(5, '0') }}
                 </td>
-                <td class="py-3.5 max-w-xs truncate italic text-slate-300">
+                <td class="py-3.5 max-w-xs truncate italic text-slate-700">
                   "{{ cb.reason }}"
                 </td>
-                <td class="py-3.5 text-rose-400 font-bold">
+                <td class="py-3.5 text-rose-650 font-bold">
                   {{ cb.technician_at_fault?.name || 'Workshop Team / Shared' }}
                 </td>
               </tr>
               <tr v-if="comebacksList.length === 0">
-                <td colspan="5" class="py-6 text-center text-slate-500 italic">No repeat repair (comeback) logs registered.</td>
+                <td colspan="5" class="py-6 text-center text-slate-400 italic">No repeat repair (comeback) logs registered.</td>
               </tr>
             </tbody>
           </table>
@@ -122,18 +122,18 @@
     </div>
 
     <!-- File Repeat Comeback Modal -->
-    <div v-if="showComebackModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in">
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl max-w-lg w-full p-6 space-y-4 text-slate-100">
-        <div class="flex justify-between items-center border-b border-slate-850 pb-3">
-          <h3 class="text-sm font-black uppercase tracking-widest text-rose-400">File Repeat Comeback Log</h3>
-          <button @click="showComebackModal = false" class="text-slate-400 hover:text-slate-200">✕</button>
+    <div v-if="showComebackModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+      <div class="bg-white border border-slate-200 rounded-3xl shadow-2xl max-w-lg w-full p-6 space-y-4 text-slate-800">
+        <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+          <h3 class="text-sm font-black uppercase tracking-widest text-rose-650">File Repeat Comeback Log</h3>
+          <button @click="showComebackModal = false" class="text-slate-500 hover:text-slate-700">✕</button>
         </div>
 
         <form @submit.prevent="submitComeback" class="space-y-4 text-xs">
           <!-- Original Job Card -->
           <div>
-            <label class="block text-[10px] text-slate-400 mb-1">Select Original Job Card (Completed) *</label>
-            <select v-model="comebackForm.original_job_card_id" required class="w-full text-xs bg-slate-850 border border-slate-750 rounded-lg p-2.5 text-white">
+            <label class="block text-[10px] text-slate-500 mb-1">Select Original Job Card (Completed) *</label>
+            <select v-model="comebackForm.original_job_card_id" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800">
               <option value="">Select Completed Job Card...</option>
               <option v-for="jc in completedJobs" :key="jc.id" :value="jc.id">
                 #JC-{{ String(jc.id).padStart(5, '0') }} - {{ jc.customer?.name }} ({{ jc.vehicle?.make }} {{ jc.vehicle?.model }} - {{ jc.vehicle?.license_plate }})
@@ -143,8 +143,8 @@
 
           <!-- Comeback Job Card -->
           <div>
-            <label class="block text-[10px] text-slate-400 mb-1">Select New Comeback Job Card (Pending) *</label>
-            <select v-model="comebackForm.comeback_job_card_id" required class="w-full text-xs bg-slate-850 border border-slate-750 rounded-lg p-2.5 text-white">
+            <label class="block text-[10px] text-slate-500 mb-1">Select New Comeback Job Card (Pending) *</label>
+            <select v-model="comebackForm.comeback_job_card_id" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800">
               <option value="">Select New Pending Check-in...</option>
               <option v-for="jc in pendingJobs" :key="jc.id" :value="jc.id">
                 #JC-{{ String(jc.id).padStart(5, '0') }} - {{ jc.customer?.name }} ({{ jc.vehicle?.make }} {{ jc.vehicle?.model }} - {{ jc.vehicle?.license_plate }})
@@ -154,8 +154,8 @@
 
           <!-- Faulty Technician -->
           <div>
-            <label class="block text-[10px] text-slate-400 mb-1">Technician At Fault (For QA statistics) *</label>
-            <select v-model="comebackForm.technician_at_fault_id" required class="w-full text-xs bg-slate-850 border border-slate-750 rounded-lg p-2.5 text-white">
+            <label class="block text-[10px] text-slate-500 mb-1">Technician At Fault (For QA statistics) *</label>
+            <select v-model="comebackForm.technician_at_fault_id" required class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800">
               <option value="">Select Original Technician...</option>
               <option v-for="t in techniciansList" :key="t.id" :value="t.id">
                 {{ t.name }}
@@ -165,19 +165,19 @@
 
           <!-- Reason -->
           <div>
-            <label class="block text-[10px] text-slate-400 mb-1">Comeback/Return Reason * (Min 10 characters)</label>
+            <label class="block text-[10px] text-slate-500 mb-1">Comeback/Return Reason * (Min 10 characters)</label>
             <textarea
               v-model="comebackForm.reason"
               required
               rows="3"
               placeholder="e.g. Front brake squeaking has returned after 5 days of service. Original brake caliper overhaul failed."
-              class="w-full text-xs bg-slate-850 border border-slate-750 rounded-lg p-2.5 text-white"
+              class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800"
             ></textarea>
             <p v-if="comebackForm.reason.length > 0 && comebackForm.reason.length < 10" class="text-[9px] text-rose-500 font-bold">Reason is too short! Supply at least 10 characters.</p>
           </div>
 
-          <div class="flex justify-end gap-3 pt-3 border-t border-slate-850">
-            <button type="button" @click="showComebackModal = false" class="px-4 py-2 border border-slate-700 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-805">Cancel</button>
+          <div class="flex justify-end gap-3 pt-3 border-t border-slate-200">
+            <button type="button" @click="showComebackModal = false" class="px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancel</button>
             <button 
               type="submit" 
               :disabled="saving || comebackForm.reason.length < 10"
@@ -281,11 +281,11 @@ const formatDate = (dateString) => {
 
 const getWarrantyStatusClass = (status) => {
   const map = {
-    'active': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-    'expired': 'bg-slate-800 text-slate-500 border border-slate-700/50',
-    'claimed': 'bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse',
+    'active': 'bg-emerald-50 text-emerald-700 border border-emerald-250',
+    'expired': 'bg-slate-100 text-slate-500 border border-slate-200',
+    'claimed': 'bg-rose-50 text-rose-700 border border-rose-250 animate-pulse',
   };
-  return map[status?.toLowerCase()] || 'bg-slate-850 text-slate-400';
+  return map[status?.toLowerCase()] || 'bg-slate-50 text-slate-500 border border-slate-200';
 };
 
 onMounted(() => {

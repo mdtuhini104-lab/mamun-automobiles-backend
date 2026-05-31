@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
+  <div class="max-w-4xl mx-auto space-y-6 p-6 bg-slate-50 border border-slate-200 rounded-3xl shadow-sm text-slate-800 min-h-screen">
     
     <!-- Fallback Stage Selector -->
     <WorkspaceJobSelector 
@@ -10,24 +10,24 @@
     />
 
     <div v-else-if="loading" class="animate-pulse space-y-6">
-      <div class="h-8 bg-slate-800 rounded w-1/4"></div>
-      <div class="h-96 bg-slate-800 rounded"></div>
+      <div class="h-8 bg-slate-200 rounded w-1/4"></div>
+      <div class="h-96 bg-slate-200 rounded"></div>
     </div>
 
     <JobDetailsLayout v-else-if="jobCard" :jobCard="jobCard" :activeStage="9">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-slate-850 pb-5">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div class="flex items-center space-x-4">
           <div v-if="jobCard">
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Vehicle Handover Delivery</h1>
-            <p class="text-xs text-slate-400 mt-1">JC #{{ String(jobCard.id).padStart(5, '0') }}</p>
+            <h1 class="text-2xl font-black tracking-tight text-slate-800 uppercase">Vehicle Handover Delivery</h1>
+            <p class="text-xs text-slate-500 mt-1">JC #{{ String(jobCard.id).padStart(5, '0') }}</p>
           </div>
         </div>
       </div>
 
     <div v-if="loading" class="animate-pulse space-y-6">
-      <div class="h-8 bg-slate-800 rounded w-1/4"></div>
-      <div class="h-96 bg-slate-800 rounded"></div>
+      <div class="h-8 bg-slate-200 rounded w-1/4"></div>
+      <div class="h-96 bg-slate-200 rounded"></div>
     </div>
 
     <div v-else-if="jobCard" class="space-y-6">
@@ -35,13 +35,13 @@
       <!-- Balance Check Gate (Invoice Settlement Linkage) -->
       <div 
         v-if="invoice && invoice.due_amount > 0" 
-        class="bg-rose-950/20 border border-rose-900/40 p-5 rounded-2xl flex flex-col sm:flex-row justify-between sm:items-center gap-4 animate-in fade-in"
+        class="bg-rose-50 border border-rose-200 p-5 rounded-2xl flex flex-col sm:flex-row justify-between sm:items-center gap-4 animate-in fade-in"
       >
         <div class="space-y-1">
-          <h4 class="text-sm font-black text-rose-400 flex items-center gap-2">
+          <h4 class="text-sm font-black text-rose-700 flex items-center gap-2">
             ⚠️ Outstanding Balance Pending Settlement
           </h4>
-          <p class="text-xs text-slate-400">This vehicle has an active invoice with BDT {{ formatCurrency(invoice.due_amount) }} due. Settle payment before handing over keys.</p>
+          <p class="text-xs text-slate-650">This vehicle has an active invoice with BDT {{ formatCurrency(invoice.due_amount) }} due. Settle payment before handing over keys.</p>
         </div>
         <router-link
           :to="{ name: 'workshop.settlement', params: { id: invoice.id } }"
@@ -53,15 +53,15 @@
 
       <div 
         v-else-if="invoice && invoice.payment_status === 'paid'" 
-        class="bg-emerald-950/10 border border-emerald-900/30 p-4 rounded-2xl text-xs text-emerald-400 font-bold flex items-center gap-2"
+        class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-xs text-emerald-700 font-bold flex items-center gap-2"
       >
         ✔ Invoice Fully Settled & Cleared for Handover (Paid: ৳{{ invoice.paid_amount }})
       </div>
 
-      <div v-else-if="!invoice" class="bg-amber-950/15 border border-amber-900/40 p-5 rounded-2xl flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+      <div v-else-if="!invoice" class="bg-amber-50 border border-amber-250 p-5 rounded-2xl flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div class="space-y-1">
-          <h4 class="text-sm font-black text-amber-400">Invoice Not Generated</h4>
-          <p class="text-xs text-slate-400">Final bill generation is required before key release.</p>
+          <h4 class="text-sm font-black text-amber-700">Invoice Not Generated</h4>
+          <p class="text-xs text-slate-650">Final bill generation is required before key release.</p>
         </div>
         <button
           @click="generateInvoice"
@@ -75,38 +75,38 @@
       <!-- Handover form -->
       <form @submit.prevent="submitHandover" class="space-y-6">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950/40 p-5 rounded-2xl border border-slate-850">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
           <!-- Collector Name -->
           <div class="space-y-4">
-            <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400 font-mono">Receiver Profile</h3>
+            <h3 class="text-xs font-black uppercase tracking-wider text-indigo-600 font-mono">Receiver Profile</h3>
             <div>
-              <label class="block text-[11px] text-slate-400 mb-1">Delivered To (Collector Name) *</label>
+              <label class="block text-[11px] text-slate-500 mb-1">Delivered To (Collector Name) *</label>
               <input
                 v-model="form.delivered_to"
                 type="text"
                 required
                 placeholder="e.g. Mr. Mamunur Rahman (Customer)"
-                class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:bg-white"
               />
             </div>
             <div>
-              <label class="block text-[11px] text-slate-400 mb-1">Handover Clerk Notes</label>
+              <label class="block text-[11px] text-slate-500 mb-1">Handover Clerk Notes</label>
               <textarea
                 v-model="form.notes"
                 rows="3"
                 placeholder="Details of returned worn parts (brake pads/spark plugs) returned to customer, or visual check feedback..."
-                class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white"
+                class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:bg-white"
               ></textarea>
             </div>
           </div>
 
           <!-- Digital signature pad -->
           <div class="space-y-2">
-            <div class="flex justify-between items-center text-xs text-slate-400">
+            <div class="flex justify-between items-center text-xs text-slate-500">
               <label>Customer Handover Sign-off Signature *</label>
-              <button type="button" @click="clearSignature" class="text-rose-400 hover:text-rose-350 text-[10px] font-bold uppercase">Clear Pad</button>
+              <button type="button" @click="clearSignature" class="text-rose-650 hover:text-rose-500 text-[10px] font-bold uppercase">Clear Pad</button>
             </div>
-            <div class="border border-slate-800 rounded-xl bg-slate-900/80 overflow-hidden flex items-center justify-center">
+            <div class="border border-slate-200 rounded-xl bg-slate-50 overflow-hidden flex items-center justify-center">
               <canvas
                 ref="sigCanvas"
                 width="360"
@@ -121,19 +121,19 @@
                 class="w-full h-[150px] cursor-crosshair"
               ></canvas>
             </div>
-            <p class="text-[10px] text-slate-500 italic">Sign on the touch pad using a mouse, pointer, or touch device.</p>
+            <p class="text-[10px] text-slate-400 italic">Sign on the touch pad using a mouse, pointer, or touch device.</p>
           </div>
         </div>
 
         <!-- Handover photographs -->
-        <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-850 space-y-4">
-          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400">Delivery Photograph Verification</h3>
-          <p class="text-[11px] text-slate-400">Optional: Record photo of the vehicle key handover or departing the service bay.</p>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-600">Delivery Photograph Verification</h3>
+          <p class="text-[11px] text-slate-500">Optional: Record photo of the vehicle key handover or departing the service bay.</p>
           <div class="flex items-center gap-4">
             <button
               type="button"
               @click="mockPhotoUpload"
-              class="w-20 h-20 border-2 border-dashed border-slate-700 hover:border-slate-500 hover:text-slate-300 rounded-2xl flex items-center justify-center text-slate-500 text-xl font-bold transition"
+              class="w-20 h-20 border-2 border-dashed border-slate-200 hover:border-slate-400 hover:text-slate-600 rounded-2xl flex items-center justify-center text-slate-400 text-xl font-bold transition bg-slate-50"
             >
               +
             </button>
@@ -141,7 +141,7 @@
               <div
                 v-for="(photo, idx) in form.delivery_photos"
                 :key="idx"
-                class="w-20 h-20 rounded-2xl bg-cover bg-center border border-slate-750 relative shadow"
+                class="w-20 h-20 rounded-2xl bg-cover bg-center border border-slate-200 relative shadow-sm"
                 :style="{ backgroundImage: `url(${photo})` }"
               >
                 <button
@@ -157,10 +157,10 @@
         </div>
 
         <!-- Save Button -->
-        <div class="flex justify-end gap-3 border-t border-slate-850 pt-4">
+        <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
           <router-link
             :to="{ name: 'workshop.hub' }"
-            class="px-4 py-2 border border-slate-700 rounded-lg text-xs font-bold text-slate-450 hover:bg-slate-850 transition"
+            class="px-4 py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
           >
             Cancel
           </router-link>
@@ -261,7 +261,7 @@ const generateInvoice = async () => {
 const initCtx = () => {
   if (!ctx && sigCanvas.value) {
     ctx = sigCanvas.value.getContext('2d');
-    ctx.strokeStyle = '#34d399'; // Emerald signature line ink
+    ctx.strokeStyle = '#4f46e5'; // Indigo signature line ink
     ctx.lineWidth = 3.0;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';

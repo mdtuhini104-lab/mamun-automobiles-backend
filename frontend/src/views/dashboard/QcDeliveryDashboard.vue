@@ -501,7 +501,7 @@ const drawTouch = (e) => {
 const initCtx = () => {
   if (!ctx && sigCanvas.value) {
     ctx = sigCanvas.value.getContext('2d');
-    ctx.strokeStyle = '#1e1b4b'; // Deep Navy color for signature ink
+    ctx.strokeStyle = '#4f46e5'; // Indigo signature line ink
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';

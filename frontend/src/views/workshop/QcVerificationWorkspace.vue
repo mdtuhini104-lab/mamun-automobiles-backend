@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto space-y-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100 min-h-screen">
+  <div class="max-w-4xl mx-auto space-y-6 p-6 bg-slate-50 border border-slate-200 rounded-3xl shadow-sm text-slate-800 min-h-screen">
     
     <!-- Fallback Stage Selector -->
     <WorkspaceJobSelector 
@@ -10,60 +10,60 @@
     />
 
     <div v-else-if="loading" class="animate-pulse space-y-6">
-      <div class="h-8 bg-slate-800 rounded w-1/4"></div>
-      <div class="h-96 bg-slate-800 rounded"></div>
+      <div class="h-8 bg-slate-200 rounded w-1/4"></div>
+      <div class="h-96 bg-slate-200 rounded"></div>
     </div>
 
     <JobDetailsLayout v-else-if="workOrder" :jobCard="workOrder?.job_card || null" :activeStage="7">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-slate-850 pb-5">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-5">
         <div class="flex items-center space-x-4">
           <div v-if="workOrder">
-            <h1 class="text-2xl font-black tracking-tight text-white uppercase">Quality Control Inspection</h1>
-            <p class="text-xs text-slate-400 mt-1">WO #{{ workOrder.id }}</p>
+            <h1 class="text-2xl font-black tracking-tight text-slate-800 uppercase">Quality Control Inspection</h1>
+            <p class="text-xs text-slate-500 mt-1">WO #{{ workOrder.id }}</p>
           </div>
         </div>
       </div>
 
     <div v-if="loading" class="animate-pulse space-y-6">
-      <div class="h-8 bg-slate-800 rounded w-1/4"></div>
-      <div class="h-96 bg-slate-800 rounded"></div>
+      <div class="h-8 bg-slate-200 rounded w-1/4"></div>
+      <div class="h-96 bg-slate-200 rounded"></div>
     </div>
 
     <div v-else-if="workOrder">
       <form @submit.prevent="submitQcReport" class="space-y-6">
         
         <!-- QC Checklist -->
-        <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-850 space-y-4">
-          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400">Mechanical Checklist Verification</h3>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-600">Mechanical Checklist Verification</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label 
               v-for="(checked, key) in form.checklist" 
               :key="key"
-              class="flex items-center gap-3 p-3 bg-slate-900 border border-slate-800 rounded-xl hover:border-slate-700 cursor-pointer transition"
+              class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-100 cursor-pointer transition"
             >
               <input 
                 type="checkbox" 
                 v-model="form.checklist[key]"
-                class="w-4 h-4 text-indigo-650 bg-slate-950 border-slate-750 rounded"
+                class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded"
               />
-              <span class="text-xs font-bold text-slate-350 capitalize">{{ key.replace('_', ' ') }} verified</span>
+              <span class="text-xs font-bold text-slate-700 capitalize">{{ key.replace('_', ' ') }} verified</span>
             </label>
           </div>
         </div>
 
         <!-- Road Test details -->
-        <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-850 space-y-5">
-          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400">Road Test Performance Validation</h3>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-5 shadow-sm">
+          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-600">Road Test Performance Validation</h3>
           
           <div class="space-y-2">
-            <label class="block text-xs text-slate-400">Was a dynamic road test performed? *</label>
+            <label class="block text-xs text-slate-500">Was a dynamic road test performed? *</label>
             <div class="flex gap-4">
               <button 
                 type="button"
                 @click="form.road_test_performed = true"
                 class="flex-1 py-3 rounded-xl font-bold text-xs border transition"
-                :class="form.road_test_performed ? 'bg-indigo-600/10 border-indigo-500 text-indigo-400' : 'bg-slate-900 border-slate-800 text-slate-400'"
+                :class="form.road_test_performed ? 'bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-slate-50 border-slate-200 text-slate-500'"
               >
                 Yes, Road Test Executed
               </button>
@@ -71,7 +71,7 @@
                 type="button"
                 @click="form.road_test_performed = false"
                 class="flex-1 py-3 rounded-xl font-bold text-xs border transition"
-                :class="!form.road_test_performed ? 'bg-indigo-600/10 border-indigo-500 text-indigo-400' : 'bg-slate-900 border-slate-800 text-slate-400'"
+                :class="!form.road_test_performed ? 'bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-slate-50 border-slate-200 text-slate-500'"
               >
                 No, Road Test Skipped
               </button>
@@ -79,27 +79,27 @@
           </div>
 
           <div>
-            <label class="block text-xs text-slate-400 mb-1">Road Test & Visual Inspection Notes *</label>
+            <label class="block text-xs text-slate-500 mb-1">Road Test & Visual Inspection Notes *</label>
             <textarea
               v-model="form.road_test_notes"
               required
               rows="3"
               placeholder="Record steering responsiveness, alignment, brake response, and engine telemetry observations during the test..."
-              class="w-full text-xs bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white animate-in"
+              class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 focus:bg-white animate-in"
             ></textarea>
           </div>
         </div>
 
         <!-- Verdict selection -->
-        <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-850 space-y-4">
-          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400">Final Supervisor Verdict</h3>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+          <h3 class="text-xs font-black uppercase tracking-wider text-indigo-600">Final Supervisor Verdict</h3>
           
           <div class="flex gap-4">
             <button 
               type="button"
               @click="form.status = 'passed'"
               class="flex-1 py-4 rounded-2xl font-bold text-xs border flex items-center justify-center gap-2 transition"
-              :class="form.status === 'passed' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400 ring-2 ring-emerald-500/20' : 'bg-slate-900 border-slate-800 text-slate-450'"
+              :class="form.status === 'passed' ? 'bg-emerald-50 border-emerald-500 text-emerald-700 ring-2 ring-emerald-500/20' : 'bg-slate-50 border-slate-200 text-slate-500'"
             >
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
               Inspection Passed (Mark Ready for Delivery)
@@ -108,7 +108,7 @@
               type="button"
               @click="form.status = 'failed'"
               class="flex-1 py-4 rounded-2xl font-bold text-xs border flex items-center justify-center gap-2 transition"
-              :class="form.status === 'failed' ? 'bg-rose-500/10 border-rose-500 text-rose-400 ring-2 ring-rose-500/20' : 'bg-slate-900 border-slate-800 text-slate-450'"
+              :class="form.status === 'failed' ? 'bg-rose-50 border-rose-500 text-rose-700 ring-2 ring-rose-500/20' : 'bg-slate-50 border-slate-200 text-slate-500'"
             >
               <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
               Inspection Failed (Revert to Workshop)
@@ -117,10 +117,10 @@
         </div>
 
         <!-- Submit actions -->
-        <div class="flex justify-end gap-3 border-t border-slate-850 pt-4">
+        <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
           <router-link
             :to="{ name: 'workshop.hub' }"
-            class="px-4 py-2 border border-slate-700 rounded-lg text-xs font-bold text-slate-405 hover:bg-slate-850 transition"
+            class="px-4 py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
           >
             Cancel
           </router-link>

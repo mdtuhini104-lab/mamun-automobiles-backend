@@ -1,15 +1,11 @@
 <template>
-  <div class="bg-slate-950/60 backdrop-blur-md border border-slate-800/80 rounded-3xl p-5 shadow-2xl relative overflow-hidden">
-    <!-- Glow effects -->
-    <div class="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
+  <div class="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm relative overflow-hidden">
     <div class="relative">
       <div class="flex justify-between items-center mb-4">
         <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 font-mono">
           Workflow Lifecycle Pipeline
         </span>
-        <span class="text-[10px] bg-indigo-500/10 text-indigo-400 font-extrabold px-3 py-0.5 rounded-full border border-indigo-500/20 uppercase">
+        <span class="text-[10px] bg-indigo-50 text-indigo-700 font-extrabold px-3 py-0.5 rounded-full border border-indigo-100 uppercase">
           Stage {{ activeIndex }} of 10: {{ stages[activeIndex - 1]?.name }}
         </span>
       </div>
@@ -18,7 +14,7 @@
       <div class="relative flex items-center justify-between mt-6 w-full px-2 overflow-x-auto pb-4 scrollbar-thin">
         
         <!-- Connecting Progress Bar Line -->
-        <div class="absolute left-6 right-6 h-0.5 bg-slate-800 top-[18px] -z-10"></div>
+        <div class="absolute left-6 right-6 h-0.5 bg-gray-100 top-[18px] -z-10"></div>
         <div 
           class="absolute left-6 h-0.5 bg-gradient-to-r from-indigo-500 to-emerald-500 top-[18px] -z-10 transition-all duration-550"
           :style="{ width: progressBarWidth }"
@@ -35,9 +31,9 @@
           <div 
             class="w-9_5 h-9_5 rounded-full flex items-center justify-center font-mono text-[10px] font-black border-2 transition-all duration-300 relative"
             :class="[
-              idx + 1 < activeIndex ? 'bg-gradient-to-br from-indigo-500 to-indigo-650 border-indigo-400 text-white shadow-[0_0_12px_rgba(99,102,241,0.3)]' : '',
-              idx + 1 === activeIndex ? 'bg-slate-900 border-indigo-500 text-indigo-400 ring-4 ring-indigo-500/20 shadow-[0_0_20px_rgba(99,102,241,0.5)] animate-pulse' : '',
-              idx + 1 > activeIndex ? 'bg-slate-950 border-slate-800 text-slate-650' : ''
+              idx + 1 < activeIndex ? 'bg-indigo-600 border-indigo-650 text-white shadow-sm' : '',
+              idx + 1 === activeIndex ? 'bg-indigo-50 border-indigo-600 text-indigo-600 ring-4 ring-indigo-100' : '',
+              idx + 1 > activeIndex ? 'bg-white border-gray-200 text-gray-400' : ''
             ]"
           >
             <!-- Tick mark for completed steps -->
@@ -56,9 +52,9 @@
           <span 
             class="text-[9px] font-extrabold mt-2.5 uppercase tracking-wide transition-colors"
             :class="[
-              idx + 1 < activeIndex ? 'text-indigo-350' : '',
-              idx + 1 === activeIndex ? 'text-white font-black' : '',
-              idx + 1 > activeIndex ? 'text-slate-600' : ''
+              idx + 1 < activeIndex ? 'text-indigo-600' : '',
+              idx + 1 === activeIndex ? 'text-slate-800 font-bold' : '',
+              idx + 1 > activeIndex ? 'text-gray-400' : ''
             ]"
           >
             {{ stage.name }}
