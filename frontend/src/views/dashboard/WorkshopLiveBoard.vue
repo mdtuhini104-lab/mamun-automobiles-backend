@@ -134,7 +134,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import api from '../../services/api';
-import { getEcho } from '../../services/echo';
+import { useEcho } from '../../composables/useEcho';
 import { useToastStore } from '../../stores/toast';
 
 const toast = useToastStore();
@@ -167,25 +167,18 @@ const handleRealtimeRefresh = (eventName) => {
   fetchLiveBoard();
 };
 
-let echoInstance = null;
-
-const setupEchoListener = () => {
-  try {
-    echoInstance = getEcho();
-    if (!echoInstance) return;
-
-    echoInstance.channel('workshop-updates')
-      .listen('.quotation.approved', () => handleRealtimeRefresh('Quotation Approved'))
-      .listen('.workorder.created', () => handleRealtimeRefresh('Work Order Created'))
-      .listen('.technician.assigned', () => handleRealtimeRefresh('Technician Assigned'))
-      .listen('.task.started', () => handleRealtimeRefresh('Task Started'))
-      .listen('.task.completed', () => handleRealtimeRefresh('Task Completed'))
-      .listen('.consumption.added', () => handleRealtimeRefresh('Materials Consumed'))
-      .listen('.vehicle.delivered', () => handleRealtimeRefresh('Vehicle Delivered'));
-  } catch (err) {
-    console.error('Failed to bind reverb websocket channels:', err);
-  }
-};
+const { connectionState } = useEcho('workshop-updates', false, {
+  '.quotation.approved': () => handleRealtimeRefresh('Quotation Approved'),
+  '.workorder.created': () => handleRealtimeRefresh('Work Order Created'),
+  '.technician.assigned': () => handleRealtimeRefresh('Technician Assigned'),
+  '.task.started': () => handleRealtimeRefresh('Task Started'),
+  '.task.completed': () => handleRealtimeRefresh('Task Completed'),
+  '.consumption.added': () => handleRealtimeRefresh('Materials Consumed'),
+  '.vehicle.delivered': () => handleRealtimeRefresh('Vehicle Delivered')
+}, {
+  callback: fetchLiveBoard,
+  interval: 20
+});
 
 const getPriorityClass = (priority) => {
   const map = {
@@ -310,17 +303,10 @@ const kanbanColumns = computed(() => {
 
 onMounted(() => {
   fetchLiveBoard();
-  setupEchoListener();
 });
 
 onUnmounted(() => {
-  try {
-    if (echoInstance) {
-      echoInstance.leaveChannel('workshop-updates');
-    }
-  } catch (err) {
-    console.error('Failed to leave reverb channels on unmount:', err);
-  }
+  // useEcho handles cleanup automatically
 });
 </script>
 

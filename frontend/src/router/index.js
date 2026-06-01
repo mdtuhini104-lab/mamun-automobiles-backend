@@ -518,7 +518,11 @@ router.beforeEach(async (to, from, next) => {
       next();
     } else {
       console.warn('Access denied to route:', to.path);
-      next({ name: 'dashboard-home' }); // or an unauthorized page
+      if (to.name === 'dashboard-home') {
+        next({ name: 'login' });
+      } else {
+        next({ name: 'dashboard-home' });
+      }
     }
   } else {
     next();

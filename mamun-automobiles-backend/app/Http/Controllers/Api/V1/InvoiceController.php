@@ -69,9 +69,14 @@ class InvoiceController extends Controller
         
         $this->authorize('view', $invoice);
         
-        \App\Jobs\GeneratePDFInvoiceJob::dispatch($invoice->id);
+        try {
+            \App\Jobs\GeneratePDFInvoiceJob::dispatch($invoice->id);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("Queue dispatch failed, falling back to sync: " . $e->getMessage());
+            \App\Jobs\GeneratePDFInvoiceJob::dispatchSync($invoice->id);
+        }
         
-        return $this->successResponse(null, 'Invoice PDF generation and email has been queued successfully');
+        return $this->successResponse(null, 'Invoice PDF generation has been processed');
     }
 
     /**

@@ -50,9 +50,25 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
     setupRealtimeListener() {
+      // Global polling fallback handler for notifications
+      let pollingInterval = null;
+      const startPolling = () => {
+        if (!pollingInterval && import.meta.env.VITE_ENABLE_POLLING_FALLBACK !== 'false') {
+          console.warn('[Notifications] Starting polling fallback (20s)');
+          pollingInterval = setInterval(() => {
+            this.fetchNotifications();
+          }, 20000); // 20s
+        }
+      };
+
+      window.addEventListener('websocket:fallback', startPolling);
+
       try {
         const echo = getEcho();
-        if (!echo) return;
+        if (!echo) {
+          startPolling();
+          return;
+        }
 
         // Listen on the public workshop-updates channel
         echo.channel('workshop-updates')
@@ -70,6 +86,7 @@ export const useNotificationStore = defineStore('notification', {
 
       } catch (err) {
         console.error('Failed to initialize Reverb listener in store:', err);
+        startPolling();
       }
     },
     handleIncomingRealtimeEvent(eventData, title) {

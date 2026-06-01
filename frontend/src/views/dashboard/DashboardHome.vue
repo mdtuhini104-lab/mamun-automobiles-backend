@@ -493,7 +493,7 @@ useDashboardSocket((newData) => {
     dashboardData.value = { ...dashboardData.value, ...newData };
   }
   refreshDataSilently();
-});
+}, refreshDataSilently);
 
 useInvoiceSocket(() => { refreshDataSilently(); });
 usePurchaseSocket(() => { refreshDataSilently(); });

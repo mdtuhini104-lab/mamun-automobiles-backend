@@ -1,14 +1,41 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import { getEcho } from '../services/echo';
 
-export function useEcho(channelName, isPrivate = true, events = {}) {
+export function useEcho(channelName, isPrivate = true, events = {}, pollingConfig = null) {
   const isConnected = ref(false);
   const connectionState = ref('Disconnected'); // Connected, Reconnecting, Disconnected, Degraded
   let channelInstance = null;
+  let pollingIntervalId = null;
   const echo = getEcho();
+
+  const startPolling = () => {
+    if (!pollingConfig || !pollingConfig.callback) return;
+    
+    // Check global polling feature flag
+    if (import.meta.env.VITE_ENABLE_POLLING_FALLBACK === 'false') return;
+
+    if (!pollingIntervalId) {
+      console.warn(`[${channelName}] WebSocket degraded, starting polling fallback (Interval: ${pollingConfig.interval || 30}s)`);
+      // Initial call
+      pollingConfig.callback();
+      // Setup interval
+      pollingIntervalId = setInterval(() => {
+        pollingConfig.callback();
+      }, (pollingConfig.interval || 30) * 1000);
+    }
+  };
+
+  const stopPolling = () => {
+    if (pollingIntervalId) {
+      clearInterval(pollingIntervalId);
+      pollingIntervalId = null;
+      console.info(`[${channelName}] WebSocket recovered, stopped polling.`);
+    }
+  };
 
   const handleStateChange = (state) => {
     if (state === 'connected') {
+      stopPolling();
       if (connectionState.value === 'Reconnecting' || connectionState.value === 'Degraded') {
         connectionState.value = 'Recovering';
         isConnected.value = true;
@@ -26,6 +53,7 @@ export function useEcho(channelName, isPrivate = true, events = {}) {
     } else if (state === 'unavailable' || state === 'failed') {
       connectionState.value = 'Degraded';
       isConnected.value = false;
+      startPolling();
     } else {
       connectionState.value = 'Disconnected';
       isConnected.value = false;
@@ -33,7 +61,13 @@ export function useEcho(channelName, isPrivate = true, events = {}) {
   };
 
   onMounted(() => {
-    if (!echo) return;
+    if (!echo) {
+      // Realtime disabled or unsupported entirely, immediately fall back to polling
+      connectionState.value = 'Degraded';
+      isConnected.value = false;
+      startPolling();
+      return;
+    }
 
     // Listen to connection state events if using Pusher/Reverb
     if (echo.connector && echo.connector.pusher && echo.connector.pusher.connection) {
@@ -60,7 +94,8 @@ export function useEcho(channelName, isPrivate = true, events = {}) {
   });
 
   onUnmounted(() => {
-    if (channelInstance) {
+    stopPolling();
+    if (channelInstance && echo) {
       Object.keys(events).forEach((eventName) => {
         channelInstance.stopListening(eventName);
       });
