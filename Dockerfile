@@ -8,9 +8,13 @@ RUN apk add --no-cache \
     zip \
     unzip \
     git \
-    oniguruma-dev
+    oniguruma-dev \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev
 
-RUN docker-php-ext-install pdo_mysql pdo_pgsql zip mbstring bcmath
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install pdo_mysql pdo_pgsql zip mbstring bcmath gd pcntl
 
 # Redis driver setup
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
