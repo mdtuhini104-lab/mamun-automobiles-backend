@@ -1,5 +1,5 @@
 # Multi-stage production packaging
-FROM php:8.2-fpm-alpine AS base
+FROM php:8.3-fpm-alpine AS base
 
 # Install extensions
 RUN apk add --no-cache \
