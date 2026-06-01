@@ -13,7 +13,8 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     libpng-dev \
     nginx \
-    gettext
+    gettext \
+    supervisor
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install pdo_mysql pdo_pgsql zip mbstring bcmath gd pcntl
@@ -35,11 +36,6 @@ FROM base AS developer
 # Copy Laravel backend source files BEFORE composer install
 COPY mamun-automobiles-backend/ .
 
-# Temporary debug verification
-RUN pwd
-RUN ls -la
-RUN ls -la /var/www/html
-
 # Final Build Sequence
 RUN composer install --no-dev
 RUN composer dump-autoload --optimize
@@ -50,16 +46,20 @@ FROM base AS runner
 WORKDIR /var/www/html
 COPY --from=developer /var/www/html .
 
-# Setup Nginx & Start Script
+# Setup Nginx, Supervisor & Start Script
 COPY nginx-railway.conf /etc/nginx/nginx.conf.template
+COPY supervisord.conf /etc/supervisord.conf
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-# Ensure storage permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache || true
+# Force PHP-FPM to listen on 127.0.0.1:9000 strictly to match nginx
+RUN echo "listen = 127.0.0.1:9000" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Remove default nginx config if exists
 RUN rm -f /etc/nginx/conf.d/default.conf
 
-# Start script will handle nginx and php-fpm
+# Ensure storage permissions during build
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache || true
+
+# Start script will handle envsubst and start supervisord
 CMD ["/usr/local/bin/start.sh"]
