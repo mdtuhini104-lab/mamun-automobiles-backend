@@ -52,14 +52,19 @@ COPY supervisord.conf /etc/supervisord.conf
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-# Force PHP-FPM to listen on 127.0.0.1:9000 strictly to match nginx
-RUN echo "listen = 127.0.0.1:9000" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+# Force PHP-FPM to use UNIX socket and not clear env vars
+RUN echo "listen = /var/run/php-fpm.sock" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
+    && echo "listen.owner = root" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
+    && echo "listen.group = root" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
+    && echo "listen.mode = 0666" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
+    && echo "clear_env = no" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
+    && echo "catch_workers_output = yes" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Remove default nginx config if exists
 RUN rm -f /etc/nginx/conf.d/default.conf
 
 # Ensure storage permissions during build
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache || true
+RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache || true
 
 # Start script will handle envsubst and start supervisord
 CMD ["/usr/local/bin/start.sh"]
