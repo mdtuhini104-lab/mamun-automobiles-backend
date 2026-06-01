@@ -29,32 +29,24 @@ class DashboardRepository extends BaseRepository
 
     public function getMonthlySales(): array
     {
-        $invoices = Invoice::whereYear('created_at', date('Y'))->get();
-        $monthlyData = [];
-        foreach ($invoices as $invoice) {
-            if (!$invoice->created_at) {
-                continue;
-            }
-            try {
-                $createdAt = $invoice->created_at instanceof \Carbon\Carbon 
-                    ? $invoice->created_at 
-                    : \Carbon\Carbon::parse($invoice->created_at);
-                
-                $month = $createdAt->format('n');
-                if (!isset($monthlyData[$month])) {
-                    $monthlyData[$month] = 0;
-                }
-                $monthlyData[$month] += $invoice->grand_total;
-            } catch (\Exception $e) {
-                continue;
-            }
+        $driver = DB::getDriverName();
+        if ($driver === 'sqlite') {
+            $invoices = Invoice::selectRaw("CAST(strftime('%m', created_at) AS INTEGER) as month, SUM(grand_total) as total")
+                ->whereYear('created_at', date('Y'))
+                ->groupBy('month')
+                ->get();
+        } else {
+            $invoices = Invoice::selectRaw('MONTH(created_at) as month, SUM(grand_total) as total')
+                ->whereYear('created_at', date('Y'))
+                ->groupBy('month')
+                ->get();
         }
 
         $result = [];
-        foreach ($monthlyData as $month => $total) {
+        foreach ($invoices as $invoice) {
             $result[] = [
-                'month' => $month,
-                'total' => $total,
+                'month' => (int)$invoice->month,
+                'total' => (float)$invoice->total,
             ];
         }
 

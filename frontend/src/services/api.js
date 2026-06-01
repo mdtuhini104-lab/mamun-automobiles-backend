@@ -29,7 +29,7 @@ api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined' && !navigator.onLine && config.method !== 'get') {
     const queue = JSON.parse(localStorage.getItem('mamun_offline_queue') || '[]');
     // Prevent duplicate entries for exact same payload
-    const isDuplicate = queue.some(q => q.url === config.url && JSON.stringify(q.data) === JSON.stringify(config.data));
+    const isDuplicate = queue.some(q => q.url === config.url && q.method === config.method && JSON.stringify(q.data || {}) === JSON.stringify(config.data || {}));
     if (!isDuplicate) {
       queue.push({
         url: config.url,
@@ -143,14 +143,17 @@ if (typeof window !== 'undefined') {
       } catch (err) {
         console.error('Failed to sync offline action:', req, err);
         const status = err.response?.status;
-        const isNetworkOrServerError = !err.response || status >= 500 || status === 408;
+        const errorMsgText = (err.response?.data?.message || err.message || '').toLowerCase();
+        // Treat 409 Conflict, 429 Too Many Requests, and direct database locks/deadlocks as temporary, retrying them later
+        const isLockError = errorMsgText.includes('lock') || errorMsgText.includes('deadlock') || errorMsgText.includes('conflict') || status === 409 || status === 429;
+        const isNetworkOrServerError = !err.response || status >= 500 || status === 408 || isLockError;
 
         if (isNetworkOrServerError) {
           remainingQueue.push(req);
           serverDisconnected = true;
           try {
             const toast = useToastStore();
-            toast.warning('Network sync paused. Temporary connection disruption.');
+            toast.warning('Network sync paused. Temporary connection disruption or database busy.');
           } catch (e) {}
         } else {
           failedCount++;

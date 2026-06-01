@@ -23,6 +23,9 @@ export const initEcho = () => {
         Authorization: 'Bearer ' + localStorage.getItem('token'),
       },
     },
+    // Heartbeat configuration for fast stale connection detection
+    activityTimeout: 20000,
+    pongTimeout: 8000,
   });
 };
 

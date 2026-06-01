@@ -313,12 +313,26 @@
             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 text-xs">▼</div>
           </div>
 
-          <!-- Latency Indicator -->
+          <!-- Latency / WebSocket Connection Indicator -->
           <span 
-            class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide border border-emerald-250 bg-emerald-50 text-emerald-700"
+            class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black tracking-wide border transition-all duration-200"
+            :class="{
+              'border-emerald-200 bg-emerald-50 text-emerald-700': wsStatus === 'connected',
+              'border-amber-200 bg-amber-50 text-amber-700': wsStatus === 'reconnecting',
+              'border-rose-200 bg-rose-50 text-rose-700': wsStatus === 'offline'
+            }"
           >
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>WS LIVE (14ms)</span>
+            <span 
+              class="w-1.5 h-1.5 rounded-full"
+              :class="{
+                'bg-emerald-500 animate-pulse': wsStatus === 'connected',
+                'bg-amber-500 animate-ping': wsStatus === 'reconnecting',
+                'bg-rose-500': wsStatus === 'offline'
+              }"
+            ></span>
+            <span>
+              {{ wsStatus === 'connected' ? 'WS LIVE' : wsStatus === 'reconnecting' ? 'RECONNECTING...' : 'OFFLINE' }}
+            </span>
           </span>
 
           <!-- Command Search Button -->
@@ -350,13 +364,25 @@
             @click="showQuickActions = true"
             class="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10.5px] font-black tracking-wide shadow-sm shadow-indigo-150 transition"
           >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             <span class="hidden sm:inline">Actions</span>
           </button>
         </div>
       </header>
+
+      <!-- Reconnect/Offline Alert Banner -->
+      <div 
+        v-if="wsStatus !== 'connected'"
+        class="text-white text-[10px] font-black uppercase tracking-widest text-center py-2 px-4 select-none shrink-0 flex items-center justify-center gap-2 transition-all duration-300 z-40"
+        :class="wsStatus === 'offline' ? 'bg-rose-600' : 'bg-amber-500'"
+      >
+        <span class="animate-bounce">⚠️</span>
+        <span>
+          {{ wsStatus === 'offline' ? 'Offline: Connection lost. Replaying offline queue when online.' : 'Reconnecting to Reverb live synchronization queue...' }}
+        </span>
+      </div>
 
       <!-- Recents Quick-Links bar -->
       <div v-if="recentPages.length > 0" class="bg-slate-100/50 border-b border-slate-200 px-6 py-1 flex items-center gap-2 text-[9px] text-slate-400 font-black select-none shrink-0 overflow-x-auto">
@@ -404,51 +430,51 @@
       </div>
 
       <!-- BOTTOM NAVIGATION BAR (Mobile quick-nav) -->
-      <div class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 py-1.5 px-6 flex justify-between items-center z-45 shadow-lg select-none">
+      <div class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 px-4 flex justify-between items-center z-45 shadow-lg select-none h-[56px]">
         <router-link 
           :to="{ name: 'dashboard-home' }"
-          class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-indigo-600"
+          class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-650 flex-1 min-h-[48px] px-2"
           active-class="!text-indigo-600 font-bold"
         >
-          <span class="text-sm">🏠</span>
-          <span class="text-[9px]">Home</span>
+          <span class="text-base">🏠</span>
+          <span class="text-[9px] mt-0.5">Home</span>
         </router-link>
         
         <router-link 
           :to="{ name: 'workshop.technician-tasks' }"
           v-show="authStore.hasRole('Technician') || authStore.hasRole('Super Admin') || authStore.hasRole('Manager')"
-          class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-indigo-600"
+          class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-650 flex-1 min-h-[48px] px-2"
           active-class="!text-indigo-600 font-bold"
         >
-          <span class="text-sm">🛠️</span>
-          <span class="text-[9px]">Tasks</span>
+          <span class="text-base">🛠️</span>
+          <span class="text-[9px] mt-0.5">Tasks</span>
         </router-link>
 
         <router-link 
           :to="{ name: 'workshop.intake' }"
           v-show="authStore.hasRole('Frontdesk') || authStore.hasRole('Super Admin') || authStore.hasRole('Manager')"
-          class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-indigo-600"
+          class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-650 flex-1 min-h-[48px] px-2"
           active-class="!text-indigo-600 font-bold"
         >
-          <span class="text-sm">📋</span>
-          <span class="text-[9px]">Intake</span>
+          <span class="text-base">📋</span>
+          <span class="text-[9px] mt-0.5">Intake</span>
         </router-link>
 
         <router-link 
           :to="{ name: 'workshop.inspection' }"
-          class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-indigo-600"
+          class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-650 flex-1 min-h-[48px] px-2"
           active-class="!text-indigo-600 font-bold"
         >
-          <span class="text-sm">🔍</span>
-          <span class="text-[9px]">Inspect</span>
+          <span class="text-base">🔍</span>
+          <span class="text-[9px] mt-0.5">Inspect</span>
         </router-link>
 
         <button 
           @click="showCommandPalette = true"
-          class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-indigo-600"
+          class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-650 flex-1 min-h-[48px] px-2"
         >
-          <span class="text-sm">🔎</span>
-          <span class="text-[9px]">Search</span>
+          <span class="text-base">🔎</span>
+          <span class="text-[9px] mt-0.5">Search</span>
         </button>
       </div>
     </main>
@@ -550,14 +576,26 @@ import { ref, computed, watch, onMounted, onUnmounted, onErrorCaptured, nextTick
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import ToastContainer from '../../components/ui/ToastContainer.vue';
+import { getEcho } from '../../services/echo';
+import { useToastStore } from '../../stores/toast';
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const toastStore = useToastStore();
 
+const wsStatus = ref('connected');
 const isMobileMenuOpen = ref(false);
 const hasError = ref(false);
 const errorMessage = ref('');
+
+watch(wsStatus, (newStatus, oldStatus) => {
+  if (newStatus === 'connected' && oldStatus !== 'connected') {
+    toastStore.success('Live connection re-established.');
+  } else if (newStatus === 'offline' && oldStatus === 'connected') {
+    toastStore.warning('Live connection dropped. Switching to offline caching.');
+  }
+});
 
 // Sidebar layout density & collapses
 const isSidebarMini = ref(false);
@@ -1019,6 +1057,25 @@ watch(() => route.name, (newRouteName) => {
 
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeydown);
+  
+  // WebSocket Reverb connection state monitoring
+  const echo = getEcho();
+  if (echo && echo.connector && echo.connector.pusher && echo.connector.pusher.connection) {
+    const connection = echo.connector.pusher.connection;
+    const updateState = (state) => {
+      if (state === 'connected') {
+        wsStatus.value = 'connected';
+      } else if (state === 'connecting') {
+        wsStatus.value = 'reconnecting';
+      } else {
+        wsStatus.value = 'offline';
+      }
+    };
+    updateState(connection.state);
+    connection.bind('state_change', (states) => {
+      updateState(states.current);
+    });
+  }
   
   const updateClock = () => {
     const d = new Date();

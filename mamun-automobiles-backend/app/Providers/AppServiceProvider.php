@@ -22,6 +22,24 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
             return $user->hasRole('Super Admin') ? true : null;
         });
+
+        // Clear dashboard metrics cache on model state changes to safeguard data freshness
+        $clearDashboardCache = function () {
+            \Illuminate\Support\Facades\Cache::forget('dashboard_data');
+        };
+
+        \App\Models\JobCard::saved($clearDashboardCache);
+        \App\Models\JobCard::deleted($clearDashboardCache);
+        \App\Models\Invoice::saved($clearDashboardCache);
+        \App\Models\Invoice::deleted($clearDashboardCache);
+        \App\Models\Vehicle::saved($clearDashboardCache);
+        \App\Models\Vehicle::deleted($clearDashboardCache);
+        \App\Models\Customer::saved($clearDashboardCache);
+        \App\Models\Customer::deleted($clearDashboardCache);
+        \App\Models\Part::saved($clearDashboardCache);
+        \App\Models\Part::deleted($clearDashboardCache);
+        \App\Models\Transaction::saved($clearDashboardCache);
+        \App\Models\Transaction::deleted($clearDashboardCache);
         
         \App\Models\Part::observe(\App\Observers\PartObserver::class);
 

@@ -79,27 +79,27 @@
             <button 
               v-if="task.status === 'pending' || task.status === 'paused'"
               @click="updateStatus(task.id, 'in_progress')"
-              class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.98] shadow-sm"
+              class="flex-1 min-h-[48px] py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.98] shadow-sm"
             >
               ▶ Start
             </button>
             <button 
               v-if="task.status === 'in_progress'"
               @click="updateStatus(task.id, 'paused')"
-              class="flex-1 py-3 bg-white hover:bg-gray-50 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.98] border border-gray-200 shadow-sm"
+              class="flex-1 min-h-[48px] py-2 bg-white hover:bg-gray-50 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.98] border border-gray-200 shadow-sm"
             >
               ⏸ Pause
             </button>
             <button 
               v-if="task.status === 'in_progress'"
               @click="updateStatus(task.id, 'completed')"
-              class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.98] shadow-sm"
+              class="flex-1 min-h-[48px] py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.98] shadow-sm"
             >
               ✔ Complete
             </button>
             <button 
               @click="promptConsumeParts(task)"
-              class="py-3 px-4.5 bg-white hover:bg-gray-50 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.98] border border-gray-200 shadow-sm"
+              class="min-h-[48px] py-2 px-4.5 bg-white hover:bg-gray-50 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.98] border border-gray-200 shadow-sm"
             >
               + Part
             </button>

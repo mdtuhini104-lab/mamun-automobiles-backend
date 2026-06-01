@@ -48,7 +48,7 @@
         v-if="task.status !== 'in_progress'"
         @click="updateStatus('in_progress')" 
         :disabled="updating"
-        class="py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1 focus:outline-none"
+        class="min-h-[48px] py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1 focus:outline-none"
       >
         Start
       </button>
@@ -57,7 +57,7 @@
         v-if="task.status === 'in_progress'"
         @click="updateStatus('paused')" 
         :disabled="updating"
-        class="py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1 focus:outline-none"
+        class="min-h-[48px] py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1 focus:outline-none"
       >
         Pause
       </button>
@@ -66,7 +66,7 @@
         v-if="task.status !== 'completed'"
         @click="updateStatus('completed')" 
         :disabled="updating"
-        class="py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1 focus:outline-none"
+        class="min-h-[48px] py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-extrabold text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1 focus:outline-none"
       >
         Done
       </button>
@@ -74,7 +74,7 @@
       <!-- Consumption Modal trigger -->
       <button 
         @click="$emit('add-consumption', task)"
-        class="py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 rounded-2xl font-extrabold text-xs active:scale-95 transition-all flex items-center justify-center gap-1 focus:outline-none"
+        class="min-h-[48px] py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 rounded-2xl font-extrabold text-xs active:scale-95 transition-all flex items-center justify-center gap-1 focus:outline-none"
       >
         + Parts
       </button>

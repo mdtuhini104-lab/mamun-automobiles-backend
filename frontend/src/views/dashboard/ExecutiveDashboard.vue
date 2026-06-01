@@ -149,11 +149,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineAsyncComponent } from 'vue';
 import api from '../../services/api';
-import RevenueAnalyticsWidget from '../../components/dashboard/RevenueAnalyticsWidget.vue';
-import WorkshopEfficiencyHeatmap from '../../components/dashboard/WorkshopEfficiencyHeatmap.vue';
-import OperationalKpiWidget from '../../components/dashboard/OperationalKpiWidget.vue';
+const RevenueAnalyticsWidget = defineAsyncComponent(() => import('../../components/dashboard/RevenueAnalyticsWidget.vue'));
+const WorkshopEfficiencyHeatmap = defineAsyncComponent(() => import('../../components/dashboard/WorkshopEfficiencyHeatmap.vue'));
+const OperationalKpiWidget = defineAsyncComponent(() => import('../../components/dashboard/OperationalKpiWidget.vue'));
 
 const activeMode = ref('monthly');
 const anomalies = ref([]);

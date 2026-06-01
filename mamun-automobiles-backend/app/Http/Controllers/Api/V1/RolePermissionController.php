@@ -25,15 +25,26 @@ class RolePermissionController extends Controller
         ]);
     }
 
+    private function clearRolePermissionCaches()
+    {
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        \Illuminate\Support\Facades\Cache::forget('roles_permissions_all_grouped');
+        \Illuminate\Support\Facades\Cache::forget('roles_with_permissions_all');
+    }
+
     public function getPermissions()
     {
-        $permissions = Permission::all()->groupBy('module');
+        $permissions = \Illuminate\Support\Facades\Cache::remember('roles_permissions_all_grouped', 3600, function () {
+            return Permission::all()->groupBy('module');
+        });
         return response()->json(['success' => true, 'data' => $permissions]);
     }
 
     public function getRoles()
     {
-        $roles = Role::with('permissions')->get();
+        $roles = \Illuminate\Support\Facades\Cache::remember('roles_with_permissions_all', 3600, function () {
+            return Role::with('permissions')->get();
+        });
         return response()->json(['success' => true, 'data' => $roles]);
     }
 
@@ -54,7 +65,7 @@ class RolePermissionController extends Controller
             DB::commit();
             
             // clear cache
-            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+            $this->clearRolePermissionCaches();
 
             return response()->json(['success' => true, 'data' => $role->load('permissions')]);
         } catch (\Exception $e) {
@@ -87,7 +98,7 @@ class RolePermissionController extends Controller
             $this->logAudit('role_updated', "Updated role {$role->name}", $role, ['permissions' => $request->permissions]);
             DB::commit();
 
-            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+            $this->clearRolePermissionCaches();
             
             return response()->json(['success' => true, 'data' => $role->load('permissions')]);
         } catch (\Exception $e) {
@@ -109,7 +120,7 @@ class RolePermissionController extends Controller
             $role->delete();
             DB::commit();
 
-            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+            $this->clearRolePermissionCaches();
 
             return response()->json(['success' => true, 'message' => 'Role deleted successfully.']);
         } catch (\Exception $e) {
@@ -131,7 +142,7 @@ class RolePermissionController extends Controller
             $this->logAudit('role_cloned', "Cloned role {$role->name} to {$newRole->name}", $newRole, ['original_role_id' => $role->id]);
             DB::commit();
 
-            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+            $this->clearRolePermissionCaches();
 
             return response()->json(['success' => true, 'data' => $newRole->load('permissions')]);
         } catch (\Exception $e) {
@@ -162,6 +173,8 @@ class RolePermissionController extends Controller
                 'permissions' => $request->permissions
             ]);
             DB::commit();
+
+            $this->clearRolePermissionCaches();
 
             return response()->json(['success' => true, 'message' => 'User permissions updated successfully.']);
         } catch (\Exception $e) {

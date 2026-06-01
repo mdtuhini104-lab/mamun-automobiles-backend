@@ -241,7 +241,9 @@ class WorkforceAssignmentController extends Controller
      */
     public function listSkills(): JsonResponse
     {
-        $skills = \App\Models\Skill::orderBy('name')->get();
+        $skills = \Illuminate\Support\Facades\Cache::remember('lookup_skills', 86400, function () {
+            return \App\Models\Skill::orderBy('name')->get();
+        });
         return $this->successResponse($skills, 'Skills retrieved successfully');
     }
 
@@ -250,7 +252,9 @@ class WorkforceAssignmentController extends Controller
      */
     public function listDepartments(): JsonResponse
     {
-        $departments = \App\Models\Department::where('is_active', true)->orderBy('name')->get();
+        $departments = \Illuminate\Support\Facades\Cache::remember('lookup_departments', 86400, function () {
+            return \App\Models\Department::where('is_active', true)->orderBy('name')->get();
+        });
         return $this->successResponse($departments, 'Departments retrieved successfully');
     }
 
@@ -259,7 +263,9 @@ class WorkforceAssignmentController extends Controller
      */
     public function listDesignations(): JsonResponse
     {
-        $designations = \App\Models\Designation::where('is_active', true)->orderBy('name')->get();
+        $designations = \Illuminate\Support\Facades\Cache::remember('lookup_designations', 86400, function () {
+            return \App\Models\Designation::where('is_active', true)->orderBy('name')->get();
+        });
         return $this->successResponse($designations, 'Designations retrieved successfully');
     }
 
@@ -268,7 +274,9 @@ class WorkforceAssignmentController extends Controller
      */
     public function listShifts(): JsonResponse
     {
-        $shifts = \App\Models\Shift::orderBy('name')->get();
+        $shifts = \Illuminate\Support\Facades\Cache::remember('lookup_shifts', 86400, function () {
+            return \App\Models\Shift::orderBy('name')->get();
+        });
         return $this->successResponse($shifts, 'Shifts retrieved successfully');
     }
 }
