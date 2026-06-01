@@ -29,14 +29,24 @@ WORKDIR /var/www/html
 
 # Stage for development/testing dependency caching
 FROM base AS developer
-COPY composer.json composer.lock ./
-RUN composer install --no-scripts --no-autoloader
+
+# Copy Laravel backend source files BEFORE composer install
+COPY mamun-automobiles-backend/ .
+
+# Temporary debug verification
+RUN pwd
+RUN ls -la
+RUN ls -la /var/www/html
+
+# Final Build Sequence
+RUN composer install --no-dev
+RUN composer dump-autoload --optimize
+RUN php artisan optimize
 
 # Runner target containing clean production build
 FROM base AS runner
-COPY --from=developer /var/www/html/vendor /var/www/html/vendor
-COPY . .
-RUN composer dump-autoload --optimize
+WORKDIR /var/www/html
+COPY --from=developer /var/www/html .
 
 EXPOSE 9000
 CMD ["php-fpm"]
