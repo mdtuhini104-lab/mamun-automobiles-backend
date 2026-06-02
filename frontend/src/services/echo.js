@@ -9,9 +9,13 @@ export const initEcho = () => {
     return null;
   }
 
-  const isProd = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
-  const apiURL = isProd ? 'https://mamun-automobiles-backend.vercel.app/api' : (import.meta.env.VITE_API_URL || 'http://localhost:8000/api');
+  const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
   const driver = import.meta.env.VITE_BROADCAST_DRIVER || 'reverb';
+
+  if (driver === 'none' || driver === 'log') {
+    console.warn(`Realtime is disabled via VITE_BROADCAST_DRIVER=${driver}.`);
+    return null;
+  }
 
   let config = {};
 
@@ -28,15 +32,15 @@ export const initEcho = () => {
     };
   } else {
     // Default to Reverb
-    const wsHost = isProd ? 'mamun-automobiles-backend.vercel.app' : (import.meta.env.VITE_REVERB_HOST || 'localhost');
-    const forceTLS = isProd ? true : ((import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https');
+    const wsHost = import.meta.env.VITE_REVERB_HOST || 'localhost';
+    const forceTLS = (import.meta.env.VITE_REVERB_SCHEME || 'http') === 'https';
     
     config = {
       broadcaster: 'reverb',
       key: import.meta.env.VITE_REVERB_APP_KEY || 'mamun_erp_key',
       wsHost: wsHost,
-      wsPort: isProd ? 443 : (import.meta.env.VITE_REVERB_PORT ? Number(import.meta.env.VITE_REVERB_PORT) : 8080),
-      wssPort: isProd ? 443 : (import.meta.env.VITE_REVERB_PORT ? Number(import.meta.env.VITE_REVERB_PORT) : 8080),
+      wsPort: import.meta.env.VITE_REVERB_PORT ? Number(import.meta.env.VITE_REVERB_PORT) : 8080,
+      wssPort: import.meta.env.VITE_REVERB_PORT ? Number(import.meta.env.VITE_REVERB_PORT) : 8080,
       forceTLS: forceTLS,
       enabledTransports: ['ws', 'wss'],
     };
