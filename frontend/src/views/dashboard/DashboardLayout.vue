@@ -629,15 +629,16 @@ const recentPages = ref([]);
 
 const expandedGroups = ref({
   dashboard: true,
-  frontdesk: true,
+  frontdesk: false,
   workshop: false,
-  qc_delivery: false,
-  customers: false,
+  crm: false,
   inventory: false,
+  pos: false,
   finance: false,
-  hr_staff: false,
-  reports_ai: false,
-  system: false,
+  hr: false,
+  reports: false,
+  ai: false,
+  admin: false,
 });
 
 // Final 10-Group Operational SIMPLICITY Sidebar Hierarchy
@@ -647,25 +648,29 @@ const menuGroups = [
     id: 'dashboard',
     icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg>',
     items: [
+      { name: 'Executive Dashboard', to: { name: 'dashboard.executive' }, roles: ['Super Admin', 'Manager'] },
       { name: 'Enterprise Cockpit', to: { name: 'dashboard-home' }, roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] },
-      { name: 'Live Workflow', to: { name: 'workshop.live-board' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
-      { name: 'Notifications', to: { name: 'dashboard.ai-inbox' }, roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] },
-      { name: 'Quick Actions', action: 'quickActions', roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] },
+      { name: 'Live Workflow Monitor', to: { name: 'workshop.live-board' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Business KPI Center', to: { name: 'dashboard.business-kpi' }, roles: ['Super Admin', 'Manager'] },
       { name: "Today's Tasks", to: { name: 'workshop.technician-tasks' }, roles: ['Super Admin', 'Manager', 'Technician'] },
       { name: 'Pending Approvals', to: { name: 'workshop.approvals' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] }
     ]
   },
   {
-    name: 'Frontdesk',
+    name: 'Front Desk',
     id: 'frontdesk',
     icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>',
     items: [
       { name: 'Customer Intake', to: { name: 'workshop.intake' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
-      { name: 'Reception Queue', to: { name: 'workshop.inspection' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
-      { name: 'Appointments', to: { name: 'appointments.index' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
-      { name: 'Quotations', to: { name: 'workshop.quotation' }, roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] },
+      { name: 'Reception Queue', to: { name: 'workshop.reception-queue' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
       { name: 'Walk-In Queue', to: { name: 'workshop.intake', query: { mode: 'walkin' } }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
-      { name: 'Waiting Customers', to: { name: 'workshop.live-board', query: { filter: 'waiting' } }, roles: ['Super Admin', 'Manager', 'Frontdesk'] }
+      { name: 'Waiting Customers', to: { name: 'workshop.live-board', query: { filter: 'waiting' } }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Appointment Scheduling', to: { name: 'appointments.index' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Service Calendar', to: { name: 'workshop.service-calendar' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Appointment Analytics', to: { name: 'workshop.appointment-analytics' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Quotations', to: { name: 'workshop.quotation' }, roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] },
+      { name: 'Approval Workflow', to: { name: 'workshop.approvals' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Acceptance Tracking', to: { name: 'workshop.customer-acceptance' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] }
     ]
   },
   {
@@ -673,35 +678,49 @@ const menuGroups = [
     id: 'workshop',
     icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>',
     items: [
-      { name: 'Active Jobs', to: { name: 'workshop.work-orders' }, roles: ['Super Admin', 'Manager'] },
-      { name: 'Technician Board', to: { name: 'workshop.technician-tasks' }, roles: ['Super Admin', 'Manager', 'Technician'] },
-      { name: 'Bay Board', to: { name: 'workshop.bays' }, roles: ['Super Admin', 'Manager'] },
-      { name: 'Parts Usage', to: { name: 'workshop.parts-consumption' }, roles: ['Super Admin', 'Manager', 'Technician'] },
-      { name: 'Diagnosis', to: { name: 'workshop.diagnosis' }, roles: ['Super Admin', 'Manager', 'Technician'] }
+      { name: 'Job Cards', to: { name: 'job-cards.index' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Work Orders', to: { name: 'workshop.work-orders' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Service Packages', to: { name: 'workshop.service-packages' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Labor Tracking', to: { name: 'workshop.labor-tracking' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Bay Allocation', to: { name: 'workshop.bays' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Technician Assignment', to: { name: 'workshop.work-orders' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Technician Queue', to: { name: 'workshop.technician-tasks' }, roles: ['Super Admin', 'Manager', 'Technician'] },
+      { name: 'Workshop Scheduling', to: { name: 'workshop.workshop-scheduling' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Vehicle Inspection', to: { name: 'workshop.inspection' }, roles: ['Super Admin', 'Manager', 'Technician'] },
+      { name: 'Digital Checklists', to: { name: 'workshop.digital-checklists' }, roles: ['Super Admin', 'Manager', 'Technician'] },
+      { name: 'Diagnostic Reports', to: { name: 'workshop.diagnosis' }, roles: ['Super Admin', 'Manager', 'Technician'] },
+      {
+        name: 'QC & Delivery',
+        subItems: [
+          { name: 'QC Checklist', to: { name: 'workshop.qc' } },
+          { name: 'Final Inspection', to: { name: 'workshop.qc', query: { type: 'final' } } },
+          { name: 'Rework Tracking', to: { name: 'workshop.qc', query: { type: 'rework' } } },
+          { name: 'Delivery Scheduling', to: { name: 'workshop.delivery', query: { filter: 'ready' } } },
+          { name: 'Handover Management', to: { name: 'workshop.delivery' } },
+          { name: 'Delivery Confirmation', to: { name: 'workshop.delivery', query: { filter: 'completed' } } }
+        ],
+        roles: ['Super Admin', 'Manager', 'Frontdesk']
+      }
     ]
   },
   {
-    name: 'QC & Delivery',
-    id: 'qc_delivery',
-    icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
-    items: [
-      { name: 'QC Verification', to: { name: 'workshop.qc' }, roles: ['Super Admin', 'Manager'] },
-      { name: 'Delivery Queue', to: { name: 'workshop.delivery' }, roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] },
-      { name: 'Warranty & Comeback', to: { name: 'workshop.warranty-comeback' }, roles: ['Super Admin', 'Manager'] },
-      { name: 'Ready For Delivery', to: { name: 'workshop.delivery', query: { filter: 'ready' } }, roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] },
-      { name: 'Pending QC', to: { name: 'workshop.qc', query: { filter: 'pending' } }, roles: ['Super Admin', 'Manager'] },
-      { name: 'Customer Pickup Queue', to: { name: 'workshop.delivery', query: { filter: 'pickup' } }, roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] }
-    ]
-  },
-  {
-    name: 'Customers',
-    id: 'customers',
+    name: 'Customers (CRM)',
+    id: 'crm',
     icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>',
     items: [
-      { name: 'Customers', to: { name: 'customers.index' }, roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] },
-      { name: 'Vehicles', to: { name: 'vehicles.index' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
-      { name: 'CRM', to: { name: 'appointments.index', query: { mode: 'crm' } }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
-      { name: 'Service History', to: { name: 'vehicles.history.index' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] }
+      { name: 'Customer Directory', to: { name: 'customers.index' }, roles: ['Super Admin', 'Manager', 'Frontdesk', 'Cashier'] },
+      { name: 'Customer Profiles', to: { name: 'customers.index' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Customer Segmentation', to: { name: 'crm.segmentation' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Loyalty Program', to: { name: 'crm.loyalty' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Membership Tiers', to: { name: 'crm.memberships' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Appointments', to: { name: 'appointments.index', query: { mode: 'crm' } }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Follow-Ups', to: { name: 'crm.followups' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Complaints', to: { name: 'crm.complaints' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Feedback Management', to: { name: 'crm.feedback' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Vehicle Service History', to: { name: 'vehicles.history.index' }, roles: ['Super Admin', 'Manager', 'Frontdesk'] },
+      { name: 'Warranty Tracking', to: { name: 'workshop.warranty-comeback' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Service Reminders', to: { name: 'crm.reminders' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Vehicle Health Score', to: { name: 'crm.vehicle-health' }, roles: ['Super Admin', 'Manager'] }
     ]
   },
   {
@@ -709,16 +728,51 @@ const menuGroups = [
     id: 'inventory',
     icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>',
     items: [
-      { name: 'Parts', to: { name: 'inventory-list' }, roles: ['Super Admin', 'Manager'] },
-      { 
-        name: 'Purchases & Suppliers', 
+      { name: 'Parts Master', to: { name: 'inventory-list' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Categories', to: { name: 'inventory-list', query: { tab: 'categories' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Stock Levels', to: { name: 'inventory.stock-levels' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Stock Transfers', to: { name: 'inventory.stock-transfers' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Stock Adjustments', to: { name: 'inventory.stock-adjustments' }, roles: ['Super Admin', 'Manager'] },
+      {
+        name: 'Procurement',
         subItems: [
-          { name: 'Purchases', to: { name: 'purchases-list' } },
-          { name: 'Suppliers', to: { name: 'purchases-list', query: { tab: 'suppliers' } } }
+          { name: 'Suppliers', to: { name: 'purchases-list', query: { tab: 'suppliers' } } },
+          { name: 'Purchase Orders', to: { name: 'purchases-list' } },
+          { name: 'Goods Receiving Notes', to: { name: 'inventory.goods-receiving' } },
+          { name: 'Purchase Returns', to: { name: 'inventory.purchase-returns' } }
         ],
         roles: ['Super Admin', 'Manager']
       },
-      { name: 'Low Stock', to: { name: 'inventory-list', query: { filter: 'low_stock' } }, roles: ['Super Admin', 'Manager'] }
+      {
+        name: 'Inventory Intelligence',
+        subItems: [
+          { name: 'Low Stock Alerts', to: { name: 'inventory-list', query: { filter: 'low_stock' } } },
+          { name: 'Dead Stock Analysis', to: { name: 'inventory.intelligence', query: { tab: 'dead_stock' } } },
+          { name: 'Fast Moving Parts', to: { name: 'inventory.intelligence', query: { tab: 'fast_moving' } } },
+          { name: 'Inventory Valuation', to: { name: 'inventory.intelligence', query: { tab: 'valuation' } } }
+        ],
+        roles: ['Super Admin', 'Manager']
+      }
+    ]
+  },
+  {
+    name: 'Sales & POS',
+    id: 'pos',
+    icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>',
+    items: [
+      { name: 'POS Terminal', to: { name: 'pos-home' }, roles: ['Super Admin', 'Manager', 'Cashier'] },
+      { name: 'Invoices', to: { name: 'invoices.index' }, roles: ['Super Admin', 'Manager', 'Cashier'] },
+      { name: 'Sales Returns', to: { name: 'pos-home', query: { tab: 'returns' } }, roles: ['Super Admin', 'Manager', 'Cashier'] },
+      { name: 'Payment Collection', to: { name: 'accounts.index' }, roles: ['Super Admin', 'Manager', 'Cashier'] },
+      {
+        name: 'Sales Analytics',
+        subItems: [
+          { name: 'Revenue Reports', to: { name: 'reports-home', query: { tab: 'revenue' } } },
+          { name: 'Sales Reports', to: { name: 'reports-home', query: { tab: 'sales' } } },
+          { name: 'Product Performance', to: { name: 'reports-home', query: { tab: 'performance' } } }
+        ],
+        roles: ['Super Admin', 'Manager']
+      }
     ]
   },
   {
@@ -726,62 +780,162 @@ const menuGroups = [
     id: 'finance',
     icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
     items: [
-      { name: 'POS Billing', to: { name: 'pos-home' }, roles: ['Super Admin', 'Manager', 'Cashier'] },
-      { name: 'Invoices', to: { name: 'invoices.index' }, roles: ['Super Admin', 'Manager', 'Cashier'] },
-      { name: 'Transactions', to: { name: 'accounts.index' }, roles: ['Super Admin', 'Manager', 'Cashier'] },
-      { name: 'Expenses', to: { name: 'transactions.index' }, roles: ['Super Admin', 'Manager', 'Cashier'] },
-      { name: 'Reports', to: { name: 'reports-home', query: { section: 'finance' } }, roles: ['Super Admin', 'Manager', 'Cashier'] }
-    ]
-  },
-  {
-    name: 'HR & Staff',
-    id: 'hr_staff',
-    icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857" /></svg>',
-    items: [
-      { name: 'Employees', to: { name: 'staff.index' }, roles: ['Super Admin', 'Manager'] },
-      { name: 'Attendance', to: { name: 'attendances.index' }, roles: ['Super Admin', 'Manager'] },
-      { name: 'Payroll', to: { name: 'payrolls.index' }, roles: ['Super Admin', 'Manager'] }
-    ]
-  },
-  {
-    name: 'Reports & AI',
-    id: 'reports_ai',
-    icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>',
-    items: [
-      { name: 'Analytics', to: { name: 'analytics.index' }, roles: ['Super Admin', 'Manager'] },
-      { name: 'Business Reports', to: { name: 'reports-home' }, roles: ['Super Admin', 'Manager'] },
-      { name: 'Operational Insights', to: { name: 'reports-home', query: { tab: 'operational' } }, roles: ['Super Admin', 'Manager'] },
       {
-        name: 'Advanced Analytics',
+        name: 'Accounting',
         subItems: [
-          { name: 'AI Monitoring', to: { name: 'ai.index' } },
-          { name: 'Telemetry Monitoring', to: { name: 'ai.index', query: { tab: 'telemetry' } } },
-          { name: 'Predictive Analytics', to: { name: 'ai.index', query: { tab: 'predictive' } } },
-          { name: 'AI Governance', to: { name: 'dashboard.ai-inbox', query: { tab: 'governance' } } }
+          { name: 'Chart of Accounts', to: { name: 'finance.chart-of-accounts' } },
+          { name: 'Journal Entries', to: { name: 'finance.journal-entries' } },
+          { name: 'Vouchers', to: { name: 'finance.vouchers' } },
+          { name: 'Cost Centers', to: { name: 'finance.cost-centers' } }
+        ],
+        roles: ['Super Admin', 'Manager', 'Cashier']
+      },
+      {
+        name: 'Treasury',
+        subItems: [
+          { name: 'Cash Management', to: { name: 'finance.cash-management' } },
+          { name: 'Bank Accounts', to: { name: 'finance.bank-accounts' } },
+          { name: 'Bank Reconciliation', to: { name: 'finance.bank-reconciliation' } }
+        ],
+        roles: ['Super Admin', 'Manager', 'Cashier']
+      },
+      {
+        name: 'Financial Reporting',
+        subItems: [
+          { name: 'Profit & Loss', to: { name: 'finance.profit-loss' } },
+          { name: 'Balance Sheet', to: { name: 'finance.balance-sheet' } },
+          { name: 'Cash Flow', to: { name: 'finance.cash-flow' } },
+          { name: 'Trial Balance', to: { name: 'finance.trial-balance' } },
+          { name: 'Tax Reports', to: { name: 'finance.tax-reports' } }
         ],
         roles: ['Super Admin', 'Manager']
       }
     ]
   },
   {
-    name: 'System',
-    id: 'system',
-    icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>',
+    name: 'HR & Payroll',
+    id: 'hr',
+    icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857" /></svg>',
     items: [
-      { name: 'Settings', to: { name: 'settings.index' }, roles: ['Super Admin'] },
-      { name: 'Roles & Permissions', to: { name: 'roles.index' }, roles: ['Super Admin'] },
-      { name: 'Activity Logs', to: { name: 'activity-logs.index' }, roles: ['Super Admin'] },
-      { name: 'SaaS Admin', to: { name: 'saas.index' }, roles: ['Super Admin'] }, // Restricted: Super Admin only
       {
-        name: 'Advanced Tools',
+        name: 'Employee Management',
         subItems: [
-          { name: 'Escalation Center', to: { name: 'settings.incident-center' } },
-          { name: 'AI Governance Inbox', to: { name: 'dashboard.ai-inbox', query: { tab: 'governance' } } },
-          { name: 'Calibration Engine', to: { name: 'settings.production-operations' } },
-          { name: 'Audit Evidence Repository', to: { name: 'settings.security-audit' } },
-          { name: 'Queue Monitoring', to: { name: 'settings.production-operations', query: { tab: 'queue' } } }
+          { name: 'Employees', to: { name: 'staff.index' } },
+          { name: 'Departments', to: { name: 'hr.departments' } },
+          { name: 'Designations', to: { name: 'hr.designations' } }
         ],
-        roles: ['Super Admin'] // Restricted: Super Admin only
+        roles: ['Super Admin', 'Manager']
+      },
+      {
+        name: 'Workforce',
+        subItems: [
+          { name: 'Attendance', to: { name: 'attendances.index' } },
+          { name: 'Leave Management', to: { name: 'attendance.leave' } },
+          { name: 'Shift Management', to: { name: 'hr.shifts' } }
+        ],
+        roles: ['Super Admin', 'Manager']
+      },
+      {
+        name: 'Payroll',
+        subItems: [
+          { name: 'Salary Processing', to: { name: 'payrolls.index' } },
+          { name: 'Bonuses', to: { name: 'hr.bonuses' } },
+          { name: 'Overtime', to: { name: 'hr.overtime' } },
+          { name: 'Loans & Advances', to: { name: 'hr.loans' } }
+        ],
+        roles: ['Super Admin', 'Manager']
+      },
+      {
+        name: 'HR Analytics',
+        subItems: [
+          { name: 'Productivity Reports', to: { name: 'hr.analytics', query: { tab: 'productivity' } } },
+          { name: 'Payroll Reports', to: { name: 'hr.analytics', query: { tab: 'payroll' } } },
+          { name: 'Employee Performance', to: { name: 'hr.analytics', query: { tab: 'performance' } } }
+        ],
+        roles: ['Super Admin', 'Manager']
+      }
+    ]
+  },
+  {
+    name: 'Reports Center',
+    id: 'reports',
+    icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>',
+    items: [
+      { name: 'Workshop Reports', to: { name: 'reports-home', query: { tab: 'workshop' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Job Card Reports', to: { name: 'reports-home', query: { tab: 'jobcards' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Technician Reports', to: { name: 'reports-home', query: { tab: 'technician' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Sales Reports', to: { name: 'reports-home', query: { tab: 'sales' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Inventory Reports', to: { name: 'reports-home', query: { tab: 'inventory' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Purchase Reports', to: { name: 'reports-home', query: { tab: 'purchases' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Financial Reports', to: { name: 'reports-home', query: { tab: 'finance' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'KPI Reports', to: { name: 'reports-home', query: { tab: 'kpi' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'AI Reports', to: { name: 'reports-home', query: { tab: 'ai' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Executive Reports', to: { name: 'reports.executive' }, roles: ['Super Admin', 'Manager'] }
+    ]
+  },
+  {
+    name: 'AI & Analytics',
+    id: 'ai',
+    icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
+    items: [
+      { name: 'Business Intelligence', to: { name: 'analytics.index' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Revenue Forecasting', to: { name: 'ai.revenue-forecast' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Customer Churn Analysis', to: { name: 'ai.customer-churn' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Inventory Prediction', to: { name: 'ai.inventory-prediction' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Workshop Analytics', to: { name: 'ai.workshop-analytics' }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Recommendations', to: { name: 'ai.index', query: { tab: 'recommendations' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Smart Alerts', to: { name: 'ai.index', query: { tab: 'alerts' } }, roles: ['Super Admin', 'Manager'] },
+      { name: 'Workflow Automation', to: { name: 'ai.workflow-automation' }, roles: ['Super Admin', 'Manager'] }
+    ]
+  },
+  {
+    name: 'Administration',
+    id: 'admin',
+    icon: '<svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>',
+    items: [
+      {
+        name: 'Security',
+        subItems: [
+          { name: 'Users', to: { name: 'settings.index', query: { tab: 'users' } } },
+          { name: 'Roles', to: { name: 'roles.index' } },
+          { name: 'Permissions', to: { name: 'roles.index', query: { tab: 'permissions' } } }
+        ],
+        roles: ['Super Admin']
+      },
+      {
+        name: 'System',
+        subItems: [
+          { name: 'Branch Management', to: { name: 'settings.index', query: { tab: 'branches' } } },
+          { name: 'Company Settings', to: { name: 'settings.company' } },
+          { name: 'Audit Logs', to: { name: 'activity-logs.index' } },
+          { name: 'API Settings', to: { name: 'settings.api' } }
+        ],
+        roles: ['Super Admin']
+      },
+      {
+        name: 'Notification Hub',
+        subItems: [
+          { name: 'SMS Config', to: { name: 'notifications.dashboard', query: { tab: 'sms' } } },
+          { name: 'WhatsApp Config', to: { name: 'notifications.dashboard', query: { tab: 'whatsapp' } } },
+          { name: 'Email Config', to: { name: 'notifications.dashboard', query: { tab: 'email' } } },
+          { name: 'Push Notifications', to: { name: 'notifications.dashboard', query: { tab: 'push' } } },
+          { name: 'Promotions', to: { name: 'notifications.dashboard', query: { tab: 'promotions' } } },
+          { name: 'Service Reminders', to: { name: 'notifications.dashboard', query: { tab: 'reminders' } } },
+          { name: 'Customer Campaigns', to: { name: 'notifications.dashboard', query: { tab: 'campaigns' } } }
+        ],
+        roles: ['Super Admin', 'Manager']
+      },
+      {
+        name: 'Backup & Disaster Recovery',
+        subItems: [
+          { name: 'Backup Center', to: { name: 'backup.dashboard' } },
+          { name: 'Scheduled Backups', to: { name: 'backup.dashboard', query: { tab: 'schedules' } } },
+          { name: 'Backup Archives', to: { name: 'backup.dashboard', query: { tab: 'archives' } } },
+          { name: 'Restore Jobs', to: { name: 'backup.dashboard', query: { tab: 'restores' } } },
+          { name: 'Disaster Recovery', to: { name: 'backup.dashboard', query: { tab: 'dr' } } },
+          { name: 'Recovery Audits', to: { name: 'backup.dashboard', query: { tab: 'audits' } } }
+        ],
+        roles: ['Super Admin']
       }
     ]
   }

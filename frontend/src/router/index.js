@@ -482,6 +482,18 @@ const router = createRouter({
           name: 'saas.customer-success',
           component: () => import('../views/saas/CustomerSuccessDashboard.vue'),
           meta: { permission: 'saas_admin.view' }
+        },
+        {
+          path: 'backup',
+          name: 'backup.dashboard',
+          component: () => import('../views/BackupDashboard.vue'),
+          meta: { permission: 'settings.view' }
+        },
+        {
+          path: 'notifications',
+          name: 'notifications.dashboard',
+          component: () => import('../views/NotificationDashboard.vue'),
+          meta: { permission: 'settings.view' }
         }
       ]
     }

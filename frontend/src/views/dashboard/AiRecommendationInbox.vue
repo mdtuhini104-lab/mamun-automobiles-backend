@@ -262,7 +262,7 @@ const fetchRecommendations = async () => {
 
 const approveRec = async (id) => {
   try {
-    await api.post(`/ai/recommendations/${id}/approve`);
+    await api.post(`/ai/recommendations/${id}/action`, { action: 'approve' });
     toast.success('Recommendation signed off and implemented.');
     fetchRecommendations();
   } catch (error) {
@@ -272,7 +272,7 @@ const approveRec = async (id) => {
 
 const rejectRec = async (id) => {
   try {
-    await api.post(`/ai/recommendations/${id}/reject`);
+    await api.post(`/ai/recommendations/${id}/action`, { action: 'reject' });
     toast.success('Recommendation dismissed.');
     fetchRecommendations();
   } catch (error) {

@@ -91,6 +91,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import api from '../../services/api';
 
 const route = useRoute();
 const loading = ref(true);
@@ -98,28 +99,43 @@ const customer = ref(null);
 const statement = ref([]);
 
 const formatCurrency = (val) => Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+};
 
 const fetchStatement = async () => {
   loading.value = true;
   try {
     const id = route.params.id;
-    // Mock data for UI presentation
-    await new Promise(resolve => setTimeout(resolve, 600));
-    customer.value = { id, name: 'John Doe', email: 'john@example.com', phone: '123-456-7890', balance: 500 };
     
-    // Calculate running balance
-    let currentBal = 0;
-    const rawTransactions = [
-      { id: 1, date: '2023-10-01', description: 'Opening Balance', debit: 0, credit: 0, type: 'info' },
-      { id: 2, date: '2023-10-05', description: 'Invoice INV-1001', debit: 1500, credit: 0, type: 'invoice', invoice_id: 1001 },
-      { id: 3, date: '2023-10-10', description: 'Payment Received', debit: 0, credit: 1000, type: 'payment' },
-    ];
+    const [custRes, txsRes] = await Promise.all([
+      api.get(`/customer-ledgers/${id}`),
+      api.get(`/customer-ledgers/${id}/statement`)
+    ]);
+
+    const custInfo = custRes.data?.customer || {};
+    const ledgerInfo = custRes.data?.ledger || {};
     
-    statement.value = rawTransactions.map(t => {
-      currentBal = currentBal + t.debit - t.credit;
-      return { ...t, balance: currentBal };
-    });
+    customer.value = {
+      id: custInfo.id,
+      name: custInfo.name || 'Unknown Customer',
+      email: custInfo.email || '',
+      phone: custInfo.phone || '',
+      balance: Number(ledgerInfo.current_balance || 0)
+    };
+
+    const rawTxs = txsRes.data || [];
+    statement.value = rawTxs.map(t => ({
+      id: t.id,
+      date: t.created_at || t.updated_at,
+      description: t.note || `${t.transaction_type.toUpperCase()} transaction`,
+      debit: Number(t.debit || 0),
+      credit: Number(t.credit || 0),
+      balance: Number(t.balance || 0),
+      type: t.transaction_type,
+      invoice_id: t.invoice_id
+    }));
   } catch (error) {
     console.error('Failed to fetch statement:', error);
   } finally {

@@ -79,25 +79,35 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import api from '../../services/api';
 
 const loading = ref(true);
 const customers = ref([]);
 const searchQuery = ref('');
 const filterStatus = ref('all');
+let searchTimeout = null;
 
 const fetchLedger = async () => {
   loading.value = true;
   try {
-    // Mocking API call for frontend implementation
-    // In real app: const response = await api.get('/customers/ledger');
-    await new Promise(resolve => setTimeout(resolve, 600));
-    customers.value = [
-      { id: 1, name: 'John Doe', email: 'john@example.com', phone: '123-456-7890', total_invoiced: 1500, total_paid: 1000, balance: 500 },
-      { id: 2, name: 'Jane Smith', email: 'jane@example.com', phone: '098-765-4321', total_invoiced: 800, total_paid: 800, balance: 0 },
-      { id: 3, name: 'Acme Corp', email: 'billing@acme.com', phone: '555-123-4567', total_invoiced: 5000, total_paid: 2500, balance: 2500 },
-    ];
+    const response = await api.get('/customer-ledgers', {
+      params: {
+        search: searchQuery.value || undefined
+      }
+    });
+    // The controller returns a paginated structure
+    const rawData = response.data?.data || response.data || [];
+    const items = Array.isArray(rawData) ? rawData : (rawData.data || []);
+    customers.value = items.map(item => ({
+      id: item.customer_id,
+      name: item.name || 'Unknown',
+      email: item.email || '',
+      phone: item.phone || '',
+      total_invoiced: Number(item.total_debit || 0),
+      total_paid: Number(item.total_credit || 0),
+      balance: Number(item.current_balance || 0)
+    }));
   } catch (error) {
     console.error('Failed to fetch customer ledger:', error);
   } finally {
@@ -109,14 +119,19 @@ onMounted(() => {
   fetchLedger();
 });
 
+watch(searchQuery, () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    fetchLedger();
+  }, 400);
+});
+
 const filteredCustomers = computed(() => {
   return customers.value.filter(c => {
-    const matchesSearch = c.name.toLowerCase().includes(searchQuery.value.toLowerCase()) || 
-                          c.phone.includes(searchQuery.value);
     const matchesFilter = filterStatus.value === 'all' || 
                           (filterStatus.value === 'due' && c.balance > 0) || 
                           (filterStatus.value === 'clear' && c.balance <= 0);
-    return matchesSearch && matchesFilter;
+    return matchesFilter;
   });
 });
 
