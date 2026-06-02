@@ -2,6 +2,69 @@
 
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Mamun Automobiles ERP API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
+|
+*/
+
+// =========================================================================
+// 1. ROOT & DIAGNOSTIC TEST ROUTES (No v1 Prefix)
+// =========================================================================
+
+/**
+ * Root API Route
+ * GET /api
+ */
+Route::get('/', function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'Mamun Automobiles ERP API Running Successfully',
+        'status' => 200
+    ], 200);
+});
+
+/**
+ * Health Check Route
+ * GET /api/health
+ */
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'server' => 'running',
+        'app' => 'Mamun Automobiles ERP'
+    ], 200);
+});
+
+/**
+ * API Version Route
+ * GET /api/version
+ */
+Route::get('/version', function () {
+    return response()->json([
+        'version' => 'v1',
+        'framework' => 'Laravel',
+        'environment' => app()->environment()
+    ], 200);
+});
+
+// =========================================================================
+// 2. FUTURE ERP MODULE STUBS & ARCHITECTURE RECOMMENDATIONS
+// =========================================================================
+/*
+Route::prefix('v2')->group(function () {
+    // Future expansion stubs can be defined here
+});
+*/
+
+// =========================================================================
+// 3. API V1 ROUTES (Route::prefix('api/v1'))
+// =========================================================================
 Route::prefix('v1')->group(function () {
     Route::get('/health', function () {
         $db = false;
