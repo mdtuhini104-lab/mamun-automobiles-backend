@@ -1,6 +1,13 @@
 #!/bin/sh
-# Replace PORT variable in nginx config
-envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+# Generate Nginx configuration dynamically, ensuring Nginx listens on port 9000 (Railway's detected port)
+# and also on the custom $PORT (if set to something else like 8080) to handle both routing targets.
+if [ -n "$PORT" ] && [ "$PORT" != "9000" ]; then
+    echo "PORT is set to $PORT. Configuring Nginx to listen on $PORT and 9000."
+    sed "s/listen \${PORT};/listen $PORT;\n        listen 9000;/g" /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+else
+    echo "PORT is not set or is 9000. Configuring Nginx to listen on 9000."
+    sed "s/listen \${PORT};/listen 9000;/g" /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+fi
 
 # Ensure storage permissions are completely open to prevent any permission issues
 chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache || true
