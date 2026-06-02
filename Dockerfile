@@ -52,8 +52,11 @@ COPY supervisord.conf /etc/supervisord.conf
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-# Force PHP-FPM to use UNIX socket and not clear env vars
-RUN echo "listen = /var/run/php-fpm.sock" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
+# Force PHP-FPM to use UNIX socket, completely replacing zz-docker.conf to avoid 'multiply defined' errors
+RUN echo "[global]" > /usr/local/etc/php-fpm.d/zz-docker.conf \
+    && echo "daemonize = no" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
+    && echo "[www]" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
+    && echo "listen = /var/run/php-fpm.sock" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
     && echo "listen.owner = root" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
     && echo "listen.group = root" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
     && echo "listen.mode = 0666" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
