@@ -16,8 +16,6 @@ php artisan optimize:clear || true
     ps aux
     echo "Open Ports (netstat):"
     netstat -tuln
-    echo "Checking FPM port 9000 response:"
-    nc -zv 127.0.0.1 9000 || echo "Port 9000 is CLOSED"
     echo "Checking Nginx process config:"
     nginx -t
     echo "=== END DIAGNOSTIC CHECK ==="
