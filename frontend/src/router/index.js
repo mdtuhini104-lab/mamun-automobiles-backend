@@ -548,7 +548,7 @@ const router = createRouter({
         { path: 'hr/overtime', name: 'hr.overtime', component: () => import('../views/hr/Overtime.vue'), meta: { permission: 'payrolls.view' } },
         { path: 'hr/loans', name: 'hr.loans', component: () => import('../views/hr/LoansAdvances.vue'), meta: { permission: 'payrolls.view' } },
         { path: 'hr/analytics', name: 'hr.analytics', component: () => import('../views/hr/HrAnalytics.vue'), meta: { permission: 'analytics.view' } },
-        { path: 'attendance/leave', name: 'attendance.leave', component: () => import('../views/attendances/AttendanceList.vue'), meta: { permission: 'attendances.view' } },
+        { path: 'attendance/leave', name: 'attendance.leave', component: () => import('../views/hr/AttendanceList.vue'), meta: { permission: 'attendances.view' } },
         
         // AI & Analytics
         { path: 'ai/revenue-forecast', name: 'ai.revenue-forecast', component: () => import('../views/ai/RevenueForecasting.vue'), meta: { permission: 'analytics.view' } },
