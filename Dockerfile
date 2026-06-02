@@ -52,16 +52,16 @@ COPY supervisord.conf /etc/supervisord.conf
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-# Force PHP-FPM to use UNIX socket, completely replacing zz-docker.conf to avoid 'multiply defined' errors
+# Force PHP-FPM to listen on 127.0.0.1:9000 strictly to match nginx, completely replacing zz-docker.conf to avoid 'multiply defined' errors
 RUN echo "[global]" > /usr/local/etc/php-fpm.d/zz-docker.conf \
     && echo "daemonize = no" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
     && echo "[www]" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
-    && echo "listen = /var/run/php-fpm.sock" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
-    && echo "listen.owner = root" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
-    && echo "listen.group = root" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
-    && echo "listen.mode = 0666" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
+    && echo "listen = 127.0.0.1:9000" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
     && echo "clear_env = no" >> /usr/local/etc/php-fpm.d/zz-docker.conf \
     && echo "catch_workers_output = yes" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+
+# Verify PHP-FPM configuration syntax during Docker build
+RUN php-fpm -t
 
 # Remove default nginx config if exists
 RUN rm -f /etc/nginx/conf.d/default.conf
