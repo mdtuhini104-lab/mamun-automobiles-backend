@@ -9,7 +9,11 @@ export const initEcho = () => {
     return null;
   }
 
-  const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+  let apiURL = import.meta.env.VITE_API_URL;
+  if (!apiURL) {
+    const isProd = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    apiURL = isProd ? 'https://mamun-automobiles-backend-production.up.railway.app/api' : 'http://localhost:8000/api';
+  }
   const driver = import.meta.env.VITE_BROADCAST_DRIVER || 'reverb';
 
   if (driver === 'none' || driver === 'log') {
