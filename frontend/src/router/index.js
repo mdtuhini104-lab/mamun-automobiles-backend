@@ -495,6 +495,78 @@ const router = createRouter({
           component: () => import('../views/NotificationDashboard.vue'),
           meta: { permission: 'settings.view' }
         }
+        // Dashboard
+        ,{ path: 'business-kpi', name: 'dashboard.business-kpi', component: () => import('../views/dashboard/BusinessKpiCenter.vue'), meta: { permission: 'dashboard.view' } },
+        
+        // CRM
+        { path: 'crm/segmentation', name: 'crm.segmentation', component: () => import('../views/crm/CustomerSegmentation.vue'), meta: { permission: 'customers.view' } },
+        { path: 'crm/loyalty', name: 'crm.loyalty', component: () => import('../views/crm/LoyaltyProgram.vue'), meta: { permission: 'customers.view' } },
+        { path: 'crm/memberships', name: 'crm.memberships', component: () => import('../views/crm/MembershipTiers.vue'), meta: { permission: 'customers.view' } },
+        { path: 'crm/followups', name: 'crm.followups', component: () => import('../views/crm/FollowUps.vue'), meta: { permission: 'customers.view' } },
+        { path: 'crm/complaints', name: 'crm.complaints', component: () => import('../views/crm/Complaints.vue'), meta: { permission: 'customers.view' } },
+        { path: 'crm/feedback', name: 'crm.feedback', component: () => import('../views/crm/FeedbackManagement.vue'), meta: { permission: 'customers.view' } },
+        { path: 'crm/reminders', name: 'crm.reminders', component: () => import('../views/crm/ServiceReminders.vue'), meta: { permission: 'customers.view' } },
+        { path: 'crm/vehicle-health', name: 'crm.vehicle-health', component: () => import('../views/crm/VehicleHealthScore.vue'), meta: { permission: 'customers.view' } },
+        
+        // Workshop & Front Desk
+        { path: 'workshop/reception-queue', name: 'workshop.reception-queue', component: () => import('../views/workshop/InspectionWorkspace.vue'), meta: { permission: 'job_cards.create' } },
+        { path: 'workshop/service-calendar', name: 'workshop.service-calendar', component: () => import('../views/workshop/ServiceCalendar.vue'), meta: { permission: 'job_cards.create' } },
+        { path: 'workshop/appointment-analytics', name: 'workshop.appointment-analytics', component: () => import('../views/workshop/AppointmentAnalytics.vue'), meta: { permission: 'analytics.view' } },
+        { path: 'workshop/customer-acceptance', name: 'workshop.customer-acceptance', component: () => import('../views/workshop/CustomerAcceptance.vue'), meta: { permission: 'job_cards.create' } },
+        { path: 'workshop/service-packages', name: 'workshop.service-packages', component: () => import('../views/workshop/ServicePackages.vue'), meta: { permission: 'job_cards.create' } },
+        { path: 'workshop/labor-tracking', name: 'workshop.labor-tracking', component: () => import('../views/workshop/LaborTracking.vue'), meta: { permission: 'job_cards.view' } },
+        { path: 'workshop/workshop-scheduling', name: 'workshop.workshop-scheduling', component: () => import('../views/workshop/WorkshopScheduling.vue'), meta: { permission: 'work_orders.view' } },
+        { path: 'workshop/digital-checklists', name: 'workshop.digital-checklists', component: () => import('../views/workshop/DigitalChecklists.vue'), meta: { permission: 'quality_controls.manage' } },
+
+        // Inventory
+        { path: 'inventory/stock-levels', name: 'inventory.stock-levels', component: () => import('../views/inventory/StockLevels.vue'), meta: { permission: 'inventory.view' } },
+        { path: 'inventory/stock-transfers', name: 'inventory.stock-transfers', component: () => import('../views/inventory/StockTransfers.vue'), meta: { permission: 'inventory.edit' } },
+        { path: 'inventory/stock-adjustments', name: 'inventory.stock-adjustments', component: () => import('../views/inventory/StockAdjustments.vue'), meta: { permission: 'inventory.edit' } },
+        { path: 'inventory/goods-receiving', name: 'inventory.goods-receiving', component: () => import('../views/inventory/GoodsReceiving.vue'), meta: { permission: 'purchases.edit' } },
+        { path: 'inventory/purchase-returns', name: 'inventory.purchase-returns', component: () => import('../views/inventory/PurchaseReturns.vue'), meta: { permission: 'purchases.edit' } },
+        { path: 'inventory/intelligence', name: 'inventory.intelligence', component: () => import('../views/inventory/InventoryIntelligence.vue'), meta: { permission: 'analytics.view' } },
+        
+        // Finance
+        { path: 'finance/chart-of-accounts', name: 'finance.chart-of-accounts', component: () => import('../views/finance/ChartOfAccounts.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/journal-entries', name: 'finance.journal-entries', component: () => import('../views/finance/JournalEntries.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/vouchers', name: 'finance.vouchers', component: () => import('../views/finance/Vouchers.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/cost-centers', name: 'finance.cost-centers', component: () => import('../views/finance/CostCenters.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/cash-management', name: 'finance.cash-management', component: () => import('../views/finance/CashManagement.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/bank-accounts', name: 'finance.bank-accounts', component: () => import('../views/finance/BankAccounts.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/bank-reconciliation', name: 'finance.bank-reconciliation', component: () => import('../views/finance/BankReconciliation.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/profit-loss', name: 'finance.profit-loss', component: () => import('../views/finance/ProfitLoss.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/balance-sheet', name: 'finance.balance-sheet', component: () => import('../views/finance/BalanceSheet.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/cash-flow', name: 'finance.cash-flow', component: () => import('../views/finance/CashFlow.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/trial-balance', name: 'finance.trial-balance', component: () => import('../views/finance/TrialBalance.vue'), meta: { permission: 'accounts.view' } },
+        { path: 'finance/tax-reports', name: 'finance.tax-reports', component: () => import('../views/finance/TaxReports.vue'), meta: { permission: 'accounts.view' } },
+        
+        // HR
+        { path: 'hr/departments', name: 'hr.departments', component: () => import('../views/hr/Departments.vue'), meta: { permission: 'staff.view' } },
+        { path: 'hr/designations', name: 'hr.designations', component: () => import('../views/hr/Designations.vue'), meta: { permission: 'staff.view' } },
+        { path: 'hr/shifts', name: 'hr.shifts', component: () => import('../views/hr/ShiftManagement.vue'), meta: { permission: 'staff.view' } },
+        { path: 'hr/bonuses', name: 'hr.bonuses', component: () => import('../views/hr/Bonuses.vue'), meta: { permission: 'payrolls.view' } },
+        { path: 'hr/overtime', name: 'hr.overtime', component: () => import('../views/hr/Overtime.vue'), meta: { permission: 'payrolls.view' } },
+        { path: 'hr/loans', name: 'hr.loans', component: () => import('../views/hr/LoansAdvances.vue'), meta: { permission: 'payrolls.view' } },
+        { path: 'hr/analytics', name: 'hr.analytics', component: () => import('../views/hr/HrAnalytics.vue'), meta: { permission: 'analytics.view' } },
+        { path: 'attendance/leave', name: 'attendance.leave', component: () => import('../views/attendances/AttendanceList.vue'), meta: { permission: 'attendances.view' } },
+        
+        // AI & Analytics
+        { path: 'ai/revenue-forecast', name: 'ai.revenue-forecast', component: () => import('../views/ai/RevenueForecasting.vue'), meta: { permission: 'analytics.view' } },
+        { path: 'ai/customer-churn', name: 'ai.customer-churn', component: () => import('../views/ai/CustomerChurn.vue'), meta: { permission: 'analytics.view' } },
+        { path: 'ai/inventory-prediction', name: 'ai.inventory-prediction', component: () => import('../views/ai/InventoryPrediction.vue'), meta: { permission: 'analytics.view' } },
+        { path: 'ai/workshop-analytics', name: 'ai.workshop-analytics', component: () => import('../views/ai/WorkshopAnalytics.vue'), meta: { permission: 'analytics.view' } },
+        { path: 'ai/workflow-automation', name: 'ai.workflow-automation', component: () => import('../views/ai/WorkflowAutomation.vue'), meta: { permission: 'settings.manage' } },
+        { path: 'ai/index', name: 'ai.index', component: () => import('../views/dashboard/AiRecommendationInbox.vue'), meta: { permission: 'ai_operations.view' } },
+        
+        // Reports
+        { path: 'reports/executive', name: 'reports.executive', component: () => import('../views/reports/ExecutiveReports.vue'), meta: { permission: 'analytics.view' } },
+
+        // Settings / Admin
+        { path: 'settings/company', name: 'settings.company', component: () => import('../views/settings/CompanySettings.vue'), meta: { permission: 'settings.manage' } },
+        { path: 'settings/api', name: 'settings.api', component: () => import('../views/settings/ApiSettings.vue'), meta: { permission: 'settings.manage' } },
+        
+        // Notification & Backup
+        { path: 'backup/dashboard', name: 'backup.dashboard', component: () => import('../views/settings/CompanySettings.vue'), meta: { permission: 'settings.manage' } }
       ]
     }
   ]
