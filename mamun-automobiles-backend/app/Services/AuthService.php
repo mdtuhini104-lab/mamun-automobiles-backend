@@ -20,6 +20,30 @@ class AuthService
         $this->userRepository = $userRepository;
     }
 
+    public function register(array $data)
+    {
+        $data['password'] = Hash::make($data['password']);
+        $data['role'] = $data['role'] ?? 'staff';
+        $data['status'] = $data['status'] ?? 'active';
+        $data['is_active'] = ($data['status'] === 'active');
+
+        $user = $this->userRepository->create($data);
+
+        // Assign default Spatie role if applicable
+        try {
+            $user->assignRole($data['role']);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to assign Spatie role during registration', ['email' => $user->email, 'role' => $data['role']]);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return [
+            'user' => $user,
+            'token' => $token,
+        ];
+    }
+
     public function login(array $credentials, string $ip)
     {
         $throttleKey = Str::transliterate(Str::lower($credentials['email']) . '|' . $ip);

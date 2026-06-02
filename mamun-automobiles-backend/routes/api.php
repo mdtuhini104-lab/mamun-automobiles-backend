@@ -101,6 +101,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/portal/analytics/log-event', [App\Http\Controllers\Api\V1\CustomerPortalAnalyticsController::class, 'logEvent']);
 
     // Auth routes (Public)
+    Route::post('/auth/register', [App\Http\Controllers\Api\V1\AuthController::class, 'register'])->middleware('throttle:5,1');
     Route::post('/auth/login', [App\Http\Controllers\Api\V1\AuthController::class, 'login'])->middleware('throttle:5,1');
     Route::post('/auth/forgot-password', [App\Http\Controllers\Api\V1\AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
     Route::post('/auth/reset-password', [App\Http\Controllers\Api\V1\AuthController::class, 'resetPassword'])->middleware('throttle:5,1');

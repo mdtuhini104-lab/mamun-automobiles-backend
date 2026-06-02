@@ -15,6 +15,9 @@ chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache || true
 # Clear any cached Laravel config/routes to ensure environment variables are read dynamically at runtime
 php artisan optimize:clear || true
 
+# Run database migrations automatically in production
+php artisan migrate --force || true
+
 # Run a background diagnostic check after 10 seconds to print active processes and open ports to logs
 (
     sleep 10
